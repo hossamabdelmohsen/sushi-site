@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Routes, Route, Link } from "react-router-dom";
-import logoImg from "./assets/logo.png";
+import logoImg from './assets/Logo.png';
 import starterImg from "./assets/starter.png";
 import familyImg from "./assets/family.png";
 import premiumImg from "./assets/premium.png";
