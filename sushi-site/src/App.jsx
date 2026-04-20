@@ -1,373 +1,456 @@
-import "./App.css";
+import { useMemo, useState } from "react";
+import { Routes, Route, Link } from "react-router-dom";
+import logoImg from "./assets/logo.png";
 import starterImg from "./assets/starter.png";
 import familyImg from "./assets/family.png";
 import premiumImg from "./assets/premium.png";
 import whatsappIcon from "./assets/whatsapp.png";
 
-export default function App() {
-  const products = [
-    {
-      name: "Starter Box",
-      price: "249 EGP",
-      desc: "بداية مثالية لتجربة السوشي في البيت",
-      msg: "السلام عليكم، عايز أطلب Starter Box",
-      image: starterImg,
-    },
-    {
-      name: "Family Box",
-      price: "399 EGP",
-      desc: "مناسب للعيلة أو خروجة مع أصحابك",
-      msg: "السلام عليكم، عايز أطلب Family Box",
-      image: familyImg,
-    },
-    {
-      name: "Premium Box",
-      price: "599 EGP",
-      desc: "أفضل جودة وتجربة كاملة لمحبي السوشي",
-      msg: "السلام عليكم، عايز أطلب Premium Box",
-      image: premiumImg,
-    },
-  ];
+const phone = "201220385694";
 
-  const phone = "201220385694";
+const categories = [
+  { id: 1, name: "Sushi Boxes", icon: "🍣" },
+  { id: 2, name: "Sauces", icon: "🥫" },
+  { id: 3, name: "Noodles", icon: "🍜" },
+  { id: 4, name: "Seafood", icon: "🐟" },
+  { id: 5, name: "Asian Grocery", icon: "🛒" },
+  { id: 6, name: "Kitchen Tools", icon: "🔪" },
+];
 
-  const openWhatsApp = (message) => {
-    const url =
-      "https://wa.me/" + phone + "?text=" + encodeURIComponent(message);
-    window.open(url, "_blank");
+const products = [
+  {
+    id: 1,
+    name: "Starter Box",
+    price: 249,
+    image: starterImg,
+    category: "Sushi Boxes",
+    inStock: true,
+    desc: "Perfect starter sushi box for home.",
+  },
+  {
+    id: 2,
+    name: "Family Box",
+    price: 399,
+    image: familyImg,
+    category: "Sushi Boxes",
+    inStock: true,
+    desc: "Great for sharing with friends and family.",
+  },
+  {
+    id: 3,
+    name: "Premium Box",
+    price: 599,
+    image: premiumImg,
+    category: "Sushi Boxes",
+    inStock: true,
+    desc: "Premium sushi selection for the best experience.",
+  },
+  {
+    id: 4,
+    name: "Soy Sauce Light",
+    price: 129.96,
+    image: starterImg,
+    category: "Sauces",
+    inStock: true,
+    desc: "Light soy sauce for sushi and cooking.",
+  },
+  {
+    id: 5,
+    name: "Teriyaki Sauce",
+    price: 174.42,
+    image: familyImg,
+    category: "Sauces",
+    inStock: true,
+    desc: "Sweet savory teriyaki sauce.",
+  },
+  {
+    id: 6,
+    name: "Nori Sheets",
+    price: 350,
+    image: premiumImg,
+    category: "Asian Grocery",
+    inStock: true,
+    desc: "50 sheets sushi nori.",
+  },
+];
+
+function App() {
+  const [cart, setCart] = useState([]);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const addToCart = (product) => {
+    setCart((prev) => {
+      const found = prev.find((item) => item.id === product.id);
+      if (found) {
+        return prev.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      }
+      return [...prev, { ...product, quantity: 1 }];
+    });
+    setCartOpen(true);
   };
 
-  const whatsappUrl =
-    "https://wa.me/" +
-    phone +
-    "?text=" +
-    encodeURIComponent("السلام عليكم، عايز أطلب من Sushi Box Delta");
+  const increaseQty = (id) => {
+    setCart((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+      )
+    );
+  };
+
+  const decreaseQty = (id) => {
+    setCart((prev) =>
+      prev
+        .map((item) =>
+          item.id === id ? { ...item, quantity: item.quantity - 1 } : item
+        )
+        .filter((item) => item.quantity > 0)
+    );
+  };
+
+  const removeItem = (id) => {
+    setCart((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const cartCount = useMemo(
+    () => cart.reduce((sum, item) => sum + item.quantity, 0),
+    [cart]
+  );
+
+  const cartTotal = useMemo(
+    () => cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    [cart]
+  );
+
+  const filteredProducts = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return products;
+    return products.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q) ||
+        p.desc.toLowerCase().includes(q)
+    );
+  }, [search]);
+
+  const whatsappCartUrl = useMemo(() => {
+    if (cart.length === 0) return "#";
+    const lines = cart.map(
+      (item) => `- ${item.name} x${item.quantity} = ${(item.price * item.quantity).toFixed(2)} EGP`
+    );
+    const message =
+      "Hello, I want to order:\n\n" +
+      lines.join("\n") +
+      `\n\nTotal = ${cartTotal.toFixed(2)} EGP` +
+      "\n\nName:\nAddress:\nPhone:";
+    return "https://wa.me/" + phone + "?text=" + encodeURIComponent(message);
+  }, [cart, cartTotal]);
 
   return (
-  <div
-    style={{
-      width: "100%", //
-      minHeight: "100vh",
-      background: "linear-gradient(180deg, #020617 0%, #08122f 100%)",
-      color: "white",
-      fontFamily: "Arial, sans-serif",
-    }}
-    >
-      <div
-        style={{
-          backgroundColor: "rgba(2, 6, 23, 0.92)",
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
-          position: "sticky",
-          top: 0,
-          zIndex: 100,
-          backdropFilter: "blur(10px)",
-        }}
-      >
-        <div
-          style={{
-            width: "min(1180px, calc(100% - 40px))",
-            margin: "0 auto",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "18px 0",
-          }}
-        >
-          <h2 style={{ margin: 0, fontSize: "30px", fontWeight: "800" }}>
-            Sushi Box Delta 🍣
-          </h2>
+    <div className="site-shell">
+      <Header
+        cartCount={cartCount}
+        onOpenCart={() => setCartOpen(true)}
+        search={search}
+        setSearch={setSearch}
+      />
 
-          <button
-            onClick={() => openWhatsApp("السلام عليكم، عايز أطلب من الموقع")}
-            style={{
-              backgroundColor: "#22c55e",
-              color: "white",
-              border: "none",
-              padding: "12px 22px",
-              borderRadius: "12px",
-              cursor: "pointer",
-              fontWeight: "700",
-              fontSize: "15px",
-              boxShadow: "0 8px 20px rgba(34, 197, 94, 0.25)",
-            }}
-          >
-            اطلب واتساب
-          </button>
-        </div>
-      </div>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <HomePage
+              addToCart={addToCart}
+              filteredProducts={filteredProducts}
+            />
+          }
+        />
+        <Route path="/about" element={<SimplePage title="About Us" />} />
+        <Route path="/contact" element={<SimplePage title="Contact Us" />} />
+        <Route path="/faqs" element={<SimplePage title="FAQs" />} />
+        <Route path="/delivery-return" element={<SimplePage title="Delivery & Return" />} />
+        <Route path="/privacy-policy" element={<SimplePage title="Privacy Policy" />} />
+        <Route path="/terms" element={<SimplePage title="Terms & Conditions" />} />
+        <Route path="/cookies" element={<SimplePage title="Cookies Policy" />} />
+      </Routes>
 
-      <div
-        style={{
-          width: "min(1180px, calc(100% - 40px))",
-          margin: "0 auto",
-        }}
-      >
-        <section
-          style={{
-            textAlign: "center",
-            padding: "90px 0 70px",
-          }}
-        >
-          <div
-            style={{
-              display: "inline-block",
-              padding: "10px 16px",
-              borderRadius: "999px",
-              backgroundColor: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              color: "#cbd5e1",
-              fontSize: "14px",
-              marginBottom: "22px",
-            }}
-          >
-            أفضل تجربة سوشي في البيت
-          </div>
+      <Footer />
 
-          <h1
-            style={{
-              margin: "0 0 16px",
-              fontSize: "clamp(42px, 7vw, 78px)",
-              lineHeight: 1.05,
-              fontWeight: "900",
-            }}
-          >
-            Sushi Box Delta 🍣
-          </h1>
+      {cartOpen && (
+        <>
+          <div className="backdrop" onClick={() => setCartOpen(false)} />
+          <aside className="cart-drawer">
+            <div className="drawer-head">
+              <h3>My Cart</h3>
+              <button onClick={() => setCartOpen(false)}>Close</button>
+            </div>
 
-          <p
-            style={{
-              maxWidth: "760px",
-              margin: "0 auto",
-              color: "#94a3b8",
-              fontSize: "21px",
-              lineHeight: 1.9,
-            }}
-          >
-            اطلب بوكس السوشي المناسب ليك واستمتع بتجربة راقية في البيت،
-            بمكونات مختارة وشكل يفتح النفس.
-          </p>
+            {cart.length === 0 ? (
+              <p className="empty-note">Your cart is empty.</p>
+            ) : (
+              <>
+                {cart.map((item) => (
+                  <div className="cart-item" key={item.id}>
+                    <img src={item.image} alt={item.name} />
+                    <div className="cart-info">
+                      <h4>{item.name}</h4>
+                      <p>{item.price.toFixed(2)} EGP</p>
+                      <div className="qty-row">
+                        <button onClick={() => decreaseQty(item.id)}>-</button>
+                        <span>{item.quantity}</span>
+                        <button onClick={() => increaseQty(item.id)}>+</button>
+                      </div>
+                    </div>
+                    <div className="cart-side">
+                      <strong>{(item.price * item.quantity).toFixed(2)} EGP</strong>
+                      <button className="remove-btn" onClick={() => removeItem(item.id)}>
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              gap: "14px",
-              flexWrap: "wrap",
-              marginTop: "30px",
-            }}
-          >
-            <button
-              onClick={() => openWhatsApp("السلام عليكم، عايز أطلب الآن")}
-              style={{
-                backgroundColor: "#22c55e",
-                color: "white",
-                border: "none",
-                padding: "16px 28px",
-                borderRadius: "14px",
-                cursor: "pointer",
-                fontWeight: "800",
-                fontSize: "16px",
-                boxShadow: "0 10px 24px rgba(34, 197, 94, 0.22)",
-              }}
-            >
-              اطلب الآن
-            </button>
-
-            <button
-              onClick={() => {
-                const el = document.getElementById("products-section");
-                if (el) el.scrollIntoView({ behavior: "smooth" });
-              }}
-              style={{
-                backgroundColor: "transparent",
-                color: "white",
-                border: "1px solid rgba(255,255,255,0.14)",
-                padding: "16px 28px",
-                borderRadius: "14px",
-                cursor: "pointer",
-                fontWeight: "700",
-                fontSize: "16px",
-              }}
-            >
-              شوف المنتجات
-            </button>
-          </div>
-        </section>
-
-        <section id="products-section" style={{ paddingBottom: "80px" }}>
-          <h2
-            style={{
-              textAlign: "center",
-              margin: "0 0 36px",
-              fontSize: "40px",
-              fontWeight: "800",
-            }}
-          >
-            المنتجات
-          </h2>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-              gap: "26px",
-            }}
-          >
-            {products.map((p) => (
-              <div
-                key={p.name}
-                style={{
-                  background: "linear-gradient(180deg, #172554 0%, #1e293b 100%)",
-                  borderRadius: "24px",
-                  padding: "18px",
-                  boxShadow: "0 18px 40px rgba(0,0,0,0.28)",
-                  border: "1px solid rgba(255,255,255,0.06)",
-                  transition: "transform 0.25s ease, box-shadow 0.25s ease",
-                }}
-              >
-                <img
-                  src={p.image}
-                  alt={p.name}
-                  style={{
-                    width: "100%",
-                    height: "220px",
-                    objectFit: "cover",
-                    borderRadius: "18px",
-                    display: "block",
-                    marginBottom: "18px",
-                  }}
-                />
-
-                <h3
-                  style={{
-                    margin: "0 0 10px",
-                    fontSize: "34px",
-                    fontWeight: "800",
-                    textAlign: "center",
-                  }}
-                >
-                  {p.name}
-                </h3>
-
-                <p
-                  style={{
-                    margin: "0 0 10px",
-                    color: "#22c55e",
-                    fontWeight: "800",
-                    fontSize: "31px",
-                    textAlign: "center",
-                  }}
-                >
-                  {p.price}
-                </p>
-
-                <p
-                  style={{
-                    margin: "0 0 18px",
-                    color: "#cbd5e1",
-                    textAlign: "center",
-                    fontSize: "18px",
-                    lineHeight: 1.8,
-                    minHeight: "58px",
-                  }}
-                >
-                  {p.desc}
-                </p>
-
-                <button
-                  onClick={() => openWhatsApp(p.msg)}
-                  style={{
-                    width: "100%",
-                    backgroundColor: "#22c55e",
-                    color: "white",
-                    border: "none",
-                    padding: "14px",
-                    borderRadius: "14px",
-                    cursor: "pointer",
-                    fontWeight: "800",
-                    fontSize: "16px",
-                    boxShadow: "0 8px 20px rgba(34, 197, 94, 0.22)",
-                  }}
-                >
-                  اطلب الآن
-                </button>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section
-          style={{
-            marginBottom: "70px",
-            background: "linear-gradient(135deg, #0f172a, #111827)",
-            border: "1px solid rgba(255,255,255,0.06)",
-            borderRadius: "28px",
-            padding: "38px 24px",
-            textAlign: "center",
-            boxShadow: "0 18px 40px rgba(0,0,0,0.24)",
-          }}
-        >
-          <h2 style={{ marginTop: 0, marginBottom: "14px", fontSize: "36px" }}>
-            جاهز تطلب؟
-          </h2>
-          <p
-            style={{
-              margin: "0 auto 22px",
-              maxWidth: "700px",
-              color: "#94a3b8",
-              fontSize: "18px",
-              lineHeight: 1.9,
-            }}
-          >
-            اطلب الآن من خلال واتساب وخلي تجربة السوشي توصلك بشكل أسهل وأفخم.
-          </p>
-
-          <button
-            onClick={() => openWhatsApp("السلام عليكم، عايز أطلب من Sushi Box Delta")}
-            style={{
-              backgroundColor: "#22c55e",
-              color: "white",
-              border: "none",
-              padding: "15px 28px",
-              borderRadius: "14px",
-              cursor: "pointer",
-              fontWeight: "800",
-              fontSize: "16px",
-            }}
-          >
-            اطلب عبر واتساب
-          </button>
-        </section>
-      </div>
-
-      <footer
-        style={{
-          marginTop: "10px",
-          padding: "28px 20px",
-          textAlign: "center",
-          borderTop: "1px solid rgba(255,255,255,0.06)",
-          color: "#94a3b8",
-          fontSize: "15px",
-          backgroundColor: "rgba(2, 6, 23, 0.6)",
-        }}
-      >
-        © 2026 Sushi Box Delta - جميع الحقوق محفوظة
-      </footer>
-
-      <div className="whatsapp-label">راسلنا الآن</div>
+                <div className="cart-total">
+                  <h3>Total: {cartTotal.toFixed(2)} EGP</h3>
+                  <a href={whatsappCartUrl} target="_blank" rel="noreferrer" className="checkout-btn">
+                    Checkout on WhatsApp
+                  </a>
+                </div>
+              </>
+            )}
+          </aside>
+        </>
+      )}
 
       <a
-        href={whatsappUrl}
+        href={"https://wa.me/" + phone}
         target="_blank"
         rel="noreferrer"
         className="whatsapp-float"
       >
-        <img
-  src={whatsappIcon}
-  alt="WhatsApp"
-  style={{ width: "35px", height: "35px" }}
-/>
+        <img src={whatsappIcon} alt="WhatsApp" />
       </a>
     </div>
   );
 }
+
+function Header({ cartCount, onOpenCart, search, setSearch }) {
+  return (
+    <>
+      <div className="topbar">
+        <div className="container topbar-inner">
+          <span>Download our app</span>
+          <span>Fast Delivery • Premium Asian Grocery</span>
+        </div>
+      </div>
+
+      <header className="main-header">
+        <div className="container header-inner">
+          <Link to="/" className="brand">
+            <img src={logoImg} alt="Sushi Box" />
+            <div>
+              <h1>Sushi Box</h1>
+              <p>Asian Grocery & Sushi Store</p>
+            </div>
+          </Link>
+
+          <div className="search-box">
+            <input
+              type="text"
+              placeholder="Search for products..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+
+          <nav className="header-actions">
+            <button>Login</button>
+            <button>Notifications</button>
+            <button className="cart-btn" onClick={onOpenCart}>
+              My Cart
+              {cartCount > 0 && <span>{cartCount}</span>}
+            </button>
+          </nav>
+        </div>
+      </header>
+    </>
+  );
+}
+
+function HomePage({ addToCart, filteredProducts }) {
+  return (
+    <>
+      <section className="hero">
+        <div className="container hero-grid">
+          <div className="hero-text">
+            <span className="badge">Premium Sushi & Asian Grocery</span>
+            <h2>Everything you need for sushi, noodles, sauces, and more.</h2>
+            <p>
+              Build a premium ordering experience with Sushi Box. Fresh look,
+              clean layout, and fast WhatsApp checkout.
+            </p>
+            <div className="hero-actions">
+              <a href="#products" className="primary-btn">Shop Now</a>
+              <Link to="/about" className="secondary-btn">Learn More</Link>
+            </div>
+          </div>
+
+          <div className="hero-card">
+            <img src={logoImg} alt="Sushi Box Logo" />
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="container">
+          <div className="section-head">
+            <h3>Top Category</h3>
+          </div>
+          <div className="categories-grid">
+            {categories.map((cat) => (
+              <div className="category-card" key={cat.id}>
+                <div className="cat-icon">{cat.icon}</div>
+                <h4>{cat.name}</h4>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section alt-bg">
+        <div className="container">
+          <div className="section-head">
+            <h3>Shop by Categories</h3>
+            <p>Explore our main product groups.</p>
+          </div>
+
+          <div className="category-banners">
+            <div className="mini-banner">
+              <h4>Sushi Essentials</h4>
+              <p>Nori, rice, soy sauce, wasabi and more.</p>
+            </div>
+            <div className="mini-banner">
+              <h4>Asian Sauces</h4>
+              <p>Teriyaki, sriracha, oyster sauce and premium mixes.</p>
+            </div>
+            <div className="mini-banner">
+              <h4>Seafood & Toppings</h4>
+              <p>Salmon, masago, tobiko and premium additions.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section" id="products">
+        <div className="container">
+          <div className="section-head">
+            <h3>All Products</h3>
+            <p>Inspired by premium online grocery stores, customized for Sushi Box.</p>
+          </div>
+
+          <div className="products-grid">
+            {filteredProducts.map((product) => (
+              <div className="product-card" key={product.id}>
+                <div className="product-image-wrap">
+                  <img src={product.image} alt={product.name} />
+                  <span className={product.inStock ? "stock in" : "stock out"}>
+                    {product.inStock ? "In Stock" : "Out of Stock"}
+                  </span>
+                </div>
+
+                <div className="product-body">
+                  <span className="product-category">{product.category}</span>
+                  <h4>{product.name}</h4>
+                  <p>{product.desc}</p>
+
+                  <div className="product-footer">
+                    <strong>{product.price.toFixed(2)} EGP</strong>
+                    <button onClick={() => addToCart(product)}>Add to Cart</button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section alt-bg">
+        <div className="container app-banner">
+          <div>
+            <h3>Sushi Box App</h3>
+            <p>
+              Order faster, browse products easily, and get updates directly.
+            </p>
+          </div>
+          <div className="app-actions">
+            <button>App Store</button>
+            <button>Google Play</button>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+function SimplePage({ title }) {
+  return (
+    <section className="section">
+      <div className="container simple-page">
+        <h2>{title}</h2>
+        <p>Content for {title} will be added in the next step.</p>
+      </div>
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="footer">
+      <div className="container footer-grid">
+        <div>
+          <h4>About Us</h4>
+          <p>
+            Sushi Box is your premium destination for sushi essentials and Asian grocery products.
+          </p>
+        </div>
+
+        <div>
+          <h4>Quick Links</h4>
+          <ul>
+            <li><Link to="/">Home</Link></li>
+            <li><Link to="/about">About Us</Link></li>
+            <li><Link to="/contact">Contact Us</Link></li>
+            <li><Link to="/faqs">FAQs</Link></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4>Customer Service</h4>
+          <ul>
+            <li><Link to="/delivery-return">Delivery & Return</Link></li>
+            <li><Link to="/privacy-policy">Privacy Policy</Link></li>
+            <li><Link to="/terms">Terms & Conditions</Link></li>
+            <li><Link to="/cookies">Cookies Policy</Link></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4>Contact</h4>
+          <p>WhatsApp: 01220385694</p>
+          <p>Email: info@sushibox.com</p>
+          <p>Cairo, Egypt</p>
+        </div>
+      </div>
+
+      <div className="footer-bottom">
+        © 2026 Sushi Box. All rights reserved.
+      </div>
+    </footer>
+  );
+}
+
+export default App;
