@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, useParams } from "react-router-dom";
 import logoImg from './assets/Logo.png';
 import starterImg from "./assets/starter.png";
 import familyImg from "./assets/family.png";
@@ -23,54 +23,66 @@ const products = [
     name: "Starter Box",
     price: 249,
     image: starterImg,
+    images: [starterImg, familyImg, premiumImg],
     category: "Sushi Boxes",
     inStock: true,
     desc: "Perfect starter sushi box for home.",
+    details: "A starter sushi selection made for beginners and casual sushi lovers. Great for small meals and easy home serving.",
   },
   {
     id: 2,
     name: "Family Box",
     price: 399,
     image: familyImg,
+    images: [familyImg, starterImg, premiumImg],
     category: "Sushi Boxes",
     inStock: true,
     desc: "Great for sharing with friends and family.",
+    details: "A larger sushi box prepared for sharing occasions, family gatherings, and light parties.",
   },
   {
     id: 3,
     name: "Premium Box",
     price: 599,
     image: premiumImg,
+    images: [premiumImg, starterImg, familyImg],
     category: "Sushi Boxes",
     inStock: true,
     desc: "Premium sushi selection for the best experience.",
+    details: "Our premium sushi box with a richer variety and a more elevated experience for sushi lovers.",
   },
   {
     id: 4,
     name: "Soy Sauce Light",
     price: 129.96,
     image: starterImg,
+    images: [starterImg],
     category: "Sauces",
     inStock: true,
     desc: "Light soy sauce for sushi and cooking.",
+    details: "Perfect for sushi dipping, marinades, and daily Asian cooking.",
   },
   {
     id: 5,
     name: "Teriyaki Sauce",
     price: 174.42,
     image: familyImg,
+    images: [familyImg],
     category: "Sauces",
     inStock: true,
     desc: "Sweet savory teriyaki sauce.",
+    details: "A balanced sweet and savory sauce for glazing, dipping, and stir-fry dishes.",
   },
   {
     id: 6,
     name: "Nori Sheets",
     price: 350,
     image: premiumImg,
+    images: [premiumImg, starterImg],
     category: "Asian Grocery",
     inStock: true,
     desc: "50 sheets sushi nori.",
+    details: "Roasted nori sheets used for sushi rolls, rice wraps, and many Japanese recipes.",
   },
 ];
 
@@ -160,23 +172,27 @@ function App() {
       />
 
       <Routes>
-        <Route
-          path="/"
-          element={
-            <HomePage
-              addToCart={addToCart}
-              filteredProducts={filteredProducts}
-            />
-          }
-        />
-        <Route path="/about" element={<SimplePage title="About Us" />} />
-        <Route path="/contact" element={<SimplePage title="Contact Us" />} />
-        <Route path="/faqs" element={<SimplePage title="FAQs" />} />
-        <Route path="/delivery-return" element={<SimplePage title="Delivery & Return" />} />
-        <Route path="/privacy-policy" element={<SimplePage title="Privacy Policy" />} />
-        <Route path="/terms" element={<SimplePage title="Terms & Conditions" />} />
-        <Route path="/cookies" element={<SimplePage title="Cookies Policy" />} />
-      </Routes>
+  <Route
+    path="/"
+    element={
+      <HomePage
+        addToCart={addToCart}
+        filteredProducts={filteredProducts}
+      />
+    }
+  />
+  <Route
+    path="/product/:id"
+    element={<ProductDetails addToCart={addToCart} />}
+  />
+  <Route path="/about" element={<SimplePage title="About Us" />} />
+  <Route path="/contact" element={<SimplePage title="Contact Us" />} />
+  <Route path="/faqs" element={<SimplePage title="FAQs" />} />
+  <Route path="/delivery-return" element={<SimplePage title="Delivery & Return" />} />
+  <Route path="/privacy-policy" element={<SimplePage title="Privacy Policy" />} />
+  <Route path="/terms" element={<SimplePage title="Terms & Conditions" />} />
+  <Route path="/cookies" element={<SimplePage title="Cookies Policy" />} />
+</Routes>
 
       <Footer />
 
@@ -355,24 +371,38 @@ function HomePage({ addToCart, filteredProducts }) {
           <div className="products-grid">
             {filteredProducts.map((product) => (
               <div className="product-card" key={product.id}>
-                <div className="product-image-wrap">
-                  <img src={product.image} alt={product.name} />
-                  <span className={product.inStock ? "stock in" : "stock out"}>
-                    {product.inStock ? "In Stock" : "Out of Stock"}
-                  </span>
-                </div>
+  <div className="product-image-wrap">
+    <Link to={`/product/${product.id}`}>
+      <img src={product.image} alt={product.name} />
+    </Link>
 
-                <div className="product-body">
-                  <span className="product-category">{product.category}</span>
-                  <h4>{product.name}</h4>
-                  <p>{product.desc}</p>
+    <span className={product.inStock ? "stock in" : "stock out"}>
+      {product.inStock ? "In Stock" : "Out of Stock"}
+    </span>
+  </div>
 
-                  <div className="product-footer">
-                    <strong>{product.price.toFixed(2)} EGP</strong>
-                    <button onClick={() => addToCart(product)}>Add to Cart</button>
-                  </div>
-                </div>
-              </div>
+  <div className="product-body">
+    <span className="product-category">{product.category}</span>
+
+    <h4>
+      <Link to={`/product/${product.id}`}>{product.name}</Link>
+    </h4>
+
+    <p>{product.desc}</p>
+
+    <div className="product-footer">
+      <strong>{product.price.toFixed(2)} EGP</strong>
+
+      <div className="product-actions">
+        <Link to={`/product/${product.id}`} className="details-btn">
+          View Details
+        </Link>
+
+        <button onClick={() => addToCart(product)}>Add to Cart</button>
+      </div>
+    </div>
+  </div>
+</div>
             ))}
           </div>
         </div>
@@ -406,7 +436,84 @@ function SimplePage({ title }) {
     </section>
   );
 }
+function ProductDetails({ addToCart }) {
+  const { id } = useParams();
+  const product = products.find((item) => item.id === Number(id));
+  const [selectedImage, setSelectedImage] = useState(product?.image || "");
 
+  if (!product) {
+    return (
+      <section className="section">
+        <div className="container simple-page">
+          <h2>Product not found</h2>
+          <p>The product you are looking for does not exist.</p>
+          <Link to="/" className="primary-btn">Back to Home</Link>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="section">
+      <div className="container">
+        <div className="product-details-page">
+          <div className="product-details-gallery">
+            <div className="product-thumbs">
+              {(product.images || [product.image]).map((img, index) => (
+                <button
+                  key={index}
+                  className={`thumb-btn ${selectedImage === img ? "active" : ""}`}
+                  onClick={() => setSelectedImage(img)}
+                >
+                  <img src={img} alt={`${product.name} ${index + 1}`} />
+                </button>
+              ))}
+            </div>
+
+            <div className="product-main-image">
+              <img src={selectedImage} alt={product.name} />
+            </div>
+          </div>
+
+          <div className="product-details-info">
+            <span className="product-category">{product.category}</span>
+            <h2>{product.name}</h2>
+            <div className="details-stock-row">
+              <span className={product.inStock ? "stock in" : "stock out"}>
+                {product.inStock ? "In Stock" : "Out of Stock"}
+              </span>
+            </div>
+
+            <h3 className="details-price">{product.price.toFixed(2)} EGP</h3>
+
+            <div className="details-box">
+              <h4>What is this product?</h4>
+              <p>{product.desc}</p>
+            </div>
+
+            <div className="details-box">
+              <h4>About this item</h4>
+              <p>{product.details}</p>
+            </div>
+
+            <div className="details-box">
+              <h4>Available images</h4>
+              <p>
+                This product has {(product.images || [product.image]).length} image
+                {(product.images || [product.image]).length > 1 ? "s" : ""}.
+              </p>
+            </div>
+
+            <div className="details-actions">
+              <button onClick={() => addToCart(product)}>Add to Cart</button>
+              <Link to="/" className="secondary-btn">Back to Products</Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 function Footer() {
   return (
     <footer className="footer">
