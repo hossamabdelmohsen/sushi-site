@@ -8,7 +8,6 @@ import premiumImg from "./assets/premium.png";
 import whatsappIcon from "./assets/whatsapp.png";
 import { signInWithGoogle } from "./firebase/config";
 import { db } from "./firebase/config";
-import { doc, updateDoc } from "firebase/firestore";
 import {
   collection,
   addDoc,
@@ -431,6 +430,7 @@ const addToCart = (product) => {
     <ProductDetails
   addToCart={addToCart}
   productsData={productsData}
+  setProductsData={setProductsData}
   user={user}
   handleLogin={handleLogin}
   addReview={addReview}
@@ -735,6 +735,7 @@ function SimplePage({ title }) {
 function ProductDetails({
   addToCart,
   productsData,
+  setProductsData,
   user,
   handleLogin,
   addReview,
@@ -744,47 +745,48 @@ function ProductDetails({
   deleteReviewById,
 }) {
   const { id } = useParams();
-  const product = productsData.find((item) => item.id === Number(id));
-  const [selectedImage, setSelectedImage] = useState("");
-  const [reviewText, setReviewText] = useState("");
-  const [reviewRating, setReviewRating] = useState(5);
+const product = productsData.find((item) => item.id === Number(id));
+const [selectedImage, setSelectedImage] = useState("");
+const [reviewText, setReviewText] = useState("");
+const [reviewRating, setReviewRating] = useState(5);
 
-  useEffect(() => {
-  if (existingUserReview) {
-    setReviewText(existingUserReview.comment || "");
-    setReviewRating(existingUserReview.rating || 5);
-  } else {
-    setReviewText("");
-    setReviewRating(5);
-  }
-}, [existingUserReview]);
+if (!product) {
+  return <div style={{ color: "white", padding: "40px" }}>Loading product...</div>;
+}
+
+useEffect(() => {
+  if (!product) return;
+
+  const q = query(
+    collection(db, "reviews"),
+    where("productId", "==", String(product.id))
+  );
 
   const unsubscribe = onSnapshot(q, (snapshot) => {
-  const reviews = snapshot.docs.map((docItem) => ({
-    id: docItem.id,
-    ...docItem.data(),
-  }));
+    const reviews = snapshot.docs.map((docItem) => ({
+      id: docItem.id,
+      ...docItem.data(),
+    }));
 
-  setFirestoreReviews(reviews);
+    setFirestoreReviews(reviews);
 
-  const reviewsCount = reviews.length;
+    const reviewsCount = reviews.length;
+    const avgRating =
+      reviewsCount > 0
+        ? reviews.reduce((sum, item) => sum + Number(item.rating || 0), 0) / reviewsCount
+        : 0;
 
-  const avgRating =
-    reviewsCount > 0
-      ? reviews.reduce((sum, item) => sum + Number(item.rating || 0), 0) / reviewsCount
-      : 0;
-
-  setProductsData((prev) =>
-    prev.map((p) =>
-      String(p.id) === String(product.id)
-        ? { ...p, rating: avgRating, reviews: reviewsCount }
-        : p
-    )
-  );
-});
+    setProductsData((prev) =>
+      prev.map((p) =>
+        String(p.id) === String(product.id)
+          ? { ...p, rating: avgRating, reviews: reviewsCount }
+          : p
+      )
+    );
+  });
 
   return () => unsubscribe();
-}, [product?.id]);
+}, [product?.id, setFirestoreReviews, setProductsData]);
 
   const relatedProducts = productsData
     .filter((item) => item.category === product.category && item.id !== product.id)
@@ -972,7 +974,11 @@ const avgRating =
   <div className="review-item" key={index}>
     <div className="review-item-head">
       <strong>{review.userName}</strong>
-      <span>{review.createdAt}</span>
+      <span>
+  {review.createdAt?.seconds
+    ? new Date(review.createdAt.seconds * 1000).toLocaleString()
+    : review.createdAt || ""}
+</span>
     </div>
 
     <div className="review-stars">
