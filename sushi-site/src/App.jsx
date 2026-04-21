@@ -8,6 +8,7 @@ import premiumImg from "./assets/premium.png";
 import whatsappIcon from "./assets/whatsapp.png";
 import { signInWithGoogle } from "./firebase/config";
 import { db } from "./firebase/config";
+import { doc, updateDoc } from "firebase/firestore";
 import {
   collection,
   addDoc,
@@ -214,7 +215,6 @@ const addReview = async (productId, rating, comment) => {
     comment: comment || "",
     updatedAt: new Date().toLocaleString(),
   });
-  alert("review updated");
 } else {
   await addDoc(collection(db, "reviews"), {
     userId: user.uid,
@@ -225,10 +225,9 @@ const addReview = async (productId, rating, comment) => {
     comment: comment || "",
     createdAt: new Date().toLocaleString(),
   });
-  alert("review saved");
 }
 
-  const reviews = await loadReviews(productId);
+await loadReviews(productId);
 alert("loadReviews done");
 };
 const loadReviews = async (productId) => {
@@ -664,6 +663,14 @@ function HomePage({ addToCart, filteredProducts }) {
               <Link to={`/product/${product.id}`}>{product.name}</Link>
             </h4>
 
+            <div className="product-rating">
+  <span>
+  {"★".repeat(Math.round(product.rating || 0))}
+  {"☆".repeat(5 - Math.round(product.rating || 0))}
+</span>
+  <span> ({product.reviews || 0} Reviews)</span>
+</div>
+
             <p>{product.desc}</p>
 
             <p className="stock-note">
@@ -743,21 +750,38 @@ function ProductDetails({
   const [reviewRating, setReviewRating] = useState(5);
 
   useEffect(() => {
-  if (!product) return;
-
-  const q = query(
-    collection(db, "reviews"),
-    where("productId", "==", String(product.id))
-  );
+  if (existingUserReview) {
+    setReviewText(existingUserReview.comment || "");
+    setReviewRating(existingUserReview.rating || 5);
+  } else {
+    setReviewText("");
+    setReviewRating(5);
+  }
+}, [existingUserReview]);
 
   const unsubscribe = onSnapshot(q, (snapshot) => {
-    const reviews = snapshot.docs.map((docItem) => ({
-      id: docItem.id,
-      ...docItem.data(),
-    }));
+  const reviews = snapshot.docs.map((docItem) => ({
+    id: docItem.id,
+    ...docItem.data(),
+  }));
 
-    setFirestoreReviews(reviews);
-  });
+  setFirestoreReviews(reviews);
+
+  const reviewsCount = reviews.length;
+
+  const avgRating =
+    reviewsCount > 0
+      ? reviews.reduce((sum, item) => sum + Number(item.rating || 0), 0) / reviewsCount
+      : 0;
+
+  setProductsData((prev) =>
+    prev.map((p) =>
+      String(p.id) === String(product.id)
+        ? { ...p, rating: avgRating, reviews: reviewsCount }
+        : p
+    )
+  );
+});
 
   return () => unsubscribe();
 }, [product?.id]);
@@ -769,6 +793,9 @@ function ProductDetails({
   const productReviews = (firestoreReviews || []).filter(
   (review) => String(review?.productId ?? "") === String(product?.id ?? "")
 );
+const existingUserReview = user
+  ? productReviews.find((review) => review.userId === user.uid)
+  : null;
 const reviewsCount = productReviews.length;
 
 const avgRating =
@@ -784,9 +811,22 @@ const avgRating =
     return;
   }
 
+  if (userAlreadyReviewed) {
+    alert("You already reviewed this product");
+    return;
+  }
+
   if (!reviewRating) return;
 
+  if (existingUserReview) {
+  await updateDoc(doc(db, "reviews", existingUserReview.id), {
+    rating: Number(reviewRating),
+    comment: reviewText || "",
+    updatedAt: new Date().toLocaleString(),
+  });
+} else {
   await addReview(product.id, Number(reviewRating), reviewText);
+}
 
   setReviewText("");
   setReviewRating(5);
@@ -917,29 +957,45 @@ const avgRating =
         />
       </div>
 
-      <button type="submit" className="review-submit-btn">
-        Submit Review
-      </button>
+      <button
+  type="submit"
+  className="review-submit-btn"
+>
+  {existingUserReview ? "Update Review" : "Submit Review"}
+</button>
     </form>
   )}
 
   {productReviews.length > 0 && (
     <div className="reviews-list">
       {productReviews.map((review, index) => (
-        <div className="review-item" key={index}>
-          <div className="review-item-head">
-            <strong>{review.userName}</strong>
-            <span>{review.createdAt}</span>
-          </div>
+  <div className="review-item" key={index}>
+    <div className="review-item-head">
+      <strong>{review.userName}</strong>
+      <span>{review.createdAt}</span>
+    </div>
 
-          <div className="review-stars">
-            {"★".repeat(review.rating)}
-            {"☆".repeat(5 - review.rating)}
-          </div>
+    <div className="review-stars">
+      {"★".repeat(review.rating)}
+      {"☆".repeat(5 - review.rating)}
+    </div>
 
-          {review.comment && <p>{review.comment}</p>}
-        </div>
-      ))}
+    {review.comment && <p>{review.comment}</p>}
+
+    {user && review.userId === user.uid && (
+      <button
+        onClick={async () => {
+          await deleteReviewById(review.id, product.id);
+          setReviewText("");
+          setReviewRating(5);
+        }}
+        className="review-delete-btn"
+      >
+        Delete Review
+      </button>
+    )}
+  </div>
+))}
     </div>
   )}
 </div>

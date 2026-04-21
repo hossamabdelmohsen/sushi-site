@@ -1155,3 +1155,11 @@ a {
   color: #cbd5e1;
   line-height: 1.7;
 }
+.product-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0;
+  font-size: 14px;
+  color: #ffd54f;
+}
