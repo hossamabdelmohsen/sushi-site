@@ -592,8 +592,8 @@ function HomePage({ addToCart, filteredProducts }) {
           </div>
 
           <div className="hero-card">
-            <img src={premiumImg} alt="Premium Sushi Box" />
-          </div>
+  <img src={logoImg} alt="Sushi Box Logo" />
+</div>
         </div>
       </section>
 
