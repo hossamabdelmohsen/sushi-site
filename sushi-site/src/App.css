@@ -24,8 +24,9 @@ a {
 .site-shell {
   min-height: 100vh;
   background:
-    radial-gradient(circle at top right, rgba(34, 197, 94, 0.08), transparent 25%),
-    linear-gradient(180deg, #071124 0%, #0b1630 100%);
+    radial-gradient(circle at top right, rgba(34, 197, 94, 0.12), transparent 30%),
+    radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.08), transparent 30%),
+    linear-gradient(180deg, #050d1f 0%, #0a1430 100%);
 }
 
 .container {
@@ -195,21 +196,22 @@ a {
 }
 
 .hero-card {
-  background: linear-gradient(180deg, #15264f 0%, #101a33 100%);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 28px;
-  padding: 28px;
+  background: linear-gradient(180deg, #1a2a5a 0%, #0f1a35 100%);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 32px;
+  padding: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 360px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.28);
+  min-height: 420px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.45);
 }
 
 .hero-card img {
   width: 100%;
-  max-width: 320px;
+  max-width: 420px;
   object-fit: contain;
+  filter: drop-shadow(0 24px 40px rgba(0, 0, 0, 0.35));
 }
 
 .section {
@@ -289,11 +291,12 @@ a {
 }
 
 .product-card {
-  background: linear-gradient(180deg, #15264f 0%, #1e293b 100%);
-  border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 24px;
+  background: linear-gradient(180deg, #182a58 0%, #121c36 100%);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 28px;
   overflow: hidden;
-  box-shadow: 0 16px 36px rgba(0,0,0,0.25);
+  box-shadow: 0 20px 44px rgba(0,0,0,0.32);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .product-image-wrap {
@@ -303,8 +306,13 @@ a {
 .product-image-wrap img {
   width: 100%;
   height: 240px;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
+  padding: 16px;
+  transition: transform 0.3s ease;
+}
+.product-card:hover .product-image-wrap img {
+  transform: scale(1.05);
 }
 
 .stock {
@@ -328,7 +336,7 @@ a {
 }
 
 .product-body {
-  padding: 18px;
+  padding: 22px;
 }
 
 .product-category {
@@ -339,8 +347,17 @@ a {
 }
 
 .product-body h4 {
-  margin: 0 0 10px;
-  font-size: 26px;
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.product-body h4 a {
+  transition: color 0.2s ease;
+}
+
+.product-body h4 a:hover {
+  color: #22c55e;
 }
 
 .product-body p {
@@ -359,18 +376,28 @@ a {
 
 .product-footer strong {
   color: #22c55e;
-  font-size: 22px;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
 }
 
 .product-footer button,
 .app-actions button {
-  background: #22c55e;
+  background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
   color: white;
   border: none;
-  padding: 12px 16px;
-  border-radius: 12px;
+  padding: 12px 18px;
+  border-radius: 14px;
   cursor: pointer;
   font-weight: 700;
+  box-shadow: 0 10px 24px rgba(34, 197, 94, 0.28);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+.product-footer button:hover,
+.app-actions button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 30px rgba(34, 197, 94, 0.35);
+  filter: brightness(1.03);
 }
 
 .app-banner {
@@ -1162,4 +1189,40 @@ a {
   margin: 8px 0;
   font-size: 14px;
   color: #ffd54f;
+}
+.hero-card img {
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+.product-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 28px 60px rgba(0,0,0,0.42);
+  border-color: rgba(34, 197, 94, 0.28);
+}
+.product-card {
+  cursor: pointer;
+}
+
+.product-card:hover .product-body h4 a {
+  color: #22c55e;
+}
+
+.product-card:hover .product-footer strong {
+  transform: scale(1.05);
+}
+
+.product-footer strong {
+  display: inline-block;
+  transition: transform 0.2s ease;
 }
