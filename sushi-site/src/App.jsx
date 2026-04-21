@@ -1,4 +1,3 @@
-onSnapshot
 import { useEffect, useMemo, useState } from "react";
 import { Routes, Route, Link, useParams } from "react-router-dom";
 import logoImg from './assets/Logo.png';
@@ -7,6 +6,7 @@ import familyImg from "./assets/family.png";
 import premiumImg from "./assets/premium.png";
 import whatsappIcon from "./assets/whatsapp.png";
 import { signInWithGoogle } from "./firebase/config";
+import SimplePage from "./SimplePage";
 import { db } from "./firebase/config";
 import {
   collection,
@@ -423,6 +423,7 @@ const addToCart = (product) => {
             />
           }
         />
+        
 
         <Route
   path="/product/:id"
@@ -722,16 +723,6 @@ function HomePage({ addToCart, filteredProducts }) {
   );
 }
 
-function SimplePage({ title }) {
-  return (
-    <section className="section">
-      <div className="container simple-page">
-        <h2>{title}</h2>
-        <p>Content for {title} will be added in the next step.</p>
-      </div>
-    </section>
-  );
-}
 function ProductDetails({
   addToCart,
   productsData,
@@ -746,9 +737,14 @@ function ProductDetails({
 }) {
   const { id } = useParams();
 const product = productsData.find((item) => item.id === Number(id));
+
 const [selectedImage, setSelectedImage] = useState("");
 const [reviewText, setReviewText] = useState("");
 const [reviewRating, setReviewRating] = useState(5);
+
+useEffect(() => {
+  setSelectedImage(product?.images?.[0] || product?.image || "");
+}, [product]);
 
 if (!product) {
   return <div style={{ color: "white", padding: "40px" }}>Loading product...</div>;
@@ -813,7 +809,7 @@ const avgRating =
     return;
   }
 
-  if (userAlreadyReviewed) {
+  if (existingUserReview) {
     alert("You already reviewed this product");
     return;
   }
