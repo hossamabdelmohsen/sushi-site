@@ -1,3 +1,4 @@
+onSnapshot
 import { useEffect, useMemo, useState } from "react";
 import { Routes, Route, Link, useParams } from "react-router-dom";
 import logoImg from './assets/Logo.png';
@@ -16,6 +17,7 @@ import {
   deleteDoc,
   doc,
   updateDoc,
+  onSnapshot,
 } from "firebase/firestore";
 const phone = "201220385694";
 
@@ -243,6 +245,20 @@ const loadReviews = async (productId) => {
     }));
 
     setFirestoreReviews(reviews);
+    const reviewsCount = reviews.length;
+
+const avgRating =
+  reviewsCount > 0
+    ? reviews.reduce((sum, item) => sum + Number(item.rating || 0), 0) / reviewsCount
+    : 0;
+
+setProductsData((prev) =>
+  prev.map((p) =>
+    String(p.id) === String(productId)
+      ? { ...p, rating: avgRating, reviews: reviewsCount }
+      : p
+  )
+);
 return reviews;
   } catch (error) {
     console.log(error);
@@ -414,15 +430,16 @@ const addToCart = (product) => {
   path="/product/:id"
   element={
     <ProductDetails
-      addToCart={addToCart}
-      productsData={productsData}
-      user={user}
-      handleLogin={handleLogin}
-      addReview={addReview}
-      firestoreReviews={firestoreReviews}
-      loadReviews={loadReviews}
-      deleteReviewById={deleteReviewById}
-    />
+  addToCart={addToCart}
+  productsData={productsData}
+  user={user}
+  handleLogin={handleLogin}
+  addReview={addReview}
+  firestoreReviews={firestoreReviews}
+  setFirestoreReviews={setFirestoreReviews}
+  loadReviews={loadReviews}
+  deleteReviewById={deleteReviewById}
+/>
   }
 />
 
@@ -715,6 +732,7 @@ function ProductDetails({
   handleLogin,
   addReview,
   firestoreReviews,
+  setFirestoreReviews,
   loadReviews,
   deleteReviewById,
 }) {
@@ -725,22 +743,24 @@ function ProductDetails({
   const [reviewRating, setReviewRating] = useState(5);
 
   useEffect(() => {
-  if (product) {
-    setSelectedImage(product.image);
-  }
-}, [product]);
+  if (!product) return;
 
-  if (!product) {
-    return (
-      <section className="section">
-        <div className="container simple-page">
-          <h2>Product not found</h2>
-          <p>This product does not exist.</p>
-          <Link to="/" className="primary-btn">Back to Home</Link>
-        </div>
-      </section>
-    );
-  }
+  const q = query(
+    collection(db, "reviews"),
+    where("productId", "==", String(product.id))
+  );
+
+  const unsubscribe = onSnapshot(q, (snapshot) => {
+    const reviews = snapshot.docs.map((docItem) => ({
+      id: docItem.id,
+      ...docItem.data(),
+    }));
+
+    setFirestoreReviews(reviews);
+  });
+
+  return () => unsubscribe();
+}, [product?.id]);
 
   const relatedProducts = productsData
     .filter((item) => item.category === product.category && item.id !== product.id)
@@ -749,6 +769,12 @@ function ProductDetails({
   const productReviews = (firestoreReviews || []).filter(
   (review) => String(review?.productId ?? "") === String(product?.id ?? "")
 );
+const reviewsCount = productReviews.length;
+
+const avgRating =
+  reviewsCount > 0
+    ? productReviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) / reviewsCount
+    : 0;
 
   const handleSubmitReview = async (e) => {
   e.preventDefault();
@@ -797,7 +823,7 @@ function ProductDetails({
 
             <div className="product-rating-row">
               <span className="stars">★</span>
-              <span>{(product.rating ?? 0).toFixed(1)} ({product.reviews ?? 0} Reviews)</span>
+              <span>{avgRating.toFixed(1)} ({reviewsCount} Reviews)</span>
             </div>
 
             <h2 className="product-big-price">{product.price.toFixed(2)} EGP</h2>
