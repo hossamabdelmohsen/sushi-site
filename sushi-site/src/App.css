@@ -1263,10 +1263,7 @@ gap: 18px;
 .product-card:hover::after {
   opacity: 1;
 }
-  transform: translateY(-8px);
-  box-shadow: 0 28px 60px rgba(0,0,0,0.42);
-  border-color: rgba(34, 197, 94, 0.28);
-}
+
 .product-card {
   cursor: pointer;
 }
