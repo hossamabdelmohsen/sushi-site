@@ -8,6 +8,7 @@ import whatsappIcon from "./assets/whatsapp.png";
 import { signInWithGoogle } from "./firebase/config";
 import SimplePage from "./SimplePage";
 import { db } from "./firebase/config";
+import toast, { Toaster } from "react-hot-toast";
 import {
   collection,
   addDoc,
@@ -146,7 +147,40 @@ reviews: 0,
 reviews: 0,
   },
 ];
+function Header({ cartCount, onOpenCart, search, setSearch, user, handleLogin }) {
+  return (
+    <header className="topbar">
+      <div className="container">
+        <div className="topbar-inner">
+          <Link to="/" className="brand">
+            <img src={logoImg} alt="Sushi Box Logo" style={{ height: "48px" }} />
+          </Link>
 
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="search-input"
+          />
+
+          <nav className="header-actions">
+            {user ? (
+              <span>Welcome, {user.displayName}</span>
+            ) : (
+              <button onClick={handleLogin}>Sign in</button>
+            )}
+
+            <button className="cart-btn" onClick={onOpenCart}>
+              My Cart
+              {cartCount > 0 && <span>{cartCount}</span>}
+            </button>
+          </nav>
+        </div>
+      </div>
+    </header>
+  );
+}
 function App() {
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
@@ -178,57 +212,24 @@ const addReview = async (productId, rating, comment) => {
     productId: String(productId),
     rating: Number(rating),
     comment: comment || "",
-    createdAt: new Date().toLocaleString(),
   };
 
-  setReviewsByProduct((prev) => {
-    const currentReviews = prev[productId] || [];
-    const filteredReviews = currentReviews.filter(
-      (r) => r.userId !== user.uid
-    );
-    const updatedReviews = [reviewData, ...filteredReviews];
-
-    const totalRatings = updatedReviews.reduce(
-      (sum, item) => sum + Number(item.rating || 0),
-      0
-    );
-    const avgRating = totalRatings / updatedReviews.length;
-
-    setProductsData((prevProducts) =>
-      prevProducts.map((product) =>
-        product.id === productId
-          ? { ...product, rating: avgRating }
-          : product
-      )
-    );
-
-    return {
-      ...prev,
-      [productId]: updatedReviews,
-    };
-  });
-
   if (existing) {
-  await updateDoc(doc(db, "reviews", existing.id), {
-    rating: Number(rating),
-    comment: comment || "",
-    updatedAt: new Date().toLocaleString(),
-  });
-} else {
-  await addDoc(collection(db, "reviews"), {
-    userId: user.uid,
-    userName: user.displayName || "User",
-    userEmail: user.email || "",
-    productId: String(productId),
-    rating: Number(rating),
-    comment: comment || "",
-    createdAt: new Date().toLocaleString(),
-  });
-}
+    await updateDoc(doc(db, "reviews", existing.id), {
+      rating: Number(rating),
+      comment: comment || "",
+      updatedAt: new Date().toLocaleString(),
+    });
+  } else {
+    await addDoc(collection(db, "reviews"), {
+      ...reviewData,
+      createdAt: new Date().toLocaleString(),
+    });
+  }
 
-await loadReviews(productId);
-alert("loadReviews done");
+  await loadReviews(productId);
 };
+
 const loadReviews = async (productId) => {
   try {
     const q = query(
@@ -271,101 +272,79 @@ const deleteReviewById = async (reviewId, productId) => {
   }
 };
 const addToCart = (product) => {
-    if (product.stockCount === 0) return;
+  if (product.stockCount === 0) return;
 
-    setProductsData((prevProducts) =>
-      prevProducts.map((p) =>
-        p.id === product.id
-          ? {
-              ...p,
-              stockCount: p.stockCount - 1,
-              inStock: p.stockCount - 1 > 0,
-            }
-          : p
-      )
-    );
+  setProductsData((prevProducts) =>
+    prevProducts.map((p) =>
+      p.id === product.id
+        ? {
+            ...p,
+            stockCount: p.stockCount - 1,
+            inStock: p.stockCount - 1 > 0,
+          }
+        : p
+    )
+  );
 
-    setCart((prev) => {
-      const found = prev.find((item) => item.id === product.id);
-      if (found) {
-        return prev.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-      return [...prev, { ...product, quantity: 1 }];
-    });
+  setCart((prev) => {
+    const found = prev.find((item) => item.id === product.id);
+    if (found) {
+      return prev.map((item) =>
+        item.id === product.id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      );
+    }
+    return [...prev, { ...product, quantity: 1 }];
+  });
 
-    setCartOpen(true);
-  };
+  toast.success("Added to cart");
+};
 
   const increaseQty = (id) => {
-    const product = productsData.find((p) => p.id === id);
-    if (!product || product.stockCount === 0) return;
+  const product = productsData.find((p) => p.id === id);
+  if (!product || product.stockCount === 0) return;
 
-    setProductsData((prevProducts) =>
-      prevProducts.map((p) =>
-        p.id === id
-          ? {
-              ...p,
-              stockCount: p.stockCount - 1,
-              inStock: p.stockCount - 1 > 0,
-            }
-          : p
-      )
-    );
+  setProductsData((prevProducts) =>
+    prevProducts.map((p) =>
+      p.id === id
+        ? {
+            ...p,
+            stockCount: p.stockCount - 1,
+            inStock: p.stockCount - 1 > 0,
+          }
+        : p
+    )
+  );
 
-    setCart((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-      )
-    );
-  };
-
-  const decreaseQty = (id) => {
-    const cartItem = cart.find((item) => item.id === id);
-    if (!cartItem) return;
-
-    setProductsData((prevProducts) =>
-      prevProducts.map((p) =>
-        p.id === id
-          ? {
-              ...p,
-              stockCount: p.stockCount + 1,
-              inStock: true,
-            }
-          : p
-      )
-    );
-
-    setCart((prev) =>
-      prev
-        .map((item) =>
-          item.id === id ? { ...item, quantity: item.quantity - 1 } : item
-        )
-        .filter((item) => item.quantity > 0)
-    );
-  };
+  setCart((prev) =>
+    prev.map((item) =>
+      item.id === id
+        ? { ...item, quantity: item.quantity + 1 }
+        : item
+    )
+  );
+};
 
   const removeItem = (id) => {
-    const cartItem = cart.find((item) => item.id === id);
-    if (!cartItem) return;
+  const cartItem = cart.find((item) => item.id === id);
+  if (!cartItem) return;
 
-    setProductsData((prevProducts) =>
-      prevProducts.map((p) =>
-        p.id === id
-          ? {
-              ...p,
-              stockCount: p.stockCount + cartItem.quantity,
-              inStock: true,
-            }
-          : p
-      )
-    );
+  setProductsData((prevProducts) => {
+    return prevProducts.map((p) => {
+      if (p.id === id) {
+        return {
+          ...p,
+          stockCount: p.stockCount + cartItem.quantity,
+          inStock: true,
+        };
+      }
+      return p;
+    });
+  });
 
-    setCart((prev) => prev.filter((item) => item.id !== id));
-  };
+  setCart((prev) => prev.filter((item) => item.id !== id));
+};
 
   const cartCount = useMemo(
     () => cart.reduce((sum, item) => sum + item.quantity, 0),
@@ -455,122 +434,64 @@ const addToCart = (product) => {
       <Footer />
 
       {cartOpen && (
-        <>
-          <div className="backdrop" onClick={() => setCartOpen(false)} />
+  <>
+    <div className="backdrop" onClick={() => setCartOpen(false)} />
 
-          <aside className="cart-drawer">
-            <div className="drawer-head">
-              <h3>My Cart</h3>
-              <button onClick={() => setCartOpen(false)}>Close</button>
-            </div>
-
-            {cart.length === 0 ? (
-              <p className="empty-note">Your cart is empty.</p>
-            ) : (
-              <>
-                {cart.map((item) => (
-                  <div className="cart-item" key={item.id}>
-                    <img src={item.image} alt={item.name} />
-
-                    <div className="cart-info">
-                      <h4>{item.name}</h4>
-                      <p>{item.price.toFixed(2)} EGP</p>
-
-                      <div className="qty-row">
-                        <button onClick={() => decreaseQty(item.id)}>-</button>
-                        <span>{item.quantity}</span>
-                        <button onClick={() => increaseQty(item.id)}>+</button>
-                      </div>
-                    </div>
-
-                    <div className="cart-side">
-                      <strong>{(item.price * item.quantity).toFixed(2)} EGP</strong>
-                      <button
-                        className="remove-btn"
-                        onClick={() => removeItem(item.id)}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                ))}
-
-                <div className="cart-total">
-                  <h3>Total: {cartTotal.toFixed(2)} EGP</h3>
-                  <a
-                    href={whatsappCartUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="checkout-btn"
-                  >
-                    Checkout on WhatsApp
-                  </a>
-                </div>
-              </>
-            )}
-          </aside>
-        </>
-      )}
-
-      <a
-        href={"https://wa.me/" + phone}
-        target="_blank"
-        rel="noreferrer"
-        className="whatsapp-float"
-      >
-        <img src={whatsappIcon} alt="WhatsApp" />
-      </a>
-    </div>
-  );
-}
-
-function Header({ cartCount, onOpenCart, search, setSearch, user, handleLogin }) {
-  return (
-    <>
-      <div className="topbar">
-        <div className="container topbar-inner">
-          <span>Download our app</span>
-          <span>Fast Delivery • Premium Asian Grocery</span>
-        </div>
+    <aside className="cart-drawer">
+      <div className="drawer-head">
+        <h3>My Cart</h3>
+        <button onClick={() => setCartOpen(false)}>Close</button>
       </div>
 
-      <header className="main-header">
-        <div className="container header-inner">
-          <Link to="/" className="brand">
-            <img src={logoImg} alt="Sushi Box" />
-            <div>
-              <h1>Sushi Box</h1>
-              <p>Asian Grocery & Sushi Store</p>
+      {cart.length === 0 ? (
+        <p className="empty-note">Your cart is empty.</p>
+      ) : (
+        <>
+          {cart.map((item) => (
+            <div className="cart-item" key={item.id}>
+              <img src={item.image} alt={item.name} />
+
+              <div className="cart-info">
+                <h4>{item.name}</h4>
+                <p>{item.price.toFixed(2)} EGP</p>
+
+                <div className="qty-row">
+                  <button onClick={() => decreaseQty(item.id)}>-</button>
+                  <span>{item.quantity}</span>
+                  <button onClick={() => increaseQty(item.id)}>+</button>
+                </div>
+              </div>
+
+              <div className="cart-side">
+                <strong>{(item.price * item.quantity).toFixed(2)} EGP</strong>
+                <button
+                  className="remove-btn"
+                  onClick={() => removeItem(item.id)}
+                >
+                  Remove
+                </button>
+              </div>
             </div>
-          </Link>
+          ))}
 
-          <div className="search-box">
-            <input
-              type="text"
-              placeholder="Search for products..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+                    <div className="cart-total">
+            <h3>Total: {cartTotal.toFixed(2)} EGP</h3>
+            <a
+              href={whatsappCartUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="checkout-btn"
+            >
+              Checkout on WhatsApp
+            </a>
           </div>
-
-          <nav className="header-actions">
-            {user ? (
-              <span>Welcome, {user.displayName}</span>
-            ) : (
-              <button onClick={handleLogin}>Sign in</button>
-            )}
-
-            <button>Notifications</button>
-
-            <button className="cart-btn" onClick={onOpenCart}>
-              My Cart
-              {cartCount > 0 && <span>{cartCount}</span>}
-            </button>
-          </nav>
-        </div>
-      </header>
-    </>
-  );
+        </>
+      )}
+        </aside>
+  </>
+)}
+  </div>
+);
 }
 
 function HomePage({ addToCart, filteredProducts }) {
@@ -665,11 +586,17 @@ function HomePage({ addToCart, filteredProducts }) {
             </h4>
 
             <div className="product-rating">
-  <span>
-  {"★".repeat(Math.round(product.rating || 0))}
-  {"☆".repeat(5 - Math.round(product.rating || 0))}
-</span>
-  <span> ({product.reviews || 0} Reviews)</span>
+  {product.reviews > 0 ? (
+    <>
+      <span>
+        {"★".repeat(Math.round(product.rating || 0))}
+        {"☆".repeat(5 - Math.round(product.rating || 0))}
+      </span>
+      <span>({product.reviews} Reviews)</span>
+    </>
+  ) : (
+    <span className="product-new-badge">New Product</span>
+  )}
 </div>
 
             <p>{product.desc}</p>
@@ -735,7 +662,7 @@ function ProductDetails({
   loadReviews,
   deleteReviewById,
 }) {
-  const { id } = useParams();
+const { id } = useParams();
 const product = productsData.find((item) => item.id === Number(id));
 
 const [selectedImage, setSelectedImage] = useState("");
@@ -745,10 +672,6 @@ const [reviewRating, setReviewRating] = useState(5);
 useEffect(() => {
   setSelectedImage(product?.images?.[0] || product?.image || "");
 }, [product]);
-
-if (!product) {
-  return <div style={{ color: "white", padding: "40px" }}>Loading product...</div>;
-}
 
 useEffect(() => {
   if (!product) return;
@@ -782,7 +705,11 @@ useEffect(() => {
   });
 
   return () => unsubscribe();
-}, [product?.id, setFirestoreReviews, setProductsData]);
+}, [product, setFirestoreReviews, setProductsData]);
+
+if (!product) {
+  return <div style={{ color: "white", padding: "40px" }}>Loading product...</div>;
+}
 
   const relatedProducts = productsData
     .filter((item) => item.category === product.category && item.id !== product.id)
@@ -809,22 +736,17 @@ const avgRating =
     return;
   }
 
-  if (existingUserReview) {
-    alert("You already reviewed this product");
-    return;
-  }
-
   if (!reviewRating) return;
 
   if (existingUserReview) {
-  await updateDoc(doc(db, "reviews", existingUserReview.id), {
-    rating: Number(reviewRating),
-    comment: reviewText || "",
-    updatedAt: new Date().toLocaleString(),
-  });
-} else {
-  await addReview(product.id, Number(reviewRating), reviewText);
-}
+    await updateDoc(doc(db, "reviews", existingUserReview.id), {
+      rating: Number(reviewRating),
+      comment: reviewText || "",
+      updatedAt: new Date().toLocaleString(),
+    });
+  } else {
+    await addReview(product.id, Number(reviewRating), reviewText);
+  }
 
   setReviewText("");
   setReviewRating(5);
@@ -1028,13 +950,13 @@ const avgRating =
 
                     <p>{item.desc}</p>
 
-                    <p className="stock-note">
-                      {item.stockCount > 0
-                        ? item.stockCount <= 5
-                          ? `Only ${item.stockCount} left`
-                          : `${item.stockCount} available`
-                        : "Out of Stock"}
-                    </p>
+                    <p className={`stock-note ${item.stockCount <= 5 ? "low-stock" : "normal-stock"}`}>
+  {item.stockCount > 0
+    ? item.stockCount <= 5
+      ? `Only ${item.stockCount} left`
+      : `Available: ${item.stockCount}`
+    : "Out of Stock"}
+</p>
 
                     <div className="product-footer">
                       <strong>{item.price.toFixed(2)} EGP</strong>
@@ -1105,7 +1027,7 @@ function Footer() {
         © 2026 Sushi Box. All rights reserved.
       </div>
     </footer>
-  );
+    );
 }
 
 export default App;
