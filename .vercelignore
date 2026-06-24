@@ -1,0 +1,15 @@
+node_modules
+.next
+.cache
+.vscode
+.env.example
+.env.local
+.gitignore
+*.err
+*.log
+*.out
+.chrome-profile-verify
+.vercel
+cart-wishlist-manual-test-checklist.md
+firebase.json
+firestore.rules

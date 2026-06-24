@@ -1,0 +1,82 @@
+import { buildProductUrl, formatPrice, getExactProductById } from "./product-catalog.js?v=20260602c";
+
+let offers = [];
+let refreshTimer = null;
+const listeners = new Set();
+
+function cairoDay(value = new Date()) {
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return "";
+  const parts = new Intl.DateTimeFormat("en", { timeZone: "Africa/Cairo", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(date);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function offerDay(value) {
+  const source = String(value || "").trim();
+  return /^\d{4}-\d{2}-\d{2}/.test(source) ? source.slice(0, 10) : cairoDay(source);
+}
+
+export function isOfferActive(offer, now = new Date()) {
+  const startDay = offerDay(offer?.startDate);
+  const endDay = offerDay(offer?.endDate);
+  const currentDay = cairoDay(now);
+  const value = Number(offer?.discountValue);
+  return Boolean(offer?.enabled === true && startDay && endDay && currentDay >= startDay && currentDay <= endDay && value > 0 && (offer.discountType === "fixed" || (offer.discountType === "percentage" && value <= 100)));
+}
+
+export function getActiveOffers() { return offers.filter((offer) => isOfferActive(offer)); }
+export function getActiveOfferForProduct(productId) { return getActiveOffers().find((offer) => offer.slug === productId) || null; }
+
+export function getProductOfferPricing(product) {
+  const originalPrice = Math.max(0, Number(product?.price) || 0);
+  const offer = getActiveOfferForProduct(product?.id);
+  if (!offer || originalPrice <= 0) return { originalPrice, finalPrice: originalPrice, savings: 0, offer: null };
+  const rawSavings = offer.discountType === "percentage" ? originalPrice * (Number(offer.discountValue) / 100) : Number(offer.discountValue);
+  const savings = Math.min(Math.max(0, rawSavings), Math.max(0, originalPrice - 0.01));
+  return { originalPrice, finalPrice: Math.round((originalPrice - savings) * 100) / 100, savings: Math.round(savings * 100) / 100, offer };
+}
+
+export function getCartOfferSubtotal(cart = []) {
+  return (Array.isArray(cart) ? cart : []).reduce((sum, item) => {
+    const product = getExactProductById(item?.id);
+    const pricing = getProductOfferPricing(product || { id: item?.id, price: item?.price });
+    return sum + (pricing.finalPrice * Math.max(1, Number(item?.quantity) || 1));
+  }, 0);
+}
+
+export function getOfferDisplayData(offer) {
+  const product = getExactProductById(offer?.slug);
+  const pricing = getProductOfferPricing(product);
+  const originalPrice = pricing.originalPrice;
+  const discountedPrice = pricing.offer ? pricing.finalPrice : originalPrice;
+  return { id: offer?.slug || "", productId: product?.id || "", product, title: product?.name || "Limited Offer", marketingTitle: String(offer?.title || "").trim(), category: product?.category || "Special Offer", image: product?.images?.[0] || "images/optimized/Logo.webp", originalPrice, discountedPrice, originalPriceText: formatPrice(originalPrice), discountedPriceText: formatPrice(discountedPrice), discountLabel: offer?.badgeText || (offer?.discountType === "percentage" ? `${Number(offer.discountValue)}% off` : `${formatPrice(offer?.discountValue)} off`), productUrl: product ? buildProductUrl(product.id) : "menu.html" };
+}
+
+export function getActiveOfferDisplayData() { return getActiveOffers().map(getOfferDisplayData).filter((offer) => offer.product && offer.discountedPrice >= 0 && offer.discountedPrice < offer.originalPrice); }
+
+function notify() { listeners.forEach((listener) => listener(getActiveOffers())); window.dispatchEvent(new CustomEvent("sushi-box:offers-ready")); }
+
+export async function refreshProductOffers(onError) {
+  try {
+    const response = await fetch("/api/public-actions?action=getActiveProductOffers", { cache: "no-store" });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(body.error || "Product offers could not be loaded.");
+    offers = Array.isArray(body.offers) ? body.offers : [];
+    notify();
+  } catch (error) {
+    console.error("Product offers could not be loaded.", error);
+    if (typeof onError === "function") onError(error);
+  }
+}
+
+export function subscribeToProductOffers(listener, onError) {
+  if (typeof listener === "function") listeners.add(listener);
+  if (!refreshTimer) {
+    refreshProductOffers(onError);
+    refreshTimer = window.setInterval(() => refreshProductOffers(onError), 60 * 1000);
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshProductOffers(onError); });
+  }
+  if (typeof listener === "function") listener(getActiveOffers());
+  return () => listeners.delete(listener);
+}

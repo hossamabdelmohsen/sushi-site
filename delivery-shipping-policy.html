@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" style="background-color: var(--bg-color, #ffffff);">
+
+<head>
+<script>
+  (function () {
+    var root = document.documentElement;
+    var theme = "light";
+    try {
+      theme = localStorage.getItem("theme") || localStorage.getItem("sushiBoxTheme") || "light";
+      if (theme !== "dark" && theme !== "light") {
+        theme = "light";
+      }
+      localStorage.setItem("theme", theme);
+      localStorage.setItem("sushiBoxTheme", theme);
+    } catch (error) {
+      theme = "light";
+    }
+    root.setAttribute("data-theme", theme);
+    root.style.backgroundColor = theme === "dark" ? "#121212" : "#ffffff";
+  }());
+</script>
+  
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="keywords" content="" />
+  <meta name="description" content="Review the Sushi Box delivery and shipping policy for supported cities and delivery days." />
+  <meta name="author" content="" />
+  <link rel="shortcut icon" href="images/favicon.png" type="">
+
+  <title>Delivery & Shipping Policy - Sushi Box</title>
+<link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+  <link href="css/font-awesome.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap" rel="stylesheet">
+  <link href="css/style.css?v=20260603b" rel="stylesheet" />
+  <link href="css/responsive.css?v=20260603e" rel="stylesheet" />
+<!-- Microsoft Clarity Analytics -->
+<script type="text/javascript">
+(function(c,l,a,r,i,t,y){
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+})(window, document, "clarity", "script", "x0oul3igxk");
+</script>
+</head>
+
+<body class="sub_page policy-page">
+  <div class="hero_area">
+    <div class="bg-box">
+      <picture>
+        <source media="(max-width: 768px)" type="image/webp" srcset="images/hero-bg.webp">
+        <source type="image/webp" srcset="images/optimized/hero-bg-768.webp 768w, images/optimized/hero-bg-1280.webp 1280w, images/optimized/hero-bg-1920.webp 1920w" sizes="100vw">
+        <img src="images/hero-bg.jpg" alt="" width="5647" height="3239" loading="lazy" decoding="async">
+      </picture>
+    </div>
+    <header class="header_section">
+      <div class="container">
+        <nav class="navbar navbar-expand-lg custom_nav-container">
+          <a class="navbar-brand" href="index.html"><picture class="brand_logo_picture"><source type="image/webp" srcset="images/optimized/Logo-160.webp 160w, images/optimized/Logo-320.webp 320w, images/optimized/Logo-640.webp 640w" sizes="64px"><img src="images/Logo.png" alt="Sushi Box logo" width="599" height="593" loading="lazy" decoding="async"></picture><span>Sushi Box</span></a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span></span></button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mx-auto">
+              <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+              <li class="nav-item"><a class="nav-link" href="menu.html">Products</a></li>
+              <li class="nav-item"><a class="nav-link" href="book.html">How to Order</a></li>
+              <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+            </ul>
+            <div class="user_option"><a class="cart_link" href="cart.html" aria-label="Cart"><i class="fa fa-shopping-cart" aria-hidden="true"></i></a></div>
+          </div>
+        </nav>
+      </div>
+    </header>
+  </div>
+
+  <main class="policy_page_main">
+    <section class="policy_hero_section">
+      <div class="container">
+        <div class="policy_hero_card">
+          <span class="policy_kicker"><i class="fa fa-truck" aria-hidden="true"></i> Delivery Policy</span>
+          <h1>Delivery &amp; Shipping Policy</h1>
+          <p>We deliver Sushi Box products on fixed weekly delivery days to help protect product quality, freshness, and frozen condition.</p>
+          <span class="policy_meta">Effective date: May 24, 2026</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="policy_content_section">
+      <div class="container">
+        <div class="policy_content_card">
+          <div class="policy_section">
+            <h2>Delivery Areas</h2>
+            <p>Sushi Box currently delivers to Kafr El Sheikh, Mansoura, Tanta, and El Mahalla.</p>
+          </div>
+          <div class="policy_section">
+            <h2>Weekly Delivery Schedule</h2>
+            <p>For all current cities, delivery days are Wednesday, Thursday, and Friday every week.</p>
+            <ul>
+              <li>Kafr El Sheikh: Wednesday, Thursday, Friday</li>
+              <li>Mansoura: Wednesday, Thursday, Friday</li>
+              <li>Tanta: Wednesday, Thursday, Friday</li>
+              <li>El Mahalla: Wednesday, Thursday, Friday</li>
+            </ul>
+          </div>
+          <div class="policy_section">
+            <h2>Delivery Coordination</h2>
+            <p>After checkout, Sushi Box may contact you using the phone number provided to confirm details, delivery timing, address information, and product availability.</p>
+          </div>
+          <div class="policy_section">
+            <h2>Frozen and Food Product Handling</h2>
+            <p>Please be ready to receive your order during the agreed delivery window. Frozen and food products should be stored properly as soon as they are received.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer_section">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 footer-col">
+        <div class="footer_contact">
+          <h4>Contact Us</h4>
+          <div class="contact_link_box">
+            <a href="https://maps.google.com/?q=Egypt%20El%20Gharbia%20El%20Mahalla%20El%20Kubra" target="_blank" rel="noopener noreferrer">
+              <i class="fa fa-map-marker" aria-hidden="true"></i>
+              <span>Egypt - El Gharbia - El Mahalla El Kubra</span>
+            </a>
+            <a href="tel:+201503460361">
+              <i class="fa fa-phone" aria-hidden="true"></i>
+              <span>Call +201503460361</span>
+            </a>
+            <a href="https://wa.me/201503460361" target="_blank" rel="noopener noreferrer">
+              <i class="fa fa-whatsapp" aria-hidden="true"></i>
+              <span>WhatsApp</span>
+            </a>
+            <a href="mailto:info@sushiboxshop.com">
+              <i class="fa fa-envelope" aria-hidden="true"></i>
+              <span>info@sushiboxshop.com</span>
+            </a>
+          </div>
+        </div>
+          <nav class="footer_policy_links footer_policy_links_contact" aria-label="Company links">
+            <a href="about.html">About Us</a>
+            <a href="privacy-policy.html">Privacy Policy</a>
+          </nav>
+      </div>
+      <div class="col-md-4 footer-col">
+        <div class="footer_detail">
+          <a href="index.html" class="footer-logo">Sushi Box</a>
+          <p>Sushi Box is your trusted source for premium Asian ingredients, sushi essentials, frozen products, sauces, noodles, baozi, dumplings, and reliable supply across the Delta region.</p>
+          <div class="footer_social">
+            <a href="https://www.facebook.com/profile.php?id=61589534703634" target="_blank" rel="noopener noreferrer"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+            <a href="https://x.com/SushiBo0oX" target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+            <a href="https://www.instagram.com/sushibo0ox/" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram" aria-hidden="true"></i></a>
+            <a href="https://wa.me/201503460361" target="_blank" rel="noopener noreferrer"><i class="fa fa-whatsapp" aria-hidden="true"></i></a><a class="footer_messenger_link" href="https://m.me/61589534703634" target="_blank" rel="noopener noreferrer" aria-label="Messenger"><svg class="footer_messenger_icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.2c-5.05 0-9 3.7-9 8.44 0 2.7 1.28 5.1 3.28 6.65v2.92l2.99-1.64c.85.24 1.77.37 2.73.37 5.05 0 9-3.7 9-8.44S17.05 3.2 12 3.2Zm.86 11.08-2.28-2.43-4.43 2.43 4.86-5.16 2.34 2.43 4.37-2.43-4.86 5.16Z"/></svg></a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 footer-col">
+        <h4>Delivery Schedule</h4>
+        <div class="delivery-list simple-footer-list">
+          <div class="footer-info-item delivery-item">
+            <span class="footer-icon delivery-icon"><i class="fa fa-map-marker" aria-hidden="true"></i></span>
+            <div class="delivery-text">
+              <strong>Kafr El Sheikh</strong>
+              <span>Wednesday, Thursday, Friday</span>
+            </div>
+          </div>
+          <div class="footer-info-item delivery-item">
+            <span class="footer-icon delivery-icon"><i class="fa fa-truck" aria-hidden="true"></i></span>
+            <div class="delivery-text">
+              <strong>Mansoura</strong>
+              <span>Wednesday, Thursday, Friday</span>
+            </div>
+          </div>
+          <div class="footer-info-item delivery-item">
+            <span class="footer-icon delivery-icon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+            <div class="delivery-text">
+              <strong>Tanta</strong>
+              <span>Wednesday, Thursday, Friday</span>
+            </div>
+          </div>
+          <div class="footer-info-item delivery-item">
+            <span class="footer-icon delivery-icon"><i class="fa fa-map-marker" aria-hidden="true"></i></span>
+            <div class="delivery-text">
+              <strong>El Mahalla</strong>
+              <span>Wednesday, Thursday, Friday</span>
+            </div>
+          </div>
+        </div>
+        <nav class="footer_policy_links footer_policy_links_delivery" aria-label="Policy links">
+          <a href="delivery-shipping-policy.html">Delivery &amp; Shipping Policy</a>
+          <a href="refund-cancellation-policy.html">Refund &amp; Cancellation Policy</a>
+        </nav>
+      </div>
+    </div>
+    <div class="footer-info">
+      <p>&copy; <span id="displayYear"></span> Sushi Box. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+  <script defer src="js/jquery-3.4.1.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+  <script defer src="js/bootstrap.js"></script>
+  <script defer src="js/custom.js?v=20260603a"></script>
+  <script type="module" src="js/navbar-offers.js?v=20260518c" defer></script>
+  <script type="module" src="js/app-shell.js?v=20260619a" defer></script>
+</body>
+
+</html>

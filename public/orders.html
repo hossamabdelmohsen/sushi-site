@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" style="background-color: var(--bg-color, #ffffff);">
+
+<head>
+<script>
+  (function () {
+    var root = document.documentElement;
+    var theme = "light";
+    try {
+      theme = localStorage.getItem("theme") || localStorage.getItem("sushiBoxTheme") || "light";
+      if (theme !== "dark" && theme !== "light") {
+        theme = "light";
+      }
+      localStorage.setItem("theme", theme);
+      localStorage.setItem("sushiBoxTheme", theme);
+    } catch (error) {
+      theme = "light";
+    }
+    root.setAttribute("data-theme", theme);
+    root.style.backgroundColor = theme === "dark" ? "#121212" : "#ffffff";
+  }());
+</script>
+
+  
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="keywords" content="" />
+  <meta name="description" content="Track your Sushi Box orders and payment status." />
+  <meta name="author" content="" />
+  <link rel="shortcut icon" href="images/favicon.png" type="">
+
+  <title>My Orders - Sushi Box</title>
+<link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+  <link href="css/font-awesome.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap" rel="stylesheet">
+  <link href="css/style.css?v=20260603b" rel="stylesheet" />
+  <link href="css/responsive.css?v=20260603e" rel="stylesheet" />
+<!-- Microsoft Clarity Analytics -->
+<script type="text/javascript">
+(function(c,l,a,r,i,t,y){
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+})(window, document, "clarity", "script", "x0oul3igxk");
+</script>
+</head>
+
+<body class="sub_page orders-page">
+
+  <div class="hero_area">
+    <div class="bg-box">
+      <picture>
+        <source media="(max-width: 768px)" type="image/webp" srcset="images/hero-bg.webp">
+        <source type="image/webp" srcset="images/optimized/hero-bg-768.webp 768w, images/optimized/hero-bg-1280.webp 1280w, images/optimized/hero-bg-1920.webp 1920w" sizes="100vw">
+        <img src="images/hero-bg.jpg" alt="" width="5647" height="3239" loading="lazy" decoding="async">
+      </picture>
+    </div>
+    <header class="header_section">
+      <div class="container">
+        <nav class="navbar navbar-expand-lg custom_nav-container ">
+          <a class="navbar-brand" href="index.html">
+            <picture class="brand_logo_picture">
+              <source type="image/webp" srcset="images/optimized/Logo-160.webp 160w, images/optimized/Logo-320.webp 320w, images/optimized/Logo-640.webp 640w" sizes="64px">
+              <img src="images/Logo.png" alt="Sushi Box logo" width="599" height="593" loading="lazy" decoding="async">
+            </picture>
+            <span>Sushi Box</span>
+          </a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class=""> </span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mx-auto">
+              <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+              <li class="nav-item"><a class="nav-link" href="menu.html">Products</a></li>
+              <li class="nav-item"><a class="nav-link" href="book.html">How to Order</a></li>
+              <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+              <li class="nav-item"><a class="nav-link wishlist_nav_link" href="wishlist.html">My Favorites <span class="wishlist_count_badge" hidden>0</span></a></li>
+              <li class="nav-item active"><a class="nav-link orders_nav_link" href="orders.html">My Orders <span class="sr-only">(current)</span></a></li>
+            </ul>
+            <div class="user_option">
+              <a href="" class="user_link"><i class="fa fa-user" aria-hidden="true"></i></a>
+              <a class="cart_link" href="cart.html">
+                <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 456.029 456.029">
+                  <g><g><path d="M345.6,338.862c-29.184,0-53.248,23.552-53.248,53.248c0,29.184,23.552,53.248,53.248,53.248 c29.184,0,53.248-23.552,53.248-53.248C398.336,362.926,374.784,338.862,345.6,338.862z" /></g></g>
+                  <g><g><path d="M439.296,84.91c-1.024,0-2.56-0.512-4.096-0.512H112.64l-5.12-34.304C104.448,27.566,84.992,10.67,61.952,10.67H20.48 C9.216,10.67,0,19.886,0,31.15c0,11.264,9.216,20.48,20.48,20.48h41.472c2.56,0,4.608,2.048,5.12,4.608l31.744,216.064 c4.096,27.136,27.648,47.616,55.296,47.616h212.992c26.624,0,49.664-18.944,55.296-45.056l33.28-166.4 C457.728,97.71,450.56,86.958,439.296,84.91z" /></g></g>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </header>
+  </div>
+
+  <main class="orders_page_main">
+    <section class="orders_page_section">
+      <div class="container">
+        <div class="orders_page_header">
+          <span>Order history</span>
+          <h1>My Orders</h1>
+          <p id="ordersScopeText">Loading your current order scope.</p>
+        </div>
+
+        <!-- This page only reads customer-visible order mirrors. Payment writes stay server-side. -->
+        <div class="orders_page_shell">
+          <div id="ordersLoadingState" class="orders_state">
+            <span class="orders_state_icon"><i class="fa fa-spinner" aria-hidden="true"></i></span>
+            <h2>Loading orders</h2>
+            <p>Please wait while we find your Sushi Box orders.</p>
+          </div>
+
+          <div id="ordersErrorState" class="orders_state orders_state_error" role="alert" hidden></div>
+
+          <div id="ordersEmptyState" class="orders_state" hidden>
+            <span class="orders_state_icon"><i class="fa fa-shopping-basket" aria-hidden="true"></i></span>
+            <h2>No orders yet</h2>
+            <p>Your paid and pending orders will appear here after checkout.</p>
+            <a class="orders_primary_link" href="menu.html">Shop Products</a>
+          </div>
+
+          <div id="ordersList" class="orders_list" hidden></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer_section">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 footer-col">
+        <div class="footer_contact">
+          <h4>Contact Us</h4>
+          <div class="contact_link_box">
+            <a href="https://maps.google.com/?q=Egypt%20El%20Gharbia%20El%20Mahalla%20El%20Kubra" target="_blank" rel="noopener noreferrer">
+              <i class="fa fa-map-marker" aria-hidden="true"></i>
+              <span>Egypt - El Gharbia - El Mahalla El Kubra</span>
+            </a>
+            <a href="tel:+201503460361">
+              <i class="fa fa-phone" aria-hidden="true"></i>
+              <span>Call +201503460361</span>
+            </a>
+            <a href="https://wa.me/201503460361" target="_blank" rel="noopener noreferrer">
+              <i class="fa fa-whatsapp" aria-hidden="true"></i>
+              <span>WhatsApp</span>
+            </a>
+            <a href="mailto:info@sushiboxshop.com">
+              <i class="fa fa-envelope" aria-hidden="true"></i>
+              <span>info@sushiboxshop.com</span>
+            </a>
+          </div>
+        </div>
+          <nav class="footer_policy_links footer_policy_links_contact" aria-label="Company links">
+            <a href="about.html">About Us</a>
+            <a href="privacy-policy.html">Privacy Policy</a>
+          </nav>
+      </div>
+      <div class="col-md-4 footer-col">
+        <div class="footer_detail">
+          <a href="index.html" class="footer-logo">Sushi Box</a>
+          <p>Sushi Box is your trusted source for premium Asian ingredients, sushi essentials, frozen products, sauces, noodles, baozi, dumplings, and reliable supply across the Delta region.</p>
+          <div class="footer_social">
+            <a href="https://www.facebook.com/profile.php?id=61589534703634" target="_blank" rel="noopener noreferrer"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+            <a href="https://x.com/SushiBo0oX" target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+            <a href="https://www.instagram.com/sushibo0ox/" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram" aria-hidden="true"></i></a>
+            <a href="https://wa.me/201503460361" target="_blank" rel="noopener noreferrer"><i class="fa fa-whatsapp" aria-hidden="true"></i></a><a class="footer_messenger_link" href="https://m.me/61589534703634" target="_blank" rel="noopener noreferrer" aria-label="Messenger"><svg class="footer_messenger_icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.2c-5.05 0-9 3.7-9 8.44 0 2.7 1.28 5.1 3.28 6.65v2.92l2.99-1.64c.85.24 1.77.37 2.73.37 5.05 0 9-3.7 9-8.44S17.05 3.2 12 3.2Zm.86 11.08-2.28-2.43-4.43 2.43 4.86-5.16 2.34 2.43 4.37-2.43-4.86 5.16Z"/></svg></a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 footer-col">
+        <h4>Delivery Schedule</h4>
+        <div class="delivery-list simple-footer-list">
+          <div class="footer-info-item delivery-item">
+            <span class="footer-icon delivery-icon"><i class="fa fa-map-marker" aria-hidden="true"></i></span>
+            <div class="delivery-text">
+              <strong>Kafr El Sheikh</strong>
+              <span>Wednesday, Thursday, Friday</span>
+            </div>
+          </div>
+          <div class="footer-info-item delivery-item">
+            <span class="footer-icon delivery-icon"><i class="fa fa-truck" aria-hidden="true"></i></span>
+            <div class="delivery-text">
+              <strong>Mansoura</strong>
+              <span>Wednesday, Thursday, Friday</span>
+            </div>
+          </div>
+          <div class="footer-info-item delivery-item">
+            <span class="footer-icon delivery-icon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+            <div class="delivery-text">
+              <strong>Tanta</strong>
+              <span>Wednesday, Thursday, Friday</span>
+            </div>
+          </div>
+          <div class="footer-info-item delivery-item">
+            <span class="footer-icon delivery-icon"><i class="fa fa-map-marker" aria-hidden="true"></i></span>
+            <div class="delivery-text">
+              <strong>El Mahalla</strong>
+              <span>Wednesday, Thursday, Friday</span>
+            </div>
+          </div>
+        </div>
+        <nav class="footer_policy_links footer_policy_links_delivery" aria-label="Policy links">
+          <a href="delivery-shipping-policy.html">Delivery &amp; Shipping Policy</a>
+          <a href="refund-cancellation-policy.html">Refund &amp; Cancellation Policy</a>
+        </nav>
+      </div>
+    </div>
+    <div class="footer-info">
+      <p>&copy; <span id="displayYear"></span> Sushi Box. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+  <script defer src="js/jquery-3.4.1.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+  <script defer src="js/bootstrap.js"></script>
+  <script defer src="js/custom.js?v=20260603a"></script>
+  <script type="module" src="js/navbar-offers.js?v=20260518c" defer></script>
+  <script type="module" src="js/app-shell.js?v=20260619a" defer></script>
+  <script type="module" src="js/orders-page.js?v=20260520c" defer></script>
+</body>
+
+</html>

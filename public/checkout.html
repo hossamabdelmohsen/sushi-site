@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en" style="background-color: var(--bg-color, #ffffff);">
+
+<head>
+<script>
+  (function () {
+    var root = document.documentElement;
+    var theme = "light";
+    try {
+      theme = localStorage.getItem("theme") || localStorage.getItem("sushiBoxTheme") || "light";
+      if (theme !== "dark" && theme !== "light") {
+        theme = "light";
+      }
+      localStorage.setItem("theme", theme);
+      localStorage.setItem("sushiBoxTheme", theme);
+    } catch (error) {
+      theme = "light";
+    }
+    root.setAttribute("data-theme", theme);
+    root.style.backgroundColor = theme === "dark" ? "#121212" : "#ffffff";
+  }());
+</script>
+
+  
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="keywords" content="" />
+  <meta name="description" content="Complete your Sushi Box order with delivery details and payment." />
+  <meta name="author" content="" />
+  <link rel="shortcut icon" href="images/favicon.png" type="">
+
+  <title>Checkout - Sushi Box</title>
+<link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/css/nice-select.min.css" />
+  <link href="css/font-awesome.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap" rel="stylesheet">
+  <link href="css/style.css?v=20260615a" rel="stylesheet" />
+  <link href="css/responsive.css?v=20260615a" rel="stylesheet" />
+<!-- Microsoft Clarity Analytics -->
+<script type="text/javascript">
+(function(c,l,a,r,i,t,y){
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+})(window, document, "clarity", "script", "x0oul3igxk");
+</script>
+</head>
+
+<body class="sub_page checkout-page">
+
+  <div class="hero_area">
+    <div class="bg-box">
+      <picture>
+        <source media="(max-width: 768px)" type="image/webp" srcset="images/hero-bg.webp">
+        <source type="image/webp" srcset="images/optimized/hero-bg-768.webp 768w, images/optimized/hero-bg-1280.webp 1280w, images/optimized/hero-bg-1920.webp 1920w" sizes="100vw">
+        <img src="images/hero-bg.jpg" alt="" width="5647" height="3239" loading="lazy" decoding="async">
+      </picture>
+    </div>
+    <header class="header_section">
+      <div class="container">
+        <nav class="navbar navbar-expand-lg custom_nav-container ">
+          <a class="navbar-brand" href="index.html">
+            <picture class="brand_logo_picture">
+              <source type="image/webp" srcset="images/optimized/Logo-160.webp 160w, images/optimized/Logo-320.webp 320w, images/optimized/Logo-640.webp 640w" sizes="64px">
+              <img src="images/Logo.png" alt="Sushi Box logo" width="599" height="593" loading="lazy" decoding="async">
+            </picture>
+            <span>Sushi Box</span>
+          </a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class=""> </span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mx-auto">
+              <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+              <li class="nav-item"><a class="nav-link" href="menu.html">Products</a></li>
+              <li class="nav-item"><a class="nav-link" href="book.html">How to Order</a></li>
+              <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+              <li class="nav-item"><a class="nav-link wishlist_nav_link" href="wishlist.html">My Favorites <span class="wishlist_count_badge" hidden>0</span></a></li>
+            </ul>
+            <div class="user_option">
+              <a href="" class="user_link"><i class="fa fa-user" aria-hidden="true"></i></a>
+              <a class="cart_link" href="cart.html">
+                <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 456.029 456.029">
+                  <g><g><path d="M345.6,338.862c-29.184,0-53.248,23.552-53.248,53.248c0,29.184,23.552,53.248,53.248,53.248 c29.184,0,53.248-23.552,53.248-53.248C398.336,362.926,374.784,338.862,345.6,338.862z" /></g></g>
+                  <g><g><path d="M439.296,84.91c-1.024,0-2.56-0.512-4.096-0.512H112.64l-5.12-34.304C104.448,27.566,84.992,10.67,61.952,10.67H20.48 C9.216,10.67,0,19.886,0,31.15c0,11.264,9.216,20.48,20.48,20.48h41.472c2.56,0,4.608,2.048,5.12,4.608l31.744,216.064 c4.096,27.136,27.648,47.616,55.296,47.616h212.992c26.624,0,49.664-18.944,55.296-45.056l33.28-166.4 C457.728,97.71,450.56,86.958,439.296,84.91z" /></g></g>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </header>
+  </div>
+
+  <main class="checkout_page_main">
+    <section class="checkout_page_section">
+      <div class="container">
+        <div class="checkout_page_header">
+          <span>Secure checkout</span>
+          <h1>Checkout</h1>
+          <p>Continue from your cart with delivery details, address, and secure Paymob payment.</p>
+        </div>
+
+        <div id="checkoutLoadingState" class="checkout_page_loading" role="status" aria-live="polite">
+          <div class="checkout_page_loading_icon"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i></div>
+          <h2>Loading your cart</h2>
+          <p>Checking your saved cart before checkout starts.</p>
+        </div>
+
+        <div id="checkoutEmptyState" class="checkout_page_empty" hidden>
+          <div class="checkout_page_empty_icon"><i class="fa fa-shopping-basket" aria-hidden="true"></i></div>
+          <h2>Your cart is empty</h2>
+          <p>Add your Sushi Box favorites before starting checkout.</p>
+          <a href="menu.html" class="checkout_menu_btn">Back to products</a>
+        </div>
+
+        <div id="checkoutFlow" class="checkout_page_shell" hidden>
+          <ol class="checkout_steps" aria-label="Checkout progress">
+            <li class="checkout_step" data-checkout-step="1">
+              <span class="checkout_step_number">1</span>
+              <span>Cart</span>
+            </li>
+            <li class="checkout_step" data-checkout-step="2">
+              <span class="checkout_step_number">2</span>
+              <span>Delivery</span>
+            </li>
+            <li class="checkout_step" data-checkout-step="3">
+              <span class="checkout_step_number">3</span>
+              <span>Address</span>
+            </li>
+            <li class="checkout_step" data-checkout-step="4">
+              <span class="checkout_step_number">4</span>
+              <span>Payment</span>
+            </li>
+          </ol>
+
+          <p class="checkout_validation" id="checkoutValidationMessage" role="alert" aria-live="polite" hidden></p>
+
+          <form id="checkoutPageForm" class="checkout_page_form" novalidate>
+            <section class="checkout_page_panel" data-checkout-panel="1">
+              <div class="checkout_panel_head">
+                <div>
+                  <span class="checkout_step_label">Step 1</span>
+                  <h2>Review cart</h2>
+                </div>
+                <strong data-checkout-final-total>&#1580;.&#1605; 0.00</strong>
+              </div>
+              <div id="checkoutCartItems" class="checkout_cart_items"></div>
+              <div class="checkout_order_summary">
+                <div class="checkout_summary_row">
+                  <span>Products Subtotal</span>
+                  <strong data-checkout-subtotal>&#1580;.&#1605; 0.00</strong>
+                </div>
+                <div class="checkout_summary_row">
+                  <span>Shipping Cost</span>
+                  <strong data-checkout-shipping>Choose city</strong>
+                </div>
+                <div class="checkout_summary_row">
+                  <span>Total Before Discount</span>
+                  <strong data-checkout-before-discount>Choose city</strong>
+                </div>
+                <div class="checkout_summary_row checkout_discount_row" data-checkout-discount-row hidden>
+                  <span>Discount</span>
+                  <strong data-checkout-discount>&#1580;.&#1605; 0.00</strong>
+                </div>
+                <div class="checkout_summary_row checkout_summary_total">
+                  <span>Final Total</span>
+                  <strong data-checkout-final-total>&#1580;.&#1605; 0.00</strong>
+                </div>
+              </div>
+              <div class="checkout_nav_row">
+                <a class="checkout_back_btn" href="menu.html">Continue shopping</a>
+                <button class="checkout_next_btn" type="button" data-checkout-next>Choose city</button>
+              </div>
+            </section>
+
+            <section class="checkout_page_panel" data-checkout-panel="2" hidden>
+              <div class="checkout_panel_head">
+                <div>
+                  <span class="checkout_step_label">Step 2</span>
+                  <h2>Choose delivery city</h2>
+                </div>
+              </div>
+              <fieldset class="checkout_city_selector">
+                <legend>Available delivery cities</legend>
+                <p class="checkout_delivery_schedule_note">Delivery is available every Wednesday, Thursday, and Friday.</p>
+                <div class="checkout_city_options">
+                  <label class="checkout_city_card" data-checkout-city="kafr-el-sheikh">
+                    <input type="radio" name="checkoutCity" value="kafr-el-sheikh" required>
+                    <span class="checkout_city_check" aria-hidden="true"></span>
+                    <span class="checkout_city_copy"><strong>Kafr El Sheikh</strong><small>Wednesday, Thursday, Friday</small><em data-city-shipping="kafr-el-sheikh">150 EGP</em></span>
+                  </label>
+                  <label class="checkout_city_card" data-checkout-city="mansoura">
+                    <input type="radio" name="checkoutCity" value="mansoura" required>
+                    <span class="checkout_city_check" aria-hidden="true"></span>
+                    <span class="checkout_city_copy"><strong>Mansoura</strong><small>Wednesday, Thursday, Friday</small><em data-city-shipping="mansoura">150 EGP</em></span>
+                  </label>
+                  <label class="checkout_city_card" data-checkout-city="tanta">
+                    <input type="radio" name="checkoutCity" value="tanta" required>
+                    <span class="checkout_city_check" aria-hidden="true"></span>
+                    <span class="checkout_city_copy"><strong>Tanta</strong><small>Wednesday, Thursday, Friday</small><em data-city-shipping="tanta">150 EGP</em></span>
+                  </label>
+                  <label class="checkout_city_card" data-checkout-city="el-mahalla">
+                    <input type="radio" name="checkoutCity" value="el-mahalla" required>
+                    <span class="checkout_city_check" aria-hidden="true"></span>
+                    <span class="checkout_city_copy"><strong>El Mahalla El Kubra</strong><small>Wednesday, Thursday, Friday</small><em data-city-shipping="el-mahalla">50 EGP</em></span>
+                  </label>
+                </div>
+              </fieldset>
+              <div class="checkout_nav_row">
+                <button class="checkout_back_btn" type="button" data-checkout-prev>Back to cart</button>
+                <button class="checkout_next_btn" type="button" data-checkout-next>Address details</button>
+              </div>
+            </section>
+
+            <section class="checkout_page_panel" data-checkout-panel="3" hidden>
+              <div class="checkout_panel_head">
+                <div>
+                  <span class="checkout_step_label">Step 3</span>
+                  <h2>Enter address details</h2>
+                </div>
+              </div>
+              <div class="checkout_selected_city">
+                <strong id="checkoutSelectedCityName">Choose a city first</strong>
+                <span>Delivery is available every Wednesday, Thursday, and Friday.</span>
+              </div>
+              <div class="checkout_saved_address_bar" id="savedAddressNotice" hidden>
+                <span>Saved address applied. You can edit any field.</span>
+                <button id="clearSavedAddressBtn" class="checkout_clear_saved_btn" type="button" hidden>Clear saved address</button>
+              </div>
+              <div class="checkout_fields checkout_address_fields">
+                <label>
+                  <span>Customer name <span class="required-star" aria-hidden="true">*</span></span>
+                  <input id="checkoutCustomerName" name="customerName" type="text" autocomplete="name" required>
+                </label>
+                <label>
+                  <span>Phone number <span class="required-star" aria-hidden="true">*</span></span>
+                  <input id="checkoutCustomerPhone" name="customerPhone" type="tel" autocomplete="tel" required>
+                </label>
+                <label>
+                  <span>Email <em>optional</em></span>
+                  <input id="checkoutCustomerEmail" name="customerEmail" type="email" autocomplete="email">
+                </label>
+                <label>
+                  <span>Area <span class="required-star" aria-hidden="true">*</span></span>
+                  <input id="checkoutCustomerArea" name="customerArea" type="text" autocomplete="address-level3" required>
+                </label>
+                <label class="checkout_full_width">
+                  <span>Full address <span class="required-star" aria-hidden="true">*</span></span>
+                  <textarea id="checkoutCustomerAddress" name="customerAddress" rows="3" autocomplete="street-address" required></textarea>
+                </label>
+                <label>
+                  <span>Building number <span class="required-star" aria-hidden="true">*</span></span>
+                  <input id="checkoutCustomerBuilding" name="customerBuilding" type="text" required>
+                </label>
+                <label>
+                  <span>Floor / apartment <span class="required-star" aria-hidden="true">*</span></span>
+                  <input id="checkoutCustomerFloorApartment" name="customerFloorApartment" type="text" required>
+                </label>
+                <label class="checkout_full_width">
+                  <span>Landmark / notes <em>optional</em></span>
+                  <textarea id="checkoutCustomerNotes" name="customerNotes" rows="2"></textarea>
+                </label>
+              </div>
+              <div class="checkout_nav_row">
+                <button class="checkout_back_btn" type="button" data-checkout-prev>Back</button>
+                <button class="checkout_next_btn" type="button" data-checkout-next>Review & pay</button>
+              </div>
+            </section>
+
+            <section class="checkout_page_panel" data-checkout-panel="4" hidden>
+              <div class="checkout_panel_head">
+                <div>
+                  <span class="checkout_step_label">Step 4</span>
+                  <h2>Review order & pay</h2>
+                </div>
+                <strong data-checkout-final-total>&#1580;.&#1605; 0.00</strong>
+              </div>
+              <div class="checkout_review_cards">
+                <div class="checkout_review_card">
+                  <span>Delivery city</span>
+                  <strong id="checkoutReviewCity">City not selected</strong>
+                </div>
+                <div class="checkout_review_card">
+                  <span>Customer</span>
+                  <strong id="checkoutReviewCustomer">Customer details not entered</strong>
+                </div>
+                <div class="checkout_review_card checkout_full_width">
+                  <span>Address</span>
+                  <strong id="checkoutReviewAddress">Address details not entered</strong>
+                </div>
+              </div>
+              <label class="checkout_payment_option">
+                <input type="radio" name="checkoutPaymentMethod" value="paymob-checkout" checked>
+                <span class="checkout_payment_icon"><i class="fa fa-credit-card" aria-hidden="true"></i></span>
+                <span>
+                  <strong>Secure online payment</strong>
+                  <small>Visa / Mastercard, mobile wallets, and kiosk / Fawry are handled by Paymob.</small>
+                </span>
+              </label>
+              <div class="checkout_payment_trust" aria-label="Secure payment information">
+                <div class="checkout_payment_trust_head">
+                  <span class="checkout_paymob_logo_mark">
+                    <img src="images/paymobLogo.png" alt="Paymob" width="148" height="40" loading="lazy" decoding="async" onerror="this.closest('.checkout_paymob_logo_mark').classList.add('is_missing'); this.hidden = true;">
+                    <span>Paymob</span>
+                  </span>
+                  <div>
+                    <strong>Secure payment powered by Paymob</strong>
+                    <p>Your payment is processed securely through Paymob. You can pay safely using bank cards and supported mobile wallets.</p>
+                  </div>
+                </div>
+                <div class="checkout_payment_logo_strip" aria-label="Available payment methods">
+                  <span class="checkout_payment_logo_item">
+                    <img src="images/Visa.png" alt="Visa" loading="lazy" decoding="async" onerror="this.closest('.checkout_payment_logo_item').classList.add('is_missing'); this.hidden = true;">
+                    <span>Visa</span>
+                  </span>
+                  <span class="checkout_payment_logo_item">
+                    <img src="images/Visa2.png" alt="Mastercard" loading="lazy" decoding="async" onerror="this.closest('.checkout_payment_logo_item').classList.add('is_missing'); this.hidden = true;">
+                    <span>Mastercard</span>
+                  </span>
+                  <span class="checkout_payment_logo_item">
+                    <img src="images/Meza.png" alt="Meeza" loading="lazy" decoding="async" onerror="this.closest('.checkout_payment_logo_item').classList.add('is_missing'); this.hidden = true;">
+                    <span>Meeza</span>
+                  </span>
+                  <span class="checkout_payment_logo_item">
+                    <img src="images/Amex.png" alt="American Express" loading="lazy" decoding="async" onerror="this.closest('.checkout_payment_logo_item').classList.add('is_missing'); this.hidden = true;">
+                    <span>AMEX</span>
+                  </span>
+                  <span class="checkout_payment_logo_item">
+                    <img src="images/Mahafez.png" alt="Mobile wallets" loading="lazy" decoding="async" onerror="this.closest('.checkout_payment_logo_item').classList.add('is_missing'); this.hidden = true;">
+                    <span>Mobile Wallets</span>
+                  </span>
+                </div>
+              </div>
+              <div class="checkout_coupon_box">
+                <label for="checkoutCouponCode">Promo code</label>
+                <div class="checkout_coupon_controls">
+                  <input id="checkoutCouponCode" name="couponCode" type="text" autocomplete="off" placeholder="">
+                  <button id="checkoutApplyCouponBtn" type="button">Apply</button>
+                  <button id="checkoutRemoveCouponBtn" type="button" hidden>Remove</button>
+                </div>
+                <p id="checkoutCouponMessage" class="checkout_coupon_message" role="status" aria-live="polite" hidden></p>
+              </div>
+              <div class="checkout_order_summary">
+                <div class="checkout_summary_row">
+                  <span>Products Subtotal</span>
+                  <strong data-checkout-subtotal>&#1580;.&#1605; 0.00</strong>
+                </div>
+                <div class="checkout_summary_row">
+                  <span>Shipping Cost</span>
+                  <strong data-checkout-shipping>Choose city</strong>
+                </div>
+                <div class="checkout_summary_row">
+                  <span>Total Before Discount</span>
+                  <strong data-checkout-before-discount>Choose city</strong>
+                </div>
+                <div class="checkout_summary_row checkout_discount_row" data-checkout-discount-row hidden>
+                  <span>Discount</span>
+                  <strong data-checkout-discount>&#1580;.&#1605; 0.00</strong>
+                </div>
+                <div class="checkout_summary_row checkout_summary_total">
+                  <span>Final Total</span>
+                  <strong data-checkout-final-total>&#1580;.&#1605; 0.00</strong>
+                </div>
+              </div>
+              <div class="checkout_nav_row">
+                <button class="checkout_back_btn" type="button" data-checkout-prev>Back</button>
+                <div class="checkout_pay_action">
+                  <p><i class="fa fa-lock" aria-hidden="true"></i> Your payment details are encrypted and processed securely by Paymob.</p>
+                  <button class="checkout_confirm_btn" type="submit">Pay now</button>
+                </div>
+              </div>
+            </section>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer_section">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 footer-col">
+        <div class="footer_contact">
+          <h4>Contact Us</h4>
+          <div class="contact_link_box">
+            <a href="https://maps.google.com/?q=Egypt%20El%20Gharbia%20El%20Mahalla%20El%20Kubra" target="_blank" rel="noopener noreferrer">
+              <i class="fa fa-map-marker" aria-hidden="true"></i>
+              <span>Egypt - El Gharbia - El Mahalla El Kubra</span>
+            </a>
+            <a href="tel:+201503460361">
+              <i class="fa fa-phone" aria-hidden="true"></i>
+              <span>Call +201503460361</span>
+            </a>
+            <a href="https://wa.me/201503460361" target="_blank" rel="noopener noreferrer">
+              <i class="fa fa-whatsapp" aria-hidden="true"></i>
+              <span>WhatsApp</span>
+            </a>
+            <a href="mailto:info@sushiboxshop.com">
+              <i class="fa fa-envelope" aria-hidden="true"></i>
+              <span>info@sushiboxshop.com</span>
+            </a>
+          </div>
+        </div>
+          <nav class="footer_policy_links footer_policy_links_contact" aria-label="Company links">
+            <a href="about.html">About Us</a>
+            <a href="privacy-policy.html">Privacy Policy</a>
+          </nav>
+      </div>
+      <div class="col-md-4 footer-col">
+        <div class="footer_detail">
+          <a href="index.html" class="footer-logo">Sushi Box</a>
+          <p>Sushi Box is your trusted source for premium Asian ingredients, sushi essentials, frozen products, sauces, noodles, baozi, dumplings, and reliable supply across the Delta region.</p>
+          <div class="footer_social">
+            <a href="https://www.facebook.com/profile.php?id=61589534703634" target="_blank" rel="noopener noreferrer"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+            <a href="https://x.com/SushiBo0oX" target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+            <a href="https://www.instagram.com/sushibo0ox/" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram" aria-hidden="true"></i></a>
+            <a href="https://wa.me/201503460361" target="_blank" rel="noopener noreferrer"><i class="fa fa-whatsapp" aria-hidden="true"></i></a><a class="footer_messenger_link" href="https://m.me/61589534703634" target="_blank" rel="noopener noreferrer" aria-label="Messenger"><svg class="footer_messenger_icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.2c-5.05 0-9 3.7-9 8.44 0 2.7 1.28 5.1 3.28 6.65v2.92l2.99-1.64c.85.24 1.77.37 2.73.37 5.05 0 9-3.7 9-8.44S17.05 3.2 12 3.2Zm.86 11.08-2.28-2.43-4.43 2.43 4.86-5.16 2.34 2.43 4.37-2.43-4.86 5.16Z"/></svg></a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 footer-col">
+        <h4>Delivery Schedule</h4>
+        <div class="delivery-list simple-footer-list">
+          <div class="footer-info-item delivery-item">
+            <span class="footer-icon delivery-icon"><i class="fa fa-map-marker" aria-hidden="true"></i></span>
+            <div class="delivery-text">
+              <strong>Kafr El Sheikh</strong>
+              <span>Wednesday, Thursday, Friday</span>
+            </div>
+          </div>
+          <div class="footer-info-item delivery-item">
+            <span class="footer-icon delivery-icon"><i class="fa fa-truck" aria-hidden="true"></i></span>
+            <div class="delivery-text">
+              <strong>Mansoura</strong>
+              <span>Wednesday, Thursday, Friday</span>
+            </div>
+          </div>
+          <div class="footer-info-item delivery-item">
+            <span class="footer-icon delivery-icon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+            <div class="delivery-text">
+              <strong>Tanta</strong>
+              <span>Wednesday, Thursday, Friday</span>
+            </div>
+          </div>
+          <div class="footer-info-item delivery-item">
+            <span class="footer-icon delivery-icon"><i class="fa fa-map-marker" aria-hidden="true"></i></span>
+            <div class="delivery-text">
+              <strong>El Mahalla</strong>
+              <span>Wednesday, Thursday, Friday</span>
+            </div>
+          </div>
+        </div>
+        <nav class="footer_policy_links footer_policy_links_delivery" aria-label="Policy links">
+          <a href="delivery-shipping-policy.html">Delivery &amp; Shipping Policy</a>
+          <a href="refund-cancellation-policy.html">Refund &amp; Cancellation Policy</a>
+        </nav>
+      </div>
+    </div>
+    <div class="footer-info">
+      <p>&copy; <span id="displayYear"></span> Sushi Box. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+  <script defer src="js/jquery-3.4.1.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+  <script defer src="js/bootstrap.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/js/jquery.nice-select.min.js"></script>
+  <script defer src="js/custom.js?v=20260603a"></script>
+  <script type="module" src="js/navbar-offers.js?v=20260518c" defer></script>
+  <script type="module" src="js/app-shell.js?v=20260619a" defer></script>
+  <script type="module" src="js/checkout-page.js?v=20260619a" defer></script>
+</body>
+
+</html>

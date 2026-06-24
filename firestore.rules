@@ -1,0 +1,144 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidRating(value) {
+      return value is number && value >= 1 && value <= 5;
+    }
+
+    function hasOnlyGuestRatingFields() {
+      return request.resource.data.keys().hasOnly([
+        "productId",
+        "productName",
+        "guestId",
+        "rating",
+        "createdAt",
+        "updatedAt"
+      ]);
+    }
+
+    function hasValidGuestRatingShape(productId, guestId) {
+      return hasOnlyGuestRatingFields()
+        && request.resource.data.productId == productId
+        && request.resource.data.guestId == guestId
+        && request.resource.data.productName is string
+        && request.resource.data.productName.size() <= 200
+        && isValidRating(request.resource.data.rating);
+    }
+
+    function isValidGuestRatingCreate(productId, guestId) {
+      return hasValidGuestRatingShape(productId, guestId)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+    }
+
+    function isValidGuestRatingUpdate(productId, guestId) {
+      return hasValidGuestRatingShape(productId, guestId)
+        && resource.data.productId == productId
+        && resource.data.guestId == guestId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "productName",
+          "rating",
+          "updatedAt"
+        ]);
+    }
+
+    function hasOnlyReviewFields() {
+      return request.resource.data.keys().hasOnly([
+        "productId",
+        "productName",
+        "userId",
+        "name",
+        "userName",
+        "userPhoto",
+        "rating",
+        "comment",
+        "createdAt",
+        "updatedAt"
+      ]);
+    }
+
+    function hasValidReviewShape(productId, uid) {
+      return hasOnlyReviewFields()
+        && request.resource.data.productId == productId
+        && request.resource.data.userId == uid
+        && request.resource.data.productName is string
+        && request.resource.data.productName.size() <= 200
+        && request.resource.data.name is string
+        && request.resource.data.name.size() <= 120
+        && request.resource.data.userName is string
+        && request.resource.data.userName.size() <= 120
+        && request.resource.data.userPhoto is string
+        && request.resource.data.userPhoto.size() <= 1000
+        && request.resource.data.comment is string
+        && request.resource.data.comment.size() <= 2000
+        && isValidRating(request.resource.data.rating);
+    }
+
+    function isValidReviewCreate(productId, uid) {
+      return hasValidReviewShape(productId, uid)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+    }
+
+    function isValidReviewUpdate(productId, uid) {
+      return hasValidReviewShape(productId, uid)
+        && resource.data.productId == productId
+        && resource.data.userId == uid
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "productName",
+          "name",
+          "userName",
+          "userPhoto",
+          "rating",
+          "comment",
+          "updatedAt"
+        ]);
+    }
+
+    match /products/{productId}/reviews/{uid} {
+      allow read: if true;
+      allow create: if isSignedIn()
+        && request.auth.uid == uid
+        && isValidReviewCreate(productId, uid);
+      allow update: if isSignedIn()
+        && request.auth.uid == uid
+        && isValidReviewUpdate(productId, uid);
+      allow delete: if isSignedIn()
+        && request.auth.uid == uid;
+    }
+
+    match /products/{productId}/guestRatings/{guestId} {
+      allow read: if true;
+      allow create: if request.auth == null
+        && isValidGuestRatingCreate(productId, guestId);
+      allow update: if request.auth == null
+        && isValidGuestRatingUpdate(productId, guestId);
+      allow delete: if false;
+    }
+
+    match /reviewSummaries/{productId} {
+      allow read: if true;
+      allow create, update, delete: if false;
+    }
+
+    match /productsInventory/{productSlug} {
+      allow read: if true;
+      allow create, update, delete: if false;
+    }
+
+    match /productOffers/{slug} {
+      allow read: if true;
+      allow create, update, delete: if false;
+    }
+
+  }
+}

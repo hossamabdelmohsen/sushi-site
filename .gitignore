@@ -1,0 +1,11 @@
+node_modules/
+.next/
+.vercel/
+.vercel000/
+.env
+.env.*
+*.log
+.chrome-hydration-check/
+.chrome-hydration-check-dev/
+.chrome-ui-profile/
+.edge-ui-profile/

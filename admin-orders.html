@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en" style="background-color: var(--bg-color, #ffffff);">
+
+<head>
+<script>
+  (function () {
+    var root = document.documentElement;
+    var theme = "light";
+    try {
+      theme = localStorage.getItem("theme") || localStorage.getItem("sushiBoxTheme") || "light";
+      if (theme !== "dark" && theme !== "light") {
+        theme = "light";
+      }
+      localStorage.setItem("theme", theme);
+      localStorage.setItem("sushiBoxTheme", theme);
+    } catch (error) {
+      theme = "light";
+    }
+    root.setAttribute("data-theme", theme);
+    root.style.backgroundColor = theme === "dark" ? "#121212" : "#ffffff";
+  }());
+</script>
+
+  
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="keywords" content="" />
+  <meta name="description" content="Manage Sushi Box customer orders and delivery workflow." />
+  <meta name="author" content="" />
+  <link rel="shortcut icon" href="images/favicon.png" type="">
+
+  <title>Admin Orders - Sushi Box</title>
+<link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+  <link href="css/font-awesome.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap" rel="stylesheet">
+  <link href="css/style.css?v=20260615a" rel="stylesheet" />
+  <link href="css/responsive.css?v=20260615a" rel="stylesheet" />
+</head>
+
+<body class="sub_page orders-page admin-orders-page">
+
+  <div class="hero_area">
+    <div class="bg-box">
+      <picture>
+        <source media="(max-width: 768px)" type="image/webp" srcset="images/hero-bg.webp">
+        <source type="image/webp" srcset="images/optimized/hero-bg-768.webp 768w, images/optimized/hero-bg-1280.webp 1280w, images/optimized/hero-bg-1920.webp 1920w" sizes="100vw">
+        <img src="images/hero-bg.jpg" alt="" width="5647" height="3239" loading="lazy" decoding="async">
+      </picture>
+    </div>
+    <header class="header_section">
+      <div class="container">
+        <nav class="navbar navbar-expand-lg custom_nav-container ">
+          <a class="navbar-brand" href="index.html">
+            <picture class="brand_logo_picture">
+              <source type="image/webp" srcset="images/optimized/Logo-160.webp 160w, images/optimized/Logo-320.webp 320w, images/optimized/Logo-640.webp 640w" sizes="64px">
+              <img src="images/Logo.png" alt="Sushi Box logo" width="599" height="593" loading="lazy" decoding="async">
+            </picture>
+            <span>Sushi Box</span>
+          </a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class=""> </span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mx-auto">
+              <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+              <li class="nav-item"><a class="nav-link" href="menu.html">Products</a></li>
+              <li class="nav-item"><a class="nav-link" href="book.html">How to Order</a></li>
+              <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+              <li class="nav-item"><a class="nav-link wishlist_nav_link" href="wishlist.html">My Favorites <span class="wishlist_count_badge" hidden>0</span></a></li>
+              <li class="nav-item"><a class="nav-link orders_nav_link" href="orders.html">My Orders</a></li>
+            </ul>
+            <div class="user_option">
+              <a href="" class="user_link"><i class="fa fa-user" aria-hidden="true"></i></a>
+              <a class="cart_link" href="cart.html">
+                <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 456.029 456.029">
+                  <g><g><path d="M345.6,338.862c-29.184,0-53.248,23.552-53.248,53.248c0,29.184,23.552,53.248,53.248,53.248 c29.184,0,53.248-23.552,53.248-53.248C398.336,362.926,374.784,338.862,345.6,338.862z" /></g></g>
+                  <g><g><path d="M439.296,84.91c-1.024,0-2.56-0.512-4.096-0.512H112.64l-5.12-34.304C104.448,27.566,84.992,10.67,61.952,10.67H20.48 C9.216,10.67,0,19.886,0,31.15c0,11.264,9.216,20.48,20.48,20.48h41.472c2.56,0,4.608,2.048,5.12,4.608l31.744,216.064 c4.096,27.136,27.648,47.616,55.296,47.616h212.992c26.624,0,49.664-18.944,55.296-45.056l33.28-166.4 C457.728,97.71,450.56,86.958,439.296,84.91z" /></g></g>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </header>
+  </div>
+
+  <main class="admin_orders_main">
+    <section class="admin_orders_section">
+      <div class="container">
+        <div class="orders_page_header admin_orders_header">
+          <div class="admin_orders_header_row">
+            <div class="admin_orders_header_copy">
+              <h1>Admin Orders</h1>
+              <p id="adminOrdersIntro">Checking admin access before loading customer orders.</p>
+            </div>
+            <button id="adminOrdersRefreshBtn" class="admin_orders_refresh_btn" type="button" aria-label="Refresh orders" title="Refresh orders">
+              <i class="fa fa-refresh" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="orders_page_shell admin_orders_shell">
+          <div id="adminOrdersLoadingState" class="orders_state">
+            <span class="orders_state_icon"><i class="fa fa-spinner" aria-hidden="true"></i></span>
+            <h2>Loading admin dashboard</h2>
+            <p>Please wait while we verify your account.</p>
+          </div>
+
+          <div id="adminOrdersDeniedState" class="orders_state orders_state_error admin_orders_denied" role="alert" hidden>
+            <span class="orders_state_icon"><i class="fa fa-lock" aria-hidden="true"></i></span>
+            <h2>Access denied</h2>
+            <p>This page is available only to Sushi Box admin users.</p>
+          </div>
+
+          <div id="adminOrdersErrorState" class="orders_state orders_state_error" role="alert" hidden></div>
+
+          <div id="adminOrdersDashboard" class="admin_orders_dashboard" hidden>
+            <div class="admin_dashboard_layout">
+              <nav class="admin_dashboard_nav" aria-label="Admin dashboard sections">
+                <a class="is_active" href="#overview" data-admin-nav-section="overview"><i class="fa fa-line-chart" aria-hidden="true"></i><span>Overview</span></a>
+                <a href="#new-orders" data-admin-nav-section="new-orders"><i class="fa fa-bell-o" aria-hidden="true"></i><span>New Orders</span><strong id="adminNeedsActionNavCount">0</strong></a>
+                <a href="#actioned-orders" data-admin-nav-section="actioned-orders"><i class="fa fa-check-circle-o" aria-hidden="true"></i><span>Actioned Orders</span><strong id="adminActionedNavCount">0</strong></a>
+                <a href="#inventory" data-admin-nav-section="inventory"><i class="fa fa-cubes" aria-hidden="true"></i><span>Inventory</span></a>
+                <a href="#shipping" data-admin-nav-section="shipping"><i class="fa fa-truck" aria-hidden="true"></i><span>Shipping Settings</span></a>
+                <a href="#promo-codes" data-admin-nav-section="promo-codes"><i class="fa fa-ticket" aria-hidden="true"></i><span>Promo Codes</span></a>
+                <a href="#product-offers" data-admin-nav-section="product-offers"><i class="fa fa-gift" aria-hidden="true"></i><span>Product Offers</span></a>
+              </nav>
+
+              <div class="admin_dashboard_content">
+                <section id="overview" class="admin_dashboard_panel" data-admin-panel="overview">
+                  <div class="admin_section_head">
+                    <div>
+                      <span class="admin_orders_group_kicker">Control panel</span>
+                      <h2>Dashboard / Overview</h2>
+                    </div>
+                  </div>
+                  <div class="admin_orders_toolbar">
+                    <div class="admin_orders_stats" aria-label="Order summary">
+                      <div>
+                        <span>Total orders</span>
+                        <strong id="adminOrdersCount">0</strong>
+                      </div>
+                      <div>
+                        <span>Shown orders</span>
+                        <strong id="adminOrdersFilteredCount">0</strong>
+                      </div>
+                      <div>
+                        <span>Total value</span>
+                        <strong id="adminOrdersRevenue">&#1580;.&#1605; 0.00</strong>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <div class="admin_orders_queue_tabs" role="tablist" aria-label="Admin order workflow">
+                  <button id="adminNeedsActionTab" class="is_active" type="button" role="tab" aria-selected="true" aria-controls="adminNeedsActionPanel" data-admin-orders-section="needs_action">
+                    New / Needs Action <span id="adminNeedsActionTabCount">0</span>
+                  </button>
+                  <button id="adminActionedTab" type="button" role="tab" aria-selected="false" aria-controls="adminActionedPanel" data-admin-orders-section="actioned">
+                    Actioned <span id="adminActionedTabCount">0</span>
+                  </button>
+                </div>
+
+                <div class="admin_orders_filters" aria-label="Filter orders by status">
+                  <button class="is_active" type="button" data-admin-order-filter="all">All <span class="admin_filter_badge">0</span></button>
+                  <button type="button" data-admin-order-filter="pending">Pending <span class="admin_filter_badge">0</span></button>
+                  <button type="button" data-admin-order-filter="preparing">Preparing <span class="admin_filter_badge">0</span></button>
+                  <button type="button" data-admin-order-filter="out_for_delivery">Out for delivery <span class="admin_filter_badge">0</span></button>
+                  <button type="button" data-admin-order-filter="delivered">Delivered <span class="admin_filter_badge">0</span></button>
+                  <button type="button" data-admin-order-filter="cancelled">Cancelled <span class="admin_filter_badge">0</span></button>
+                </div>
+
+                <div id="adminOrdersEmptyState" class="orders_state" hidden>
+                  <span class="orders_state_icon"><i class="fa fa-list-alt" aria-hidden="true"></i></span>
+                  <h2>No orders found</h2>
+                  <p>There are no orders matching this filter yet.</p>
+                </div>
+
+                <div class="admin_orders_groups" id="adminOrdersGroups" hidden>
+                  <section id="new-orders" class="admin_dashboard_panel admin_orders_group admin_orders_group_new" role="tabpanel" aria-labelledby="adminNeedsActionTab" data-admin-panel="new-orders">
+                    <div class="admin_orders_group_head">
+                      <div>
+                        <span class="admin_orders_group_kicker">Needs action</span>
+                        <h2 id="adminNewOrdersTitle">New / Needs Action Orders</h2>
+                      </div>
+                      <strong id="adminNewOrdersCount">0</strong>
+                    </div>
+                    <div id="adminOrdersList" class="admin_orders_list"></div>
+                  </section>
+
+                  <section id="actioned-orders" class="admin_dashboard_panel admin_orders_group admin_orders_group_actioned" role="tabpanel" aria-labelledby="adminActionedTab" data-admin-panel="actioned-orders">
+                    <div class="admin_orders_group_head">
+                      <div>
+                        <span class="admin_orders_group_kicker">Completed queue</span>
+                        <h2 id="adminActionedOrdersTitle">Actioned Orders</h2>
+                      </div>
+                      <strong id="adminActionedOrdersCount">0</strong>
+                    </div>
+                    <div id="adminActionedOrdersList" class="admin_orders_list"></div>
+                  </section>
+                </div>
+
+                <section id="inventory" class="admin_dashboard_panel admin_inventory_panel" aria-label="Inventory" data-admin-panel="inventory" hidden>
+                  <div class="admin_checkout_settings_head">
+                    <div>
+                      <span class="admin_orders_group_kicker">Stock control</span>
+                      <h2>Inventory</h2>
+                    </div>
+                    <button id="adminInventoryRefreshBtn" class="admin_orders_refresh_btn" type="button" aria-label="Refresh inventory" title="Refresh inventory">
+                      <i class="fa fa-refresh" aria-hidden="true"></i>
+                    </button>
+                  </div>
+
+                  <div class="admin_inventory_toolbar">
+                    <div class="admin_inventory_search_group">
+                      <span>Search product</span>
+                      <input id="adminInventorySearch" type="search" autocomplete="off" placeholder="Search by name, slug, or category">
+                    </div>
+                    <strong id="adminInventoryCount" class="admin_inventory_count">0 products</strong>
+                    <label class="admin_inventory_track_all"><span>Track Stock All</span><input id="adminInventoryTrackAll" type="checkbox"></label>
+                    <button id="adminInventorySaveAllBtn" class="admin_inventory_save_all" type="button">Save All Inventory</button>
+                  </div>
+
+                  <p id="adminInventoryEmpty" class="orders_item_empty" hidden>No matching products found.</p>
+                  <div id="adminInventoryList" class="admin_inventory_list"></div>
+                </section>
+
+                <section id="shipping" class="admin_dashboard_panel admin_checkout_settings" aria-label="Shipping settings" data-admin-panel="shipping" hidden>
+                  <div class="admin_checkout_settings_head">
+                    <div>
+                      <span class="admin_orders_group_kicker">Checkout settings</span>
+                      <h2>Shipping Settings</h2>
+                    </div>
+                    <button id="adminCheckoutSettingsRefreshBtn" class="admin_orders_refresh_btn" type="button" aria-label="Refresh checkout settings" title="Refresh checkout settings">
+                      <i class="fa fa-refresh" aria-hidden="true"></i>
+                    </button>
+                  </div>
+
+                  <form id="adminShippingRatesForm" class="admin_shipping_rates_form">
+                    <h3>Shipping Rates</h3>
+                    <div id="adminShippingRatesList" class="admin_shipping_rates_grid"></div>
+                    <button type="submit">Save shipping rates</button>
+                  </form>
+                </section>
+
+                <section id="promo-codes" class="admin_dashboard_panel admin_checkout_settings" aria-label="Promo code settings" data-admin-panel="promo-codes" hidden>
+                  <div class="admin_checkout_settings_head">
+                    <div>
+                      <span class="admin_orders_group_kicker">Checkout settings</span>
+                      <h2>Promo Codes</h2>
+                    </div>
+                  </div>
+
+                  <form id="adminCouponForm" class="admin_coupon_form">
+                    <h3 id="adminCouponFormTitle">Create Promo Code</h3>
+                    <input id="adminCouponOriginalCode" type="hidden">
+                    <div class="admin_coupon_grid">
+                      <label>
+                        <span>Code</span>
+                        <input id="adminCouponCode" type="text" autocomplete="off" required>
+                      </label>
+                      <label>
+                        <span>Type</span>
+                        <select id="adminCouponType" required>
+                          <option value="free_shipping">Free Shipping</option>
+                          <option value="fixed_discount">Fixed Discount</option>
+                          <option value="percentage_discount">Percentage Discount</option>
+                        </select>
+                      </label>
+                      <label>
+                        <span>Value</span>
+                        <input id="adminCouponValue" type="number" min="0" step="0.01" value="0">
+                      </label>
+                      <label>
+                        <span>Expiration date</span>
+                        <input id="adminCouponExpiresAt" type="date">
+                      </label>
+                      <label>
+                        <span>Usage limit</span>
+                        <input id="adminCouponUsageLimit" type="number" min="0" step="1" value="0">
+                      </label>
+                      <label class="admin_coupon_enabled">
+                        <input id="adminCouponEnabled" type="checkbox" checked>
+                        <span>Enabled</span>
+                      </label>
+                    </div>
+                    <div class="admin_coupon_actions">
+                      <button type="submit">Save promo code</button>
+                      <button id="adminCouponResetBtn" type="button">New code</button>
+                    </div>
+                  </form>
+
+                  <div class="admin_coupons_panel">
+                    <h3>Promo Codes</h3>
+                    <div id="adminCouponsList" class="admin_coupons_list"></div>
+                  </div>
+                </section>
+
+                <section id="product-offers" class="admin_dashboard_panel admin_product_offers_panel" data-admin-panel="product-offers" hidden>
+                  <div class="admin_section_head admin_product_offers_head">
+                    <div>
+                      <span class="admin_orders_group_kicker">Transactional offers</span>
+                      <h2>Product Offers</h2>
+                    </div>
+                  </div>
+                  <p class="admin_product_offers_note">Active offers apply automatically across product pages, cart, checkout, and payment.</p>
+                  <div class="admin_product_offers_card">
+                    <div class="admin_product_offers_card_head"><div><span>Create or edit</span><h3>Offer details</h3></div><p>Choose a catalog item, set its active period, then preview its display price.</p></div>
+                    <form id="adminProductOfferForm" class="admin_product_offers_form">
+                    <input id="adminProductOfferOriginalSlug" type="hidden">
+                    <div class="admin_product_offers_grid">
+                      <label class="admin_product_offers_field"><span>Product</span><select id="adminProductOfferSlug" required></select></label>
+                      <label class="admin_product_offers_field"><span>Discount type</span><select id="adminProductOfferType" required><option value="percentage">Percentage</option><option value="fixed">Fixed amount</option></select></label>
+                      <label class="admin_product_offers_field"><span>Discount value</span><input id="adminProductOfferValue" type="number" min="0.01" step="0.01" required></label>
+                      <label class="admin_product_offers_field"><span>Priority</span><input id="adminProductOfferPriority" type="number" min="0" step="1" value="0"></label>
+                      <label class="admin_product_offers_field"><span>Start date</span><input id="adminProductOfferStartDate" type="date" required></label>
+                      <label class="admin_product_offers_field"><span>End date</span><input id="adminProductOfferEndDate" type="date" required></label>
+                      <label class="admin_product_offers_field"><span>Title <em>optional</em></span><input id="adminProductOfferTitle" type="text" maxlength="120"></label>
+                      <label class="admin_product_offers_field"><span>Badge text <em>optional</em></span><input id="adminProductOfferBadgeText" type="text" maxlength="48"></label>
+                    </div>
+                    <label class="admin_product_offers_toggle"><input id="adminProductOfferEnabled" type="checkbox" checked><span class="admin_product_offers_toggle_track" aria-hidden="true"></span><span><strong>Enable this offer</strong><small>Show it when the selected date range is active.</small></span></label>
+                    <div class="admin_product_offers_preview" id="adminProductOfferPreview"><span>Final price preview</span><strong>Select a product and enter a valid discount to preview the final price.</strong></div>
+                    <div class="admin_product_offers_actions"><button type="submit" class="admin_product_offers_primary">Save Offer</button><button id="adminProductOfferResetBtn" type="button" class="admin_product_offers_secondary">New Offer</button></div>
+                    </form>
+                  </div>
+                  <div class="admin_product_offers_card admin_product_offers_current">
+                    <div class="admin_product_offers_card_head"><div><span>Current offers</span><h3>Offer library</h3></div><p>Manage what customers see on the Offers page.</p></div>
+                    <div id="adminProductOffersList" class="admin_product_offers_list"></div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer_section">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 footer-col">
+        <div class="footer_contact">
+          <h4>Contact Us</h4>
+          <div class="contact_link_box">
+            <a href="https://maps.google.com/?q=Egypt%20El%20Gharbia%20El%20Mahalla%20El%20Kubra" target="_blank" rel="noopener noreferrer">
+              <i class="fa fa-map-marker" aria-hidden="true"></i>
+              <span>Egypt - El Gharbia - El Mahalla El Kubra</span>
+            </a>
+            <a href="tel:+201503460361">
+              <i class="fa fa-phone" aria-hidden="true"></i>
+              <span>Call +201503460361</span>
+            </a>
+            <a href="https://wa.me/201503460361" target="_blank" rel="noopener noreferrer">
+              <i class="fa fa-whatsapp" aria-hidden="true"></i>
+              <span>WhatsApp</span>
+            </a>
+            <a href="mailto:info@sushiboxshop.com">
+              <i class="fa fa-envelope" aria-hidden="true"></i>
+              <span>info@sushiboxshop.com</span>
+            </a>
+          </div>
+        </div>
+          <nav class="footer_policy_links footer_policy_links_contact" aria-label="Company links">
+            <a href="about.html">About Us</a>
+            <a href="privacy-policy.html">Privacy Policy</a>
+          </nav>
+      </div>
+      <div class="col-md-4 footer-col">
+        <div class="footer_detail">
+          <a href="index.html" class="footer-logo">Sushi Box</a>
+          <p>Sushi Box is your trusted source for premium Asian ingredients, sushi essentials, frozen products, sauces, noodles, baozi, dumplings, and reliable supply across the Delta region.</p>
+          <div class="footer_social">
+            <a href="https://www.facebook.com/profile.php?id=61589534703634" target="_blank" rel="noopener noreferrer"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+            <a href="https://x.com/SushiBo0oX" target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+            <a href="https://www.instagram.com/sushibo0ox/" target="_blank" rel="noopener noreferrer"><i class="fa fa-instagram" aria-hidden="true"></i></a>
+            <a href="https://wa.me/201503460361" target="_blank" rel="noopener noreferrer"><i class="fa fa-whatsapp" aria-hidden="true"></i></a><a class="footer_messenger_link" href="https://m.me/61589534703634" target="_blank" rel="noopener noreferrer" aria-label="Messenger"><svg class="footer_messenger_icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.2c-5.05 0-9 3.7-9 8.44 0 2.7 1.28 5.1 3.28 6.65v2.92l2.99-1.64c.85.24 1.77.37 2.73.37 5.05 0 9-3.7 9-8.44S17.05 3.2 12 3.2Zm.86 11.08-2.28-2.43-4.43 2.43 4.86-5.16 2.34 2.43 4.37-2.43-4.86 5.16Z"/></svg></a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 footer-col">
+        <h4>Delivery Schedule</h4>
+        <div class="delivery-list simple-footer-list">
+          <div class="footer-info-item delivery-item">
+            <span class="footer-icon delivery-icon"><i class="fa fa-map-marker" aria-hidden="true"></i></span>
+            <div class="delivery-text">
+              <strong>Kafr El Sheikh</strong>
+              <span>Wednesday, Thursday, Friday</span>
+            </div>
+          </div>
+          <div class="footer-info-item delivery-item">
+            <span class="footer-icon delivery-icon"><i class="fa fa-truck" aria-hidden="true"></i></span>
+            <div class="delivery-text">
+              <strong>Mansoura</strong>
+              <span>Wednesday, Thursday, Friday</span>
+            </div>
+          </div>
+          <div class="footer-info-item delivery-item">
+            <span class="footer-icon delivery-icon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+            <div class="delivery-text">
+              <strong>Tanta</strong>
+              <span>Wednesday, Thursday, Friday</span>
+            </div>
+          </div>
+          <div class="footer-info-item delivery-item">
+            <span class="footer-icon delivery-icon"><i class="fa fa-map-marker" aria-hidden="true"></i></span>
+            <div class="delivery-text">
+              <strong>El Mahalla</strong>
+              <span>Wednesday, Thursday, Friday</span>
+            </div>
+          </div>
+        </div>
+        <nav class="footer_policy_links footer_policy_links_delivery" aria-label="Policy links">
+          <a href="delivery-shipping-policy.html">Delivery &amp; Shipping Policy</a>
+          <a href="refund-cancellation-policy.html">Refund &amp; Cancellation Policy</a>
+        </nav>
+      </div>
+    </div>
+    <div class="footer-info">
+      <p>&copy; <span id="displayYear"></span> Sushi Box. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+  <script defer src="js/jquery-3.4.1.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+  <script defer src="js/bootstrap.js"></script>
+  <script defer src="js/custom.js?v=20260603a"></script>
+  <script type="module" src="js/navbar-offers.js?v=20260518c" defer></script>
+  <script type="module" src="js/app-shell.js?v=20260619a" defer></script>
+  <script type="module" src="js/admin-orders.js?v=20260619a" defer></script>
+</body>
+
+</html>
