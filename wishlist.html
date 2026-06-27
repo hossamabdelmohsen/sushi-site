@@ -80,7 +80,7 @@
               <li class="nav-item"><a class="nav-link" href="book.html">How to Order</a></li>
               <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
               <li class="nav-item active">
-                <a class="nav-link wishlist_nav_link" href="wishlist.html">My Favorites <span class="wishlist_count_badge" hidden>0</span> <span class="sr-only">(current)</span></a>
+                <a class="nav-link wishlist_nav_link" href="wishlist.html"><span data-i18n="favoritesUi.myFavorites">My Favorites</span> <span class="wishlist_count_badge" hidden>0</span> <span class="sr-only">(current)</span></a>
               </li>
             </ul>
             <div class="user_option">
@@ -107,12 +107,12 @@
     <div class="container">
       <div class="wishlist_header">
         <div class="heading_container">
-          <h2>My Favorites</h2>
+          <h2 data-i18n="favoritesUi.myFavorites">My Favorites</h2>
           <p id="wishlistPageCount">0 saved products</p>
         </div>
         <button id="wishlistClearBtn" class="wishlist_clear_btn" type="button" hidden>
           <i class="fa fa-trash" aria-hidden="true"></i>
-          Clear Favorites
+          <span data-i18n="favoritesUi.clearFavorites">Clear Favorites</span>
         </button>
       </div>
 
@@ -120,9 +120,9 @@
         <div class="wishlist_empty_icon">
           <i class="fa fa-heart-o" aria-hidden="true"></i>
         </div>
-        <h3>No saved products yet</h3>
-        <p>Tap the heart on any product card to keep your favorites here.</p>
-        <a href="menu.html" class="wishlist_empty_btn">Browse Products</a>
+        <h3 data-i18n="favoritesUi.noSavedProductsYet">You have no saved products yet</h3>
+        <p data-i18n="favoritesUi.emptyHint">Tap the heart on any product card to keep your favorites here.</p>
+        <a href="menu.html" class="wishlist_empty_btn" data-i18n="favoritesUi.startShopping">Start Shopping</a>
       </div>
 
       <div id="wishlistGrid" class="wishlist_grid"></div>
@@ -224,7 +224,7 @@
   <script defer src="js/custom.js?v=20260603a"></script>
   <script type="module" src="js/navbar-offers.js?v=20260518c" defer></script>
   <script type="module" src="js/app-shell.js?v=20260619a" defer></script>
-  <script type="module" src="js/wishlist-page.js?v=20260619a" defer></script>
+  <script type="module" src="js/wishlist-page.js?v=20260627a" defer></script>
 </body>
 
 </html>

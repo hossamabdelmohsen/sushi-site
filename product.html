@@ -101,7 +101,7 @@
     <div class="container product_page_container">
       <a href="menu.html" class="return_menu_btn product_back_link">
         <i class="fa fa-angle-left" aria-hidden="true"></i>
-        Return to Products
+        <span data-i18n="productUi.backToProducts">Back to products</span>
       </a>
       <div class="row product_details_layout">
         <div class="col-lg-7 product_gallery_column">
@@ -116,25 +116,25 @@
         </div>
         <div class="col-lg-5 product_info_column">
           <div class="product_info_card">
-            <button id="productShareBtn" type="button" class="product_share_detail_btn" aria-label="Share product" title="Share">
+            <button id="productShareBtn" type="button" class="product_share_detail_btn" aria-label="Share product" title="Share" data-i18n-title="productUi.share">
               <i class="fa fa-share-alt" aria-hidden="true"></i>
             </button>
             <button id="productFavoriteBtn" type="button" class="product_favorite_detail_btn" data-wishlist-product-id="" aria-label="Add product to favorites" aria-pressed="false" title="Add to favorites">
               <i class="fa fa-heart-o" aria-hidden="true"></i>
             </button>
             <span id="productCategory" class="product_category_label"></span>
-            <h1 id="productName"></h1>
+            <h1 id="productName" data-i18n="productUi.loadingProduct">Loading product</h1>
             <div class="product_rating_meta">
               <div id="productRatingStars" class="rating_stars_wrap"></div>
               <span id="productRatingText" hidden></span>
             </div>
             <p id="productDescription"></p>
             <div id="productComponentsSection" class="product_meta_section" hidden>
-              <h2 class="product_meta_title">Components</h2>
+              <h2 class="product_meta_title" data-i18n="productUi.components">Components</h2>
               <ul id="productComponentsList" class="product_feature_list"></ul>
             </div>
             <div id="productItemDetailsSection" class="product_meta_section" hidden>
-              <h2 class="product_meta_title">Item Details</h2>
+              <h2 class="product_meta_title" data-i18n="productUi.productDetails">Product Details</h2>
               <dl id="productItemDetailsList" class="product_spec_list"></dl>
             </div>
             <div class="product_price_row">
@@ -144,7 +144,7 @@
             </div>
 
             <div class="quantity_wrap">
-              <span>Quantity</span>
+              <span data-i18n="productUi.quantity">Quantity</span>
               <div class="qty_controls">
                 <button id="qtyMinus" type="button">-</button>
                 <input id="qtyInput" type="text" value="1" readonly>
@@ -157,7 +157,7 @@
             <div class="product_action_row">
               <button id="addToCartBtn" type="button" class="product_cart_primary_btn">
                 <i class="fa fa-shopping-basket" aria-hidden="true"></i>
-                Add to Cart
+                <span data-product-button-label data-i18n="productUi.addToCart">Add to Cart</span>
               </button>
               <button id="productCheckoutBtn" type="button" class="product_checkout_btn">
                 <i class="fa fa-credit-card" aria-hidden="true"></i>
@@ -197,12 +197,12 @@
     <div class="container product_page_container">
       <div class="product_story_card">
         <div class="product_detail_tabs" aria-label="Product detail sections">
-          <a class="product_detail_tab active" href="#productStorySection">Description</a>
-          <a class="product_detail_tab" href="#productComponentsSection">Components</a>
-          <a class="product_detail_tab" href="#productReviewsSection">Reviews</a>
+          <a class="product_detail_tab active" href="#productStorySection" data-i18n="productUi.description">Description</a>
+          <a class="product_detail_tab" href="#productComponentsSection" data-i18n="productUi.components">Components</a>
+          <a class="product_detail_tab" href="#productReviewsSection" data-i18n="productUi.reviews">Reviews</a>
         </div>
         <div class="heading_container">
-          <h2>Product Description</h2>
+          <h2 data-i18n="productUi.productDetails">Product Details</h2>
         </div>
         <h3 id="productStoryTitle" class="product_story_title"></h3>
         <p id="productStoryLead" class="product_story_lead"></p>
@@ -215,16 +215,16 @@
     <div class="container product_page_container">
       <div class="product_reviews_stack">
         <div class="reviews_summary_card">
-          <span class="reviews_kicker">Live customer reviews</span>
-          <h2>What customers think</h2>
+          <span class="reviews_kicker" data-i18n="productUi.reviews">Reviews</span>
+          <h2 data-i18n="productUi.customerReviews">Customer Reviews</h2>
           <div class="rating_overview">
             <div class="rating_overview_score" id="averageRatingValue">0.0</div>
             <div class="rating_overview_meta">
               <div id="averageRatingStars" class="rating_stars_wrap"></div>
-              <p><span id="reviewCountValue">0</span> ratings</p>
+              <p><span id="reviewCountValue">0</span> <span data-i18n="productUi.ratings">Ratings</span></p>
             </div>
           </div>
-          <p class="reviews_summary_text" id="ratingSummaryText">Be the first to rate this product and help future customers choose with confidence.</p>
+          <p class="reviews_summary_text" id="ratingSummaryText" data-i18n="productUi.ratingSummaryEmpty">No reviews yet. Be the first to rate this product and help future customers choose with confidence.</p>
         </div>
 
         <div id="reviewsList" class="reviews_list"></div>
@@ -232,15 +232,15 @@
         <div class="reviews_panel">
           <div class="reviews_panel_head">
             <div>
-              <span class="reviews_kicker">Share your experience</span>
-              <h3>Leave a review</h3>
+              <span class="reviews_kicker" data-i18n="productUi.reviews">Reviews</span>
+              <h3 data-i18n="productUi.writeReview">Write a Review</h3>
             </div>
           </div>
 
           <form id="reviewForm" class="review_form">
             <div class="review_field">
-              <label>Rating</label>
-              <div class="review_star_picker" aria-label="Choose a star rating from one to five">
+              <label data-i18n="productUi.ratings">Ratings</label>
+              <div class="review_star_picker" aria-label="Choose a star rating from one to five" data-i18n-aria-label="productUi.chooseRating">
                 <button type="button" class="review_star_btn" data-rating="1" aria-label="Rate 1 star"><i class="fa fa-star" aria-hidden="true"></i></button>
                 <button type="button" class="review_star_btn" data-rating="2" aria-label="Rate 2 stars"><i class="fa fa-star" aria-hidden="true"></i></button>
                 <button type="button" class="review_star_btn" data-rating="3" aria-label="Rate 3 stars"><i class="fa fa-star" aria-hidden="true"></i></button>
@@ -250,16 +250,16 @@
             </div>
 
             <div class="review_field">
-              <label for="reviewComment">Comment</label>
-              <textarea id="reviewComment" rows="5" placeholder="Tell other customers what stood out about this product."></textarea>
+              <label for="reviewComment" data-i18n="productUi.reviewComment">Comment</label>
+              <textarea id="reviewComment" rows="5" placeholder="Tell other customers what stood out about this product." data-i18n-placeholder="productUi.reviewCommentPlaceholder"></textarea>
             </div>
 
             <div class="review_form_actions">
-              <button id="reviewSubmitBtn" type="submit" class="review_submit_btn">Publish Review</button>
-              <button id="reviewDeleteBtn" type="button" class="review_delete_btn" hidden>Delete My Review</button>
+              <button id="reviewSubmitBtn" type="submit" class="review_submit_btn" data-i18n="productUi.submitReview">Submit Review</button>
+              <button id="reviewDeleteBtn" type="button" class="review_delete_btn" hidden data-i18n="productUi.reviewDelete">Delete My Review</button>
             </div>
 
-            <p id="reviewFormStatus" class="review_form_status">Please sign in first to review this product.</p>
+            <p id="reviewFormStatus" class="review_form_status" data-i18n="productUi.signInToWriteReview">Sign in to write a review</p>
           </form>
           <div id="reviewAuthNotice" class="review_auth_notice"></div>
         </div>
@@ -270,8 +270,8 @@
   <section class="product_recommendations_section products-section layout_padding-bottom">
     <div class="container product_page_container">
       <div class="heading_container">
-        <h2>You Might Also Like</h2>
-        <p>Handpicked pairings for this product.</p>
+        <h2 data-i18n="productUi.youMightAlsoLike">You Might Also Like</h2>
+        <p data-i18n="productUi.handpickedPairings">Handpicked pairings for this product.</p>
       </div>
       <div id="recommendedProducts" class="recommendations_grid products-grid"></div>
     </div>
@@ -372,7 +372,7 @@
   <script defer src="js/custom.js?v=20260603a"></script>
   <script type="module" src="js/navbar-offers.js?v=20260518c" defer></script>
   <script type="module" src="js/app-shell.js?v=20260619a" defer></script>
-  <script type="module" src="js/product-page.js?v=20260619a" defer></script>
+  <script type="module" src="js/product-page.js?v=20260627a" defer></script>
 </body>
 
 </html>

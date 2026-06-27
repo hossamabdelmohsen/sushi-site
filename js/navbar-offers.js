@@ -1,4 +1,5 @@
 import { getActiveOffers, subscribeToProductOffers } from "./offers-data.js?v=20260620a";
+import { applyTranslations, t } from "./i18n/i18n.js";
 
 function createElementFromHTML(markup) {
   const template = document.createElement("template");
@@ -51,7 +52,7 @@ function getOffersButton() {
     offersButton = createElementFromHTML(`
       <a class="offers_nav_btn" href="${getSitePageHref("offers.html")}">
         <i class="fa fa-tags" aria-hidden="true"></i>
-        <span class="offers_nav_label">Offers</span>
+        <span class="offers_nav_label" data-i18n="nav.offers">${t("nav.offers", "Offers")}</span>
         <span class="offers_nav_badge">0</span>
       </a>
     `);
@@ -59,6 +60,7 @@ function getOffersButton() {
 
   offersButton.setAttribute("href", getSitePageHref("offers.html"));
   updateOffersButtonState(offersButton);
+  applyTranslations(offersButton);
   return offersButton;
 }
 

@@ -47,6 +47,12 @@ import {
   trackSearch,
   trackWhatsAppClick
 } from "./analytics-events.js?v=20260602c";
+import {
+  applyTranslations,
+  getLanguage,
+  initI18n,
+  t
+} from "./i18n/i18n.js";
 
 const THEME_STORAGE_KEY = "theme";
 const LEGACY_THEME_STORAGE_KEY = "sushiBoxTheme";
@@ -80,15 +86,15 @@ let searchAnalyticsTimer = 0;
 let lastTrackedSearchSignature = "";
 
 const SIDE_DRAWER_NAV_ITEMS = [
-  { label: "Home", href: "index.html", icon: "fa-home" },
-  { label: "Admin Dashboard", href: "admin-orders.html", icon: "fa-shield", requiresAdmin: true },
-  { label: "My Orders", href: "orders.html", icon: "fa-list-alt" },
-  { label: "Products", href: "menu.html", icon: "fa-cutlery" },
-  { label: "How to Order", href: "book.html", icon: "fa-paper-plane" },
-  { label: "About", href: "about.html", icon: "fa-info-circle" },
-  { label: "Feedback", href: "feedback.html", icon: "fa-commenting-o" },
-  { label: "My Favorites", href: "wishlist.html", icon: "fa-heart-o", hasWishlistBadge: true },
-  { label: "Offers", href: "offers.html", icon: "fa-tags", hasOfferBadge: true }
+  { label: "Home", i18nKey: "nav.home", href: "index.html", icon: "fa-home" },
+  { label: "Admin Dashboard", i18nKey: "nav.adminDashboard", href: "admin-orders.html", icon: "fa-shield", requiresAdmin: true },
+  { label: "My Orders", i18nKey: "nav.orders", href: "orders.html", icon: "fa-list-alt" },
+  { label: "Products", i18nKey: "nav.products", href: "menu.html", icon: "fa-cutlery" },
+  { label: "How to Order", i18nKey: "nav.howToOrder", href: "book.html", icon: "fa-paper-plane" },
+  { label: "About", i18nKey: "nav.about", href: "about.html", icon: "fa-info-circle" },
+  { label: "Feedback", i18nKey: "nav.feedback", href: "feedback.html", icon: "fa-commenting-o" },
+  { label: "My Favorites", i18nKey: "nav.favorites", href: "wishlist.html", icon: "fa-heart-o", hasWishlistBadge: true },
+  { label: "Offers", i18nKey: "nav.offers", href: "offers.html", icon: "fa-tags", hasOfferBadge: true }
 ];
 
 function createElementFromHTML(markup) {
@@ -101,6 +107,390 @@ function getSitePageHref(pageName) {
   return window.location.pathname.startsWith("/products/") ? `/${pageName}` : pageName;
 }
 
+function getLocalizedText(key, fallback = "", values = {}) {
+  return t(key, fallback, values);
+}
+
+function getProductUiText(key, fallback = "", values = {}) {
+  return getLocalizedText(`productUi.${key}`, fallback, values);
+}
+
+function getCartUiText(key, fallback = "", values = {}) {
+  return getLocalizedText(`cartUi.${key}`, fallback, values);
+}
+
+function getCartUiCountText(key, count, fallbackSingular, fallbackPlural) {
+  const isSingle = count === 1;
+  return getCartUiText(isSingle ? key : `${key}_plural`, isSingle ? fallbackSingular : fallbackPlural, { count });
+}
+
+function getProductUiCountText(key, count, fallbackSingular, fallbackPlural) {
+  const isSingle = count === 1;
+  return getProductUiText(isSingle ? key : `${key}_plural`, isSingle ? fallbackSingular : fallbackPlural, { count });
+}
+
+function getCurrentPageFileName() {
+  return window.location.pathname.split("/").pop() || "index.html";
+}
+
+function getNavLinkMarkup(i18nKey, fallback, isCurrent = false, options = {}) {
+  const label = escapeHtml(getLocalizedText(i18nKey, fallback));
+  const badge = options.badgeMarkup || "";
+  const current = isCurrent ? ' <span class="sr-only">(current)</span>' : "";
+  return `<span data-i18n="${i18nKey}">${label}</span>${badge}${current}`;
+}
+
+function setNavLinkMarkup(link, i18nKey, fallback, isCurrent = false, options = {}) {
+  if (!link) {
+    return;
+  }
+
+  link.innerHTML = getNavLinkMarkup(i18nKey, fallback, isCurrent, options);
+  applyTranslations(link);
+}
+
+function normalizeNavHref(href) {
+  return String(href || "").replace(/^\/+/, "");
+}
+
+function getNavTranslationByHref(href) {
+  const normalizedHref = normalizeNavHref(href);
+  const navMap = {
+    "index.html": { i18nKey: "nav.home", fallback: "Home" },
+    "menu.html": { i18nKey: "nav.products", fallback: "Products" },
+    "book.html": { i18nKey: "nav.howToOrder", fallback: "How to Order" },
+    "about.html": { i18nKey: "nav.about", fallback: "About" },
+    "feedback.html": { i18nKey: "nav.feedback", fallback: "Feedback" },
+    "wishlist.html": { i18nKey: "nav.favorites", fallback: "My Favorites", hasWishlistBadge: true },
+    "orders.html": { i18nKey: "nav.orders", fallback: "My Orders" },
+    "offers.html": { i18nKey: "nav.offers", fallback: "Offers" },
+    "admin-orders.html": { i18nKey: "nav.adminDashboard", fallback: "Admin Dashboard" }
+  };
+
+  return navMap[normalizedHref] || null;
+}
+
+function ensurePrimaryNavI18n() {
+  const currentPage = getCurrentPageFileName();
+  document.querySelectorAll(".navbar-nav .nav-link").forEach((link) => {
+    const navItem = link.closest(".nav-item");
+    const navTranslation = getNavTranslationByHref(link.getAttribute("href"));
+    if (!navTranslation) {
+      return;
+    }
+
+    const href = normalizeNavHref(link.getAttribute("href"));
+    const isCurrent = currentPage === href || Boolean(navItem && navItem.classList.contains("active"));
+    const badgeMarkup = navTranslation.hasWishlistBadge
+      ? ' <span class="wishlist_count_badge" hidden>0</span>'
+      : "";
+    setNavLinkMarkup(link, navTranslation.i18nKey, navTranslation.fallback, isCurrent, { badgeMarkup });
+  });
+}
+
+function setI18nText(selector, key, root = document) {
+  root.querySelectorAll(selector).forEach((element) => {
+    element.setAttribute("data-i18n", key);
+  });
+}
+
+function setI18nAttribute(selector, dataAttribute, key, root = document) {
+  root.querySelectorAll(selector).forEach((element) => {
+    element.setAttribute(dataAttribute, key);
+  });
+}
+
+function setI18nTextByIndex(selector, keys, root = document) {
+  const elements = Array.from(root.querySelectorAll(selector));
+  keys.forEach((key, index) => {
+    if (elements[index]) {
+      elements[index].setAttribute("data-i18n", key);
+    }
+  });
+}
+
+function setI18nByExactText(selector, textMap, root = document) {
+  root.querySelectorAll(selector).forEach((element) => {
+    const text = element.textContent.replace(/\s+/g, " ").trim();
+    const key = textMap[text];
+    if (key) {
+      element.setAttribute("data-i18n", key);
+    }
+  });
+}
+
+function wrapInlineTextWithI18n(element, key) {
+  if (!element || element.querySelector(`[data-i18n="${key}"]`)) {
+    return;
+  }
+
+  const textNode = Array.from(element.childNodes).find((node) => {
+    return node.nodeType === Node.TEXT_NODE && node.textContent.trim();
+  });
+
+  if (!textNode) {
+    return;
+  }
+
+  const prefix = textNode.textContent.match(/^\s*/)?.[0] || "";
+  const suffix = textNode.textContent.match(/\s*$/)?.[0] || "";
+  const label = document.createElement("span");
+  label.setAttribute("data-i18n", key);
+  label.textContent = textNode.textContent.trim();
+
+  if (prefix) {
+    element.insertBefore(document.createTextNode(prefix), textNode);
+  }
+  element.insertBefore(label, textNode);
+  if (suffix) {
+    element.insertBefore(document.createTextNode(suffix), textNode);
+  }
+  element.removeChild(textNode);
+}
+
+function annotateFooterI18n(root = document) {
+  root.querySelectorAll(".footer_section").forEach((footer) => {
+    setI18nText(".footer_contact h4", "footer.contactUs", footer);
+    setI18nAttribute(".footer_policy_links_contact", "data-i18n-aria-label", "footer.companyLinks", footer);
+    setI18nAttribute(".footer_policy_links_delivery", "data-i18n-aria-label", "footer.policyLinks", footer);
+    setI18nAttribute(".footer_messenger_link", "data-i18n-aria-label", "footer.messenger", footer);
+    setI18nText(".footer_detail p", "footer.description", footer);
+    setI18nText(".footer-col > h4", "footer.deliverySchedule", footer);
+
+    setI18nByExactText(".contact_link_box span, .footer_policy_links a, .delivery-text strong, .delivery-text span", {
+      "Egypt - El Gharbia - El Mahalla El Kubra": "footer.location",
+      "Call +201503460361": "footer.call",
+      "WhatsApp": "footer.whatsapp",
+      "About Us": "footer.aboutUs",
+      "Privacy Policy": "footer.privacyPolicy",
+      "Delivery & Shipping Policy": "footer.deliveryPolicy",
+      "Refund & Cancellation Policy": "footer.refundPolicy",
+      "Kafr El Sheikh": "common.cities.kafrElSheikh",
+      "Mansoura": "common.cities.mansoura",
+      "Tanta": "common.cities.tanta",
+      "El Mahalla": "common.cities.elMahalla",
+      "Wednesday, Thursday, Friday": "common.wednesdayFriday"
+    }, footer);
+
+    const copyright = footer.querySelector(".footer-info p");
+    const year = footer.querySelector("#displayYear")?.textContent || "";
+    if (copyright && copyright.dataset.i18nReady !== "true") {
+      copyright.dataset.i18nReady = "true";
+      copyright.innerHTML = `&copy; <span id="displayYear">${escapeHtml(year)}</span> <span data-i18n="footer.copyrightSuffix">Sushi Box. All rights reserved.</span>`;
+    }
+  });
+}
+
+function annotateAboutPageI18n() {
+  if (!document.querySelector(".about_article_section")) {
+    return;
+  }
+
+  setI18nText(".about_article_label", "aboutPage.label");
+  setI18nText(".about_article_hero h1", "aboutPage.title");
+  setI18nText(".about_article_hero p", "aboutPage.intro");
+  setI18nTextByIndex(".about_article_content .about_article_block h2", [
+    "aboutPage.ingredientsTitle",
+    "aboutPage.productsTitle",
+    "aboutPage.visionTitle",
+    "aboutPage.missionTitle"
+  ]);
+  setI18nTextByIndex(".about_article_content .about_article_block:nth-of-type(1) p", [
+    "aboutPage.ingredientsP1",
+    "aboutPage.ingredientsP2",
+    "aboutPage.ingredientsP3"
+  ]);
+  setI18nText(".about_article_content .about_article_block:nth-of-type(2) > p:first-of-type", "aboutPage.productsIntro");
+  setI18nText(".about_article_content .about_article_block:nth-of-type(2) > p:last-of-type", "aboutPage.productsOutro");
+  setI18nTextByIndex(".about_product_item h3", [
+    "aboutPage.productSushiTitle",
+    "aboutPage.productNoodlesTitle",
+    "aboutPage.productDumplingsTitle",
+    "aboutPage.productSaucesTitle",
+    "aboutPage.productFrozenTitle",
+    "aboutPage.productPantryTitle"
+  ]);
+  setI18nTextByIndex(".about_product_item p", [
+    "aboutPage.productSushiText",
+    "aboutPage.productNoodlesText",
+    "aboutPage.productDumplingsText",
+    "aboutPage.productSaucesText",
+    "aboutPage.productFrozenText",
+    "aboutPage.productPantryText"
+  ]);
+  setI18nText(".about_article_content .about_article_block:nth-of-type(3) p", "aboutPage.visionText");
+  setI18nText(".about_article_content .about_article_block:nth-of-type(4) p", "aboutPage.missionIntro");
+  setI18nTextByIndex(".about_check_list li", [
+    "aboutPage.missionPoint1",
+    "aboutPage.missionPoint2",
+    "aboutPage.missionPoint3",
+    "aboutPage.missionPoint4"
+  ]);
+  setI18nAttribute(".about_article_sidebar", "data-i18n-aria-label", "aboutPage.highlightsAria");
+  setI18nAttribute(".about_image_panel img", "data-i18n-attr", "alt:aboutPage.imageAlt");
+  setI18nTextByIndex(".about_highlight_panel h2", [
+    "aboutPage.distributeTitle",
+    "aboutPage.whyTitle"
+  ]);
+  setI18nText(".about_highlight_panel:first-of-type p", "aboutPage.distributeText");
+  setI18nTextByIndex(".about_highlight_panel:nth-of-type(2) li", [
+    "aboutPage.whyPoint1",
+    "aboutPage.whyPoint2",
+    "aboutPage.whyPoint3",
+    "aboutPage.whyPoint4",
+    "aboutPage.whyPoint5",
+    "aboutPage.whyPoint6"
+  ]);
+  setI18nByExactText(".about_highlight_panel:first-of-type li", {
+    "Mansoura": "common.cities.mansoura",
+    "Kafr El Sheikh": "common.cities.kafrElSheikh",
+    "Tanta": "common.cities.tanta",
+    "El Mahalla": "common.cities.elMahalla"
+  });
+  setI18nText(".about_cta_inner h2", "aboutPage.ctaTitle");
+  setI18nText(".about_cta_inner a", "aboutPage.ctaButton");
+}
+
+function annotateOrderPageI18n() {
+  if (!document.querySelector(".how_to_order_section")) {
+    return;
+  }
+
+  setI18nText(".how_to_order_section .heading_container:first-of-type h2", "orderPage.title");
+  setI18nText(".how_to_order_intro", "orderPage.intro");
+  setI18nText(".order_section_title", "orderPage.worksTitle");
+  setI18nTextByIndex(".order_step_item h5", [
+    "orderPage.stepExploreTitle",
+    "orderPage.stepCartTitle",
+    "orderPage.stepOpenTitle",
+    "orderPage.stepDeliveryTitle",
+    "orderPage.stepReviewTitle",
+    "orderPage.stepPaymentTitle",
+    "orderPage.stepSupportTitle"
+  ]);
+  setI18nTextByIndex(".order_step_item p", [
+    "orderPage.stepExploreText",
+    "orderPage.stepCartText",
+    "orderPage.stepOpenText",
+    "orderPage.stepDeliveryText",
+    "orderPage.stepReviewText",
+    "orderPage.stepPaymentText",
+    "orderPage.stepSupportText"
+  ]);
+  setI18nText(".delivery_schedule_panel .heading_container h2", "orderPage.deliveryTitle");
+  setI18nText(".delivery_schedule_panel .heading_container p", "orderPage.deliveryIntro");
+  setI18nByExactText(".delivery_schedule_item span, .delivery_schedule_item strong", {
+    "Kafr El Sheikh": "common.cities.kafrElSheikh",
+    "Mansoura": "common.cities.mansoura",
+    "Tanta": "common.cities.tanta",
+    "El Mahalla": "common.cities.elMahalla",
+    "Wednesday, Thursday, Friday": "common.wednesdayFriday"
+  });
+  setI18nText(".wholesale_order_kicker", "orderPage.wholesaleKicker");
+  setI18nText(".wholesale_order_box h3", "orderPage.wholesaleTitle");
+  setI18nText(".wholesale_order_box p", "orderPage.wholesaleText");
+  document.querySelectorAll(".wholesale_contact_btn").forEach((button) => {
+    wrapInlineTextWithI18n(button, "orderPage.contactSales");
+  });
+}
+
+function annotateFeedbackPageI18n() {
+  if (!document.querySelector(".feedback_hero_section")) {
+    return;
+  }
+
+  setI18nText(".feedback_kicker", "feedbackPage.kicker");
+  const title = document.querySelector(".feedback_hero_header h1");
+  if (title && title.dataset.i18nReady !== "true") {
+    title.dataset.i18nReady = "true";
+    title.innerHTML = '<span data-i18n="feedbackPage.titlePrefix">Your Opinion Helps</span> <span class="feedback_heading_tail" data-i18n="feedbackPage.titleTail">Us Improve</span>';
+  }
+  setI18nText(".feedback_hero_header p", "feedbackPage.intro");
+  setI18nAttribute(".feedback_info_panel", "data-i18n-aria-label", "feedbackPage.supportAria");
+  setI18nText(".feedback_info_panel h2", "feedbackPage.readTitle");
+  setI18nText(".feedback_info_panel > p", "feedbackPage.readText");
+  setI18nTextByIndex(".feedback_support_list span", [
+    "feedbackPage.ideaPoint",
+    "feedbackPage.deliveryPoint",
+    "feedbackPage.servicePoint"
+  ]);
+  setI18nText(".feedback_direct_support > span", "feedbackPage.directSupport");
+  document.querySelectorAll(".feedback_direct_support a").forEach((link) => {
+    wrapInlineTextWithI18n(link, "feedbackPage.whatsapp");
+  });
+  setI18nText(".feedback_form_intro span", "feedbackPage.formKicker");
+  setI18nText(".feedback_form_intro h2", "feedbackPage.formTitle");
+  setI18nTextByIndex(".feedback_form label", [
+    "feedbackPage.fullName",
+    "feedbackPage.email",
+    "feedbackPage.type",
+    "feedbackPage.subject",
+    "feedbackPage.message"
+  ]);
+  setI18nAttribute("#feedbackName", "data-i18n-placeholder", "feedbackPage.fullNamePlaceholder");
+  setI18nAttribute("#feedbackEmail", "data-i18n-placeholder", "feedbackPage.emailPlaceholder");
+  setI18nAttribute("#feedbackSubject", "data-i18n-placeholder", "feedbackPage.subjectPlaceholder");
+  setI18nAttribute("#feedbackMessage", "data-i18n-placeholder", "feedbackPage.messagePlaceholder");
+  setI18nTextByIndex("#feedbackType option", [
+    "feedbackPage.typeSuggestion",
+    "feedbackPage.typeComplaint",
+    "feedbackPage.typeProductRequest",
+    "feedbackPage.typeBugReport",
+    "feedbackPage.typeGeneral"
+  ]);
+  setI18nText(".feedback_form_footer p", "feedbackPage.privacyNote");
+  setI18nText(".feedback_submit_text", "feedbackPage.send");
+  setI18nText(".feedback_appreciation_inner h2", "feedbackPage.appreciationTitle");
+  setI18nText(".feedback_appreciation_inner p", "feedbackPage.appreciationText");
+}
+
+function annotateDeliveryPolicyI18n() {
+  if (getCurrentPageFileName() !== "delivery-shipping-policy.html" || !document.querySelector(".policy_page_main")) {
+    return;
+  }
+
+  document.querySelectorAll(".policy_kicker").forEach((kicker) => {
+    wrapInlineTextWithI18n(kicker, "deliveryPolicy.kicker");
+  });
+  setI18nText(".policy_hero_card h1", "deliveryPolicy.title");
+  setI18nText(".policy_hero_card p", "deliveryPolicy.intro");
+  setI18nText(".policy_meta", "deliveryPolicy.effectiveDate");
+  setI18nTextByIndex(".policy_section h2", [
+    "deliveryPolicy.areasTitle",
+    "deliveryPolicy.scheduleTitle",
+    "deliveryPolicy.coordinationTitle",
+    "deliveryPolicy.handlingTitle"
+  ]);
+  setI18nTextByIndex(".policy_section p", [
+    "deliveryPolicy.areasText",
+    "deliveryPolicy.scheduleText",
+    "deliveryPolicy.coordinationText",
+    "deliveryPolicy.handlingText"
+  ]);
+  setI18nTextByIndex(".policy_section li", [
+    "deliveryPolicy.scheduleKafr",
+    "deliveryPolicy.scheduleMansoura",
+    "deliveryPolicy.scheduleTanta",
+    "deliveryPolicy.scheduleMahalla"
+  ]);
+}
+
+function refreshNiceSelectI18n() {
+  if (window.jQuery && window.jQuery.fn && window.jQuery.fn.niceSelect) {
+    window.jQuery("select").niceSelect("update");
+  }
+}
+
+function annotatePhase2StaticContent() {
+  annotateAboutPageI18n();
+  annotateOrderPageI18n();
+  annotateFeedbackPageI18n();
+  annotateDeliveryPolicyI18n();
+  annotateFooterI18n();
+  applyTranslations(document);
+  refreshNiceSelectI18n();
+}
+
 function getExactProduct(productId) {
   return getExactProductById(productId);
 }
@@ -111,10 +501,33 @@ function getQuantityLimitNotice(inventoryStatus, quantity) {
   }
 
   if (inventoryStatus.available <= 0) {
-    return "Out of stock.";
+    return getCartUiText("outOfStock", "Out of stock.");
   }
 
-  return `Only ${inventoryStatus.available} item${inventoryStatus.available === 1 ? "" : "s"} available.`;
+  return getCartUiCountText(
+    "onlyItemsAvailable",
+    inventoryStatus.available,
+    `Only ${inventoryStatus.available} item available.`,
+    `Only ${inventoryStatus.available} items available.`
+  );
+}
+
+function getCartStockStatusText(inventoryStatus) {
+  if (!inventoryStatus || !inventoryStatus.message) {
+    return "";
+  }
+
+  if (inventoryStatus.isOutOfStock) {
+    return getCartUiText("outOfStockShort", "Out of stock");
+  }
+
+  if (inventoryStatus.isLowStock && Number.isFinite(inventoryStatus.available)) {
+    return getCartUiText("sorryOnlyLeft", "Sorry, only {count} left in stock.", {
+      count: inventoryStatus.available
+    });
+  }
+
+  return inventoryStatus.message;
 }
 
 function renderProductThumb({ product = null, imagePath = "", alt = "", width = 74, height = 74, sizes = "74px", loading = "lazy" } = {}) {
@@ -230,8 +643,12 @@ function updateWishlistButtons(wishlist) {
 
     button.classList.toggle("is_active", isActive);
     button.setAttribute("aria-pressed", String(isActive));
-    button.setAttribute("aria-label", `${isActive ? "Remove" : "Add"} ${productName} ${isActive ? "from" : "to"} favorites`);
-    button.setAttribute("title", isActive ? "Remove from favorites" : "Add to favorites");
+    button.setAttribute("aria-label", getProductUiText(
+      isActive ? "removeProductFromFavorites" : "addProductToFavorites",
+      isActive ? "Remove {name} from favorites" : "Add {name} to favorites",
+      { name: productName }
+    ));
+    button.setAttribute("title", getProductUiText(isActive ? "removeFromFavoritesLower" : "addToFavorites", isActive ? "Remove from favorites" : "Add to favorites"));
 
     if (icon) {
       icon.className = `fa ${isActive ? "fa-heart" : "fa-heart-o"}`;
@@ -257,7 +674,7 @@ function ensureHowToOrderNav() {
     return;
   }
 
-  const currentPage = window.location.pathname.split("/").pop() || "index.html";
+  const currentPage = getCurrentPageFileName();
   let howToOrderItem = Array.from(navList.querySelectorAll(".nav-item")).find((item) => {
     const link = item.querySelector(".nav-link");
     if (!link) {
@@ -279,7 +696,7 @@ function ensureHowToOrderNav() {
 
   const link = howToOrderItem.querySelector(".nav-link");
   link.setAttribute("href", getSitePageHref("book.html"));
-  link.innerHTML = currentPage === "book.html" ? 'How to Order <span class="sr-only">(current)</span>' : "How to Order";
+  setNavLinkMarkup(link, "nav.howToOrder", "How to Order", currentPage === "book.html");
   if (currentPage === "book.html") {
     howToOrderItem.classList.add("active");
   }
@@ -288,7 +705,7 @@ function ensureHowToOrderNav() {
 function ensureWishlistNav() {
   const navItems = Array.from(document.querySelectorAll(".navbar-nav .nav-item"));
   const wishlistHref = getSitePageHref("wishlist.html");
-  const currentPage = window.location.pathname.split("/").pop() || "index.html";
+  const currentPage = getCurrentPageFileName();
 
   navItems.forEach((item) => {
     const link = item.querySelector(".nav-link");
@@ -297,9 +714,9 @@ function ensureWishlistNav() {
     }
 
     link.classList.add("wishlist_nav_link");
-    link.innerHTML = currentPage === wishlistHref
-      ? 'My Favorites <span class="wishlist_count_badge" hidden>0</span> <span class="sr-only">(current)</span>'
-      : 'My Favorites <span class="wishlist_count_badge" hidden>0</span>';
+    setNavLinkMarkup(link, "nav.favorites", "My Favorites", currentPage === wishlistHref, {
+      badgeMarkup: ' <span class="wishlist_count_badge" hidden>0</span>'
+    });
 
     if (currentPage === wishlistHref) {
       item.classList.add("active");
@@ -312,7 +729,7 @@ function ensureWishlistAction(userOption) {
 
   if (!wishlistLink) {
     wishlistLink = createElementFromHTML(`
-      <a class="wishlist_icon_link" href="${getSitePageHref("wishlist.html")}" aria-label="View favorites" title="Favorites">
+      <a class="wishlist_icon_link" href="${getSitePageHref("wishlist.html")}" aria-label="${escapeHtml(getLocalizedText("header.viewFavorites", "View favorites"))}" title="${escapeHtml(getLocalizedText("header.favoritesTitle", "Favorites"))}" data-i18n-attr="aria-label:header.viewFavorites,title:header.favoritesTitle">
         <i class="fa fa-heart-o" aria-hidden="true"></i>
         <span class="wishlist_count_badge" hidden>0</span>
       </a>
@@ -325,8 +742,9 @@ function ensureWishlistAction(userOption) {
   }
 
   wishlistLink.setAttribute("href", getSitePageHref("wishlist.html"));
-  wishlistLink.setAttribute("aria-label", "View favorites");
-  wishlistLink.setAttribute("title", "Favorites");
+  wishlistLink.setAttribute("aria-label", getLocalizedText("header.viewFavorites", "View favorites"));
+  wishlistLink.setAttribute("title", getLocalizedText("header.favoritesTitle", "Favorites"));
+  wishlistLink.setAttribute("data-i18n-attr", "aria-label:header.viewFavorites,title:header.favoritesTitle");
 
   if (!wishlistLink.querySelector(".wishlist_count_badge")) {
     wishlistLink.appendChild(createElementFromHTML('<span class="wishlist_count_badge" hidden>0</span>'));
@@ -349,7 +767,7 @@ function ensureOrdersNav() {
   }
 
   const ordersHref = getSitePageHref("orders.html");
-  const currentPage = window.location.pathname.split("/").pop() || "index.html";
+  const currentPage = getCurrentPageFileName();
   let ordersItem = Array.from(navList.querySelectorAll(".nav-item")).find((item) => {
     const link = item.querySelector(".nav-link");
     return link && (link.getAttribute("href") === ordersHref || link.textContent.indexOf("My Orders") !== -1);
@@ -371,7 +789,7 @@ function ensureOrdersNav() {
   const link = ordersItem.querySelector(".nav-link");
   link.setAttribute("href", ordersHref);
   link.classList.add("orders_nav_link");
-  link.innerHTML = currentPage === ordersHref ? 'My Orders <span class="sr-only">(current)</span>' : "My Orders";
+  setNavLinkMarkup(link, "nav.orders", "My Orders", currentPage === ordersHref);
 
   if (currentPage === ordersHref) {
     ordersItem.classList.add("active");
@@ -385,7 +803,7 @@ function ensureFeedbackNav() {
   }
 
   const feedbackHref = getSitePageHref("feedback.html");
-  const currentPage = window.location.pathname.split("/").pop() || "index.html";
+  const currentPage = getCurrentPageFileName();
   let feedbackItem = Array.from(navList.querySelectorAll(".nav-item")).find((item) => {
     const link = item.querySelector(".nav-link");
     if (!link) {
@@ -408,7 +826,7 @@ function ensureFeedbackNav() {
   const link = feedbackItem.querySelector(".nav-link");
   link.setAttribute("href", feedbackHref);
   link.classList.add("feedback_nav_link");
-  link.innerHTML = currentPage === feedbackHref ? 'Feedback <span class="sr-only">(current)</span>' : "Feedback";
+  setNavLinkMarkup(link, "nav.feedback", "Feedback", currentPage === feedbackHref);
 
   if (currentPage === feedbackHref) {
     navList.querySelectorAll(".nav-item.active").forEach((item) => {
@@ -428,14 +846,17 @@ function ensureSearchButton(userOption) {
     searchForm.classList.add("site_search_toggle_form");
     const searchButton = searchForm.querySelector(".nav_search-btn");
     if (searchButton && !searchButton.getAttribute("aria-label")) {
-      searchButton.setAttribute("aria-label", "Search products");
+      searchButton.setAttribute("aria-label", getLocalizedText("header.searchProducts", "Search products"));
+    }
+    if (searchButton) {
+      searchButton.setAttribute("data-i18n-attr", "aria-label:header.searchProducts");
     }
     return searchForm;
   }
 
   searchForm = createElementFromHTML(`
     <form class="form-inline site_search_toggle_form">
-      <button class="btn my-2 my-sm-0 nav_search-btn" type="submit" aria-label="Search products">
+      <button class="btn my-2 my-sm-0 nav_search-btn" type="submit" aria-label="${escapeHtml(getLocalizedText("header.searchProducts", "Search products"))}" data-i18n-attr="aria-label:header.searchProducts">
         <i class="fa fa-search" aria-hidden="true"></i>
       </button>
     </form>
@@ -494,7 +915,7 @@ function ensureThemeToggle(userOption) {
   }
 
   themeToggle = createElementFromHTML(`
-    <button class="theme_toggle" type="button" data-theme-toggle="true" aria-label="Switch to dark mode" aria-pressed="false" title="Dark mode">
+    <button class="theme_toggle" type="button" data-theme-toggle="true" aria-label="${escapeHtml(getLocalizedText("theme.switchToDark", "Switch to dark mode"))}" aria-pressed="false" title="${escapeHtml(getLocalizedText("theme.dark", "Dark mode"))}">
       <span class="theme_toggle_orbit" aria-hidden="true">
         <span class="theme_toggle_halo"></span>
         <i class="fa fa-sun theme_toggle_icon" aria-hidden="true"></i>
@@ -511,6 +932,33 @@ function ensureThemeToggle(userOption) {
   return wrapNavbarThemeToggle(themeToggle);
 }
 
+function ensureLanguageSwitcher(userOption) {
+  let switcher = document.querySelector(".custom-language-switcher");
+  if (switcher) {
+    return switcher;
+  }
+
+  switcher = createElementFromHTML(`
+    <div class="custom-language-switcher">
+      <button class="language-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="${escapeHtml(getLocalizedText("language.label", "Language"))}" data-language-toggle data-i18n-attr="aria-label:language.label">
+        <span class="lang-icon" aria-hidden="true"></span>
+        <span id="currentLangText" data-current-language>${escapeHtml(getLocalizedText("language.current", "English"))}</span>
+        <span class="lang-divider" aria-hidden="true">/</span>
+        <span class="lang-code" aria-hidden="true" data-language-code>${escapeHtml(getLanguage().toUpperCase())}</span>
+        <i class="fa fa-angle-down lang-arrow" aria-hidden="true"></i>
+      </button>
+      <div class="language-menu" role="menu">
+        <button type="button" role="menuitemradio" data-language-option="en" data-i18n="language.english">${escapeHtml(getLocalizedText("language.english", "English"))}</button>
+        <button type="button" role="menuitemradio" data-language-option="ar" data-i18n="language.arabic">${escapeHtml(getLocalizedText("language.arabic", "Arabic"))}</button>
+      </div>
+    </div>
+  `);
+
+  userOption.appendChild(switcher);
+  applyTranslations(switcher);
+  return switcher;
+}
+
 function setThemeToggleElementState(themeToggle, isDarkMode) {
   if (!themeToggle) {
     return;
@@ -524,8 +972,11 @@ function setThemeToggleElementState(themeToggle, isDarkMode) {
     themeToggle.setAttribute("aria-pressed", String(isDarkMode));
     themeToggle.removeAttribute("aria-checked");
   }
-  themeToggle.setAttribute("aria-label", isDarkMode ? "Switch to light mode" : "Switch to dark mode");
-  themeToggle.setAttribute("title", isDarkMode ? "Light mode" : "Dark mode");
+  const labelKey = isDarkMode ? "theme.switchToLight" : "theme.switchToDark";
+  const titleKey = isDarkMode ? "theme.light" : "theme.dark";
+  themeToggle.setAttribute("aria-label", getLocalizedText(labelKey, isDarkMode ? "Switch to light mode" : "Switch to dark mode"));
+  themeToggle.setAttribute("title", getLocalizedText(titleKey, isDarkMode ? "Light mode" : "Dark mode"));
+  themeToggle.setAttribute("data-i18n-attr", `aria-label:${labelKey},title:${titleKey}`);
 
   const icon = themeToggle.querySelector(".theme_toggle_icon");
   if (icon) {
@@ -535,17 +986,17 @@ function setThemeToggleElementState(themeToggle, isDarkMode) {
 
   const drawerTitle = themeToggle.querySelector(".side_drawer_theme_title");
   if (drawerTitle) {
-    drawerTitle.textContent = "Dark Mode";
+    drawerTitle.textContent = getLocalizedText("theme.darkMode", "Dark Mode");
   }
 
   const drawerHint = themeToggle.querySelector(".side_drawer_theme_hint");
   if (drawerHint) {
-    drawerHint.textContent = isDarkMode ? "On" : "Off";
+    drawerHint.textContent = getLocalizedText(isDarkMode ? "theme.on" : "theme.off", isDarkMode ? "On" : "Off");
   }
 
   const drawerState = themeToggle.querySelector(".side_drawer_theme_state");
   if (drawerState) {
-    drawerState.textContent = isDarkMode ? "On" : "Off";
+    drawerState.textContent = getLocalizedText(isDarkMode ? "theme.on" : "theme.off", isDarkMode ? "On" : "Off");
   }
 }
 
@@ -648,7 +1099,7 @@ function getUserInitials(user) {
 
 function renderAvatarContent(user) {
   if (user && user.photoURL) {
-    const altText = user.displayName || user.email || "Sushi Box customer";
+    const altText = user.displayName || user.email || getLocalizedText("auth.sushiBoxCustomer", "Sushi Box Customer");
     return `<img src="${escapeHtml(user.photoURL)}" alt="${escapeHtml(altText)}" width="96" height="96" loading="lazy" decoding="async">`;
   }
 
@@ -667,15 +1118,15 @@ function renderSideDrawerAccount(user = latestAuthUser || getCurrentUser()) {
           <i class="fa fa-user-o" aria-hidden="true"></i>
         </span>
         <span class="side_drawer_account_text">
-          <strong>Login / Sign up</strong>
-          <small>Save orders and favorites</small>
+          <strong data-i18n="auth.loginSignup">${escapeHtml(getLocalizedText("auth.loginSignup", "Login / Sign up"))}</strong>
+          <small data-i18n="auth.signInSaveOrdersFavorites">${escapeHtml(getLocalizedText("auth.signInSaveOrdersFavorites", "Sign in to save your orders and favorites"))}</small>
         </span>
       </button>
     `;
   }
 
-  const title = user.displayName || user.email || "Sushi Box Customer";
-  const subtitle = user.email || "Signed in";
+  const title = user.displayName || user.email || getLocalizedText("auth.sushiBoxCustomer", "Sushi Box Customer");
+  const subtitle = user.email || getLocalizedText("auth.signedIn", "Signed in");
 
   return `
     <div class="side_drawer_account_shell">
@@ -689,7 +1140,7 @@ function renderSideDrawerAccount(user = latestAuthUser || getCurrentUser()) {
         </span>
       </button>
       <div class="side_drawer_account_actions" id="sideDrawerAccountActions" hidden>
-        <button class="side_drawer_logout_btn" type="button" data-auth-action="logout" aria-label="Logout" title="Logout">
+        <button class="side_drawer_logout_btn" type="button" data-auth-action="logout" aria-label="${escapeHtml(getLocalizedText("auth.logout", "Logout"))}" title="${escapeHtml(getLocalizedText("auth.logout", "Logout"))}" data-i18n-attr="aria-label:auth.logout,title:auth.logout">
           <i class="fa fa-sign-out" aria-hidden="true"></i>
         </button>
       </div>
@@ -699,16 +1150,13 @@ function renderSideDrawerAccount(user = latestAuthUser || getCurrentUser()) {
 
 function renderSideDrawerLanguageSection() {
   return `
-    <div class="side_drawer_coming_soon" data-tooltip-en="Coming soon" data-tooltip-ar="قريباً">
-      <div class="drawer-language-row side_drawer_coming_soon_control" aria-label="Language" aria-disabled="true">
-        <span class="drawer-language-icon fa fa-globe" aria-hidden="true"></span>
-        <span class="drawer-language-label">Language</span>
-        <div class="drawer-language-pills" role="group" aria-label="Choose language">
-          <button class="drawer-language-pill is_active" type="button" aria-pressed="true" aria-disabled="true" tabindex="-1">EN</button>
-          <button class="drawer-language-pill" type="button" aria-pressed="false" aria-disabled="true" tabindex="-1">AR</button>
-        </div>
+    <div class="drawer-language-row" aria-label="${escapeHtml(getLocalizedText("language.label", "Language"))}" data-i18n-attr="aria-label:language.label">
+      <span class="drawer-language-icon fa fa-globe" aria-hidden="true"></span>
+      <span class="drawer-language-label" data-i18n="language.label">${escapeHtml(getLocalizedText("language.label", "Language"))}</span>
+      <div class="drawer-language-pills" role="group" aria-label="${escapeHtml(getLocalizedText("language.choose", "Choose language"))}" data-i18n-attr="aria-label:language.choose">
+        <button class="drawer-language-pill" type="button" data-language-option="en" data-i18n="language.englishCode">${escapeHtml(getLocalizedText("language.englishCode", "EN"))}</button>
+        <button class="drawer-language-pill" type="button" data-language-option="ar" data-i18n="language.arabicCode">${escapeHtml(getLocalizedText("language.arabicCode", "AR"))}</button>
       </div>
-      <span class="side_drawer_lock" aria-hidden="true">🔒</span>
     </div>
   `;
 }
@@ -718,13 +1166,13 @@ function renderSideDrawerThemeSection() {
 
   return `
     <div class="side_drawer_coming_soon" data-tooltip-en="Coming soon" data-tooltip-ar="قريباً">
-      <button class="side_drawer_theme_row theme_toggle side_drawer_coming_soon_control${isDarkMode ? " is_dark" : ""}" type="button" role="switch" data-theme-toggle="true" aria-label="${isDarkMode ? "Switch to light mode" : "Switch to dark mode"}" aria-checked="${isDarkMode ? "true" : "false"}" aria-disabled="true" tabindex="-1" title="${isDarkMode ? "Light mode" : "Dark mode"}">
+      <button class="side_drawer_theme_row theme_toggle side_drawer_coming_soon_control${isDarkMode ? " is_dark" : ""}" type="button" role="switch" data-theme-toggle="true" aria-label="${escapeHtml(getLocalizedText(isDarkMode ? "theme.switchToLight" : "theme.switchToDark", isDarkMode ? "Switch to light mode" : "Switch to dark mode"))}" aria-checked="${isDarkMode ? "true" : "false"}" aria-disabled="true" tabindex="-1" title="${escapeHtml(getLocalizedText(isDarkMode ? "theme.light" : "theme.dark", isDarkMode ? "Light mode" : "Dark mode"))}">
         <span class="side_drawer_theme_icon" aria-hidden="true">
           <i class="fa ${isDarkMode ? "fa-moon" : "fa-sun"} theme_toggle_icon" aria-hidden="true"></i>
         </span>
         <span class="side_drawer_theme_text">
-          <strong class="side_drawer_theme_title">Dark Mode</strong>
-          <small class="side_drawer_theme_hint">${isDarkMode ? "On" : "Off"}</small>
+          <strong class="side_drawer_theme_title" data-i18n="theme.darkMode">${escapeHtml(getLocalizedText("theme.darkMode", "Dark Mode"))}</strong>
+          <small class="side_drawer_theme_hint" data-i18n="${isDarkMode ? "theme.on" : "theme.off"}">${escapeHtml(getLocalizedText(isDarkMode ? "theme.on" : "theme.off", isDarkMode ? "On" : "Off"))}</small>
         </span>
         <span class="side_drawer_theme_switch" aria-hidden="true">
           <span class="side_drawer_theme_switch_knob"></span>
@@ -754,7 +1202,7 @@ function renderSideDrawerMenuItems(user = latestAuthUser || getCurrentUser()) {
     return `
       <a class="side_drawer_link${isActive ? " is_active" : ""}" href="${getSitePageHref(item.href)}"${activeText}>
         <i class="fa ${item.icon} side_drawer_icon" aria-hidden="true"></i>
-        <span>${escapeHtml(item.label)}</span>
+        <span data-i18n="${item.i18nKey}">${escapeHtml(getLocalizedText(item.i18nKey, item.label))}</span>
         ${badge}
       </a>
     `;
@@ -764,10 +1212,10 @@ function renderSideDrawerMenuItems(user = latestAuthUser || getCurrentUser()) {
 function renderSideDrawerInner() {
   return `
     <div class="side_drawer_header">
-      <button class="side_drawer_edge_close" type="button" data-close-side-drawer="true" aria-label="Close menu" title="Close menu">
+      <button class="side_drawer_edge_close" type="button" data-close-side-drawer="true" aria-label="${escapeHtml(getLocalizedText("menu.close", "Close menu"))}" title="${escapeHtml(getLocalizedText("menu.close", "Close menu"))}" data-i18n-attr="aria-label:menu.close,title:menu.close">
         <i class="fa fa-chevron-right" aria-hidden="true"></i>
       </button>
-      <a class="side_drawer_brand" href="${getSitePageHref("index.html")}" aria-label="Sushi Box home">
+      <a class="side_drawer_brand" href="${getSitePageHref("index.html")}" aria-label="${escapeHtml(getLocalizedText("header.brandHome", "Sushi Box home"))}" data-i18n-attr="aria-label:header.brandHome">
         <span class="side_drawer_brand_mark" aria-hidden="true">
           <img src="/images/Logo.png" alt="" width="599" height="593" loading="lazy" decoding="async">
         </span>
@@ -776,7 +1224,7 @@ function renderSideDrawerInner() {
       </a>
     </div>
     <div class="side_drawer_middle">
-      <nav class="side_drawer_nav" aria-label="Site links">
+      <nav class="side_drawer_nav" aria-label="${escapeHtml(getLocalizedText("menu.siteLinks", "Site links"))}" data-i18n-attr="aria-label:menu.siteLinks">
         ${renderSideDrawerMenuItems()}
       </nav>
     </div>
@@ -799,7 +1247,7 @@ function ensureSideDrawerMenu() {
 
   if (!drawer) {
     drawer = createElementFromHTML(`
-      <aside class="site_side_drawer" id="siteSideDrawer" role="dialog" aria-modal="true" aria-label="Site menu" aria-hidden="true" hidden>
+      <aside class="site_side_drawer" id="siteSideDrawer" role="dialog" aria-modal="true" aria-label="${escapeHtml(getLocalizedText("menu.siteMenu", "Site menu"))}" data-i18n-attr="aria-label:menu.siteMenu" aria-hidden="true" hidden>
         ${renderSideDrawerInner()}
       </aside>
     `);
@@ -809,6 +1257,7 @@ function ensureSideDrawerMenu() {
   }
 
   setThemeToggleState(null, (getSavedTheme() || "light") === "dark");
+  applyTranslations(drawer);
   return { drawer, overlay };
 }
 
@@ -817,11 +1266,13 @@ function updateSideDrawerAccount(user = latestAuthUser || getCurrentUser()) {
   if (footer) {
     footer.innerHTML = `${renderSideDrawerLanguageSection()}${renderSideDrawerThemeSection()}${renderSideDrawerAccount(user)}`;
     setThemeToggleState(null, (getSavedTheme() || "light") === "dark");
+    applyTranslations(footer);
   }
 
   const nav = document.querySelector(".side_drawer_nav");
   if (nav) {
     nav.innerHTML = renderSideDrawerMenuItems(user);
+    applyTranslations(nav);
     updateSideDrawerOfferBadge();
     updateFavoritesBadge();
   }
@@ -852,7 +1303,8 @@ function openSideDrawerMenu() {
 
   if (toggler) {
     toggler.setAttribute("aria-expanded", "true");
-    toggler.setAttribute("aria-label", "Close menu");
+    toggler.setAttribute("aria-label", getLocalizedText("menu.close", "Close menu"));
+    toggler.setAttribute("data-i18n-attr", "aria-label:menu.close");
   }
 
   const firstControl = drawer.querySelector(".side_drawer_brand, .side_drawer_link, .side_drawer_account_row");
@@ -880,7 +1332,8 @@ function closeSideDrawerMenu() {
 
   if (toggler) {
     toggler.setAttribute("aria-expanded", "false");
-    toggler.setAttribute("aria-label", "Open menu");
+    toggler.setAttribute("aria-label", getLocalizedText("menu.open", "Open menu"));
+    toggler.setAttribute("data-i18n-attr", "aria-label:menu.open");
   }
 
   sideDrawerCloseTimer = window.setTimeout(() => {
@@ -915,7 +1368,8 @@ function initSideDrawerMenu() {
   toggler.removeAttribute("data-target");
   toggler.setAttribute("aria-controls", "siteSideDrawer");
   toggler.setAttribute("aria-expanded", "false");
-  toggler.setAttribute("aria-label", "Open menu");
+  toggler.setAttribute("aria-label", getLocalizedText("menu.open", "Open menu"));
+  toggler.setAttribute("data-i18n-attr", "aria-label:menu.open");
 
   toggler.addEventListener("click", (event) => {
     event.preventDefault();
@@ -965,12 +1419,12 @@ function ensureNavbarSearchShell(nav) {
   }
 
   shell = createElementFromHTML(`
-    <form class="navbar_search_shell" role="search" aria-label="Search products">
+    <form class="navbar_search_shell" role="search" aria-label="${escapeHtml(getLocalizedText("header.searchProducts", "Search products"))}" data-i18n-attr="aria-label:header.searchProducts">
       <span class="navbar_search_icon" aria-hidden="true">
         <i class="fa fa-search"></i>
       </span>
-      <input id="siteSearchInput" type="search" autocomplete="off" placeholder="Search sauces, noodles, dumplings, nori, and more">
-      <button class="navbar_search_close" type="button" data-close-search="true" aria-label="Close search">
+      <input id="siteSearchInput" type="search" autocomplete="off" placeholder="${escapeHtml(getLocalizedText("header.searchPlaceholder", "Search sauces, noodles, dumplings, nori, and more"))}" data-i18n-attr="placeholder:header.searchPlaceholder">
+      <button class="navbar_search_close" type="button" data-close-search="true" aria-label="${escapeHtml(getLocalizedText("header.closeSearch", "Close search"))}" data-i18n-attr="aria-label:header.closeSearch">
         <span aria-hidden="true">&times;</span>
       </button>
     </form>
@@ -987,6 +1441,7 @@ function placeNavbarControls() {
   const cartLink = document.querySelector(".cart_link");
   const searchForm = document.querySelector(".site_search_toggle_form") || document.querySelector(".form-inline");
   const authShell = document.querySelector(".auth_shell");
+  const languageSwitcher = document.querySelector(".custom-language-switcher");
   const collapse = nav && nav.querySelector(".navbar-collapse");
 
   if (!nav || !userOption) {
@@ -1008,7 +1463,7 @@ function placeNavbarControls() {
     userOption.appendChild(themeToggleWrapper);
   }
 
-  [authShell, cartLink, searchForm, isPhoneNav ? null : (themeToggleWrapper || themeToggle), toggler].forEach((control) => {
+  [authShell, cartLink, searchForm, languageSwitcher, isPhoneNav ? null : (themeToggleWrapper || themeToggle), toggler].forEach((control) => {
     if (control) {
       actions.appendChild(control);
     }
@@ -1038,7 +1493,10 @@ function placeNavbarControls() {
   }
 
   if (cartLink && !cartLink.getAttribute("aria-label")) {
-    cartLink.setAttribute("aria-label", "View cart");
+    cartLink.setAttribute("aria-label", getLocalizedText("header.viewCart", "View cart"));
+  }
+  if (cartLink) {
+    cartLink.setAttribute("data-i18n-attr", "aria-label:header.viewCart");
   }
 }
 
@@ -1055,7 +1513,7 @@ function ensureAuthShell(userOption) {
         <span class="auth_avatar">
           <i class="fa fa-user" aria-hidden="true"></i>
         </span>
-        <span class="auth_button_text">Login</span>
+        <span class="auth_button_text" data-i18n="auth.login">${escapeHtml(getLocalizedText("auth.login", "Login"))}</span>
         <i class="fa fa-angle-down auth_chevron" aria-hidden="true"></i>
       </button>
       <div class="auth_dropdown" hidden></div>
@@ -1112,35 +1570,35 @@ function ensureCartDrawer() {
   drawer = createElementFromHTML(`
     <div class="cart_drawer" hidden>
       <div class="cart_drawer_backdrop" data-close-cart="true"></div>
-      <aside class="cart_drawer_panel" role="dialog" aria-modal="true" aria-label="Shopping cart">
+      <aside class="cart_drawer_panel" role="dialog" aria-modal="true" aria-label="${escapeHtml(getCartUiText("shoppingCart", "Shopping Cart"))}" data-i18n-attr="aria-label:cartUi.shoppingCart">
         <div class="cart_drawer_header">
           <div>
-            <span class="cart_drawer_kicker">Your products</span>
-            <h3>Cart</h3>
+            <span class="cart_drawer_kicker" data-i18n="cartUi.yourProducts">${escapeHtml(getCartUiText("yourProducts", "Your products"))}</span>
+            <h3 data-i18n="cartUi.cart">${escapeHtml(getCartUiText("cart", "Cart"))}</h3>
           </div>
-          <button class="cart_drawer_close" type="button" data-close-cart="true" aria-label="Close cart">
+          <button class="cart_drawer_close" type="button" data-close-cart="true" aria-label="${escapeHtml(getCartUiText("closeCart", "Close cart"))}" data-i18n-attr="aria-label:cartUi.closeCart">
             <i class="fa fa-times" aria-hidden="true"></i>
           </button>
         </div>
         <div class="cart_drawer_body">
           <div class="cart_empty_state" id="cartEmptyState">
             <div class="cart_empty_icon"><i class="fa fa-shopping-basket" aria-hidden="true"></i></div>
-            <p>Your cart is empty. Add a few favorites to get started.</p>
+            <p data-i18n="cartUi.drawerEmptyHint">${escapeHtml(getCartUiText("drawerEmptyHint", "Your cart is empty. Add a few favorites to get started."))}</p>
           </div>
           <div class="cart_items" id="cartItems"></div>
         </div>
         <div class="cart_drawer_footer">
           <div class="cart_subtotal_row">
-            <span>Subtotal</span>
+            <span data-i18n="cartUi.subtotal">${escapeHtml(getCartUiText("subtotal", "Subtotal"))}</span>
             <strong id="cartSubtotal">\u062c.\u0645 0.00</strong>
           </div>
           <div class="cart_drawer_actions">
-            <button class="cart_clear_btn" id="cartClearBtn" type="button">Clear Cart</button>
+            <button class="cart_clear_btn" id="cartClearBtn" type="button" data-i18n="cartUi.emptyCart">${escapeHtml(getCartUiText("emptyCart", "Empty Cart"))}</button>
             <button class="return_menu_btn" type="button" data-close-cart="true">
               <i class="fa fa-home" aria-hidden="true"></i>
-              Continue Shopping
+              <span data-i18n="cartUi.continueShopping">${escapeHtml(getCartUiText("continueShopping", "Continue Shopping"))}</span>
             </button>
-            <button class="cart_checkout_btn" id="cartCheckoutBtn" type="button" data-open-checkout>Proceed to Checkout</button>
+            <button class="cart_checkout_btn" id="cartCheckoutBtn" type="button" data-open-checkout data-i18n="cartUi.proceedToSecureCheckout">${escapeHtml(getCartUiText("proceedToSecureCheckout", "Proceed to Secure Checkout"))}</button>
           </div>
         </div>
       </aside>
@@ -1149,6 +1607,7 @@ function ensureCartDrawer() {
 
   drawer.setAttribute("aria-hidden", "true");
   document.body.appendChild(drawer);
+  applyTranslations(drawer);
   return drawer;
 }
 
@@ -2031,12 +2490,12 @@ function closeCheckoutModal() {
 
 function navigateToCheckoutPage() {
   if (!isCartReady()) {
-    emitToast("Your cart is still loading. Please try again in a moment.", "info");
+    emitToast(getCartUiText("cartStillLoading", "Your cart is still loading. Please try again in a moment."), "info");
     return;
   }
 
   if (!getCart().length) {
-    emitToast("Your cart is empty. Add products before checkout.", "info");
+    emitToast(getCartUiText("cartEmptyBeforeCheckout", "Your cart is empty. Add products before checkout."), "info");
     return;
   }
 
@@ -2088,7 +2547,7 @@ function getSearchResultMarkup(product, index = 0) {
 
   return `
     <article class="site_search_result" role="option" aria-selected="${index === 0 ? "true" : "false"}" data-product-id="${escapeHtml(product.id)}" data-product-url="${escapeHtml(productUrl)}">
-      <a href="${escapeHtml(productUrl)}" class="site_search_result_link" aria-label="View ${escapeHtml(product.name)}">
+      <a href="${escapeHtml(productUrl)}" class="site_search_result_link" aria-label="${escapeHtml(getProductUiText("viewProductAria", "View {name}", { name: product.name }))}">
         ${renderProductThumb({
           product,
           alt: product.name,
@@ -2104,7 +2563,7 @@ function getSearchResultMarkup(product, index = 0) {
           <span class="site_search_result_meta">${formatPrice(product.price)}</span>
         </div>
       </a>
-      <button class="product-wishlist-btn site_search_wishlist_btn" type="button" data-wishlist-product-id="${escapeHtml(product.id)}" aria-label="Add ${escapeHtml(product.name)} to favorites" aria-pressed="false" title="Add to favorites">
+      <button class="product-wishlist-btn site_search_wishlist_btn" type="button" data-wishlist-product-id="${escapeHtml(product.id)}" aria-label="${escapeHtml(getProductUiText("addProductToFavorites", "Add {name} to favorites", { name: product.name }))}" aria-pressed="false" title="${escapeHtml(getProductUiText("addToFavorites", "Add to favorites"))}">
         <i class="fa fa-heart-o" aria-hidden="true"></i>
       </button>
     </article>
@@ -2124,9 +2583,9 @@ function renderSearchResults(query) {
   const visibleResults = detailedResults.slice(0, normalizedQuery ? 6 : 4);
 
   if (!normalizedQuery) {
-    hint.textContent = "Try ramen, shrimp, soy, sushi, Samyang, or dumplings.";
+    hint.textContent = getProductUiText("searchHint", "Try ramen, shrimp, soy, sushi, Samyang, or dumplings.");
     sectionLabel.hidden = false;
-    sectionLabel.textContent = "Popular products";
+    sectionLabel.textContent = getProductUiText("popularProducts", "Popular products");
     resultsContainer.innerHTML = getAllProducts().slice(0, 4).map((product, index) => getSearchResultMarkup(product, index)).join("");
     updateWishlistButtons(getWishlist());
     setActiveSearchResult(0);
@@ -2134,13 +2593,13 @@ function renderSearchResults(query) {
   }
 
   if (!detailedResults.length) {
-    hint.textContent = `No products matched "${normalizedQuery}".`;
+    hint.textContent = getProductUiText("noProductsMatched", "No products matched \"{query}\".", { query: normalizedQuery });
     sectionLabel.hidden = true;
     resultsContainer.innerHTML = `
       <div class="site_search_empty_state">
         <span class="site_search_empty_icon"><i class="fa fa-search" aria-hidden="true"></i></span>
-        <strong>No products found</strong>
-        <p>Try a product type, brand, ingredient, or a shorter word like "soy", "ramen", "shrimp", or "sushi".</p>
+        <strong>${escapeHtml(getProductUiText("noProductsFound", "No products found"))}</strong>
+        <p>${escapeHtml(getProductUiText("noProductsFoundHint", "Try a product type, brand, ingredient, or a shorter word like \"soy\", \"ramen\", \"shrimp\", or \"sushi\"."))}</p>
       </div>
     `;
     return;
@@ -2149,15 +2608,15 @@ function renderSearchResults(query) {
   const hasStrongMatch = visibleResults.some((result) => result.strength === "strong");
   const seeAllLink = `
     <a class="site_search_see_all" href="${getSitePageHref("menu.html")}?search=${encodeURIComponent(normalizedQuery)}">
-      See all results
+      ${escapeHtml(getProductUiText("seeAllResults", "See all results"))}
     </a>
   `;
 
   hint.textContent = hasStrongMatch
-    ? `${detailedResults.length} result${detailedResults.length === 1 ? "" : "s"} found.`
-    : "Exact matches are weak, so we found the closest products.";
+    ? getProductUiCountText("resultsFound", detailedResults.length, "{count} result found.", "{count} results found.")
+    : getProductUiText("weakMatches", "Exact matches are weak, so we found the closest products.");
   sectionLabel.hidden = false;
-  sectionLabel.textContent = hasStrongMatch ? "Best matches" : "Related results";
+  sectionLabel.textContent = hasStrongMatch ? getProductUiText("bestMatches", "Best matches") : getProductUiText("relatedResults", "Related results");
   resultsContainer.innerHTML = visibleResults.map(({ product }, index) => getSearchResultMarkup(product, index)).join("") + seeAllLink;
   updateWishlistButtons(getWishlist());
   setActiveSearchResult(0);
@@ -2237,14 +2696,15 @@ function renderCart(cart, detail = {}) {
   const cartLinks = document.querySelectorAll(".cart_link");
   const isReady = detail.ready !== false && !detail.loading;
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const languageKey = getLanguage();
   const markupKey = isReady
-    ? cart.map((item) => {
+    ? `${languageKey}:` + cart.map((item) => {
       const status = getInventoryStatus(item.id);
       const product = getExactProduct(item.id);
       const pricing = getProductOfferPricing(product || { id: item.id, price: item.price });
       return `${item.id}:${item.quantity}:${pricing.originalPrice}:${pricing.finalPrice}:${status.message}:${status.available}`;
     }).join("|")
-    : "loading";
+    : `${languageKey}:loading`;
 
   logCartDebug("navbar/cart drawer reads cart", {
     storageKey: detail.storageKey,
@@ -2281,7 +2741,7 @@ function renderCart(cart, detail = {}) {
     cartEmptyState.hidden = false;
     cartEmptyState.innerHTML = `
       <div class="cart_empty_icon"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i></div>
-      <p>Loading your cart...</p>
+      <p>${escapeHtml(getCartUiText("loadingCart", "Loading cart"))}...</p>
     `;
     if (lastCartMarkupKey !== markupKey) {
       cartItems.innerHTML = "";
@@ -2300,7 +2760,7 @@ function renderCart(cart, detail = {}) {
   cartEmptyState.hidden = cart.length > 0;
   cartEmptyState.innerHTML = `
     <div class="cart_empty_icon"><i class="fa fa-shopping-basket" aria-hidden="true"></i></div>
-    <p>Your cart is empty. Add a few favorites to get started.</p>
+    <p>${escapeHtml(getCartUiText("drawerEmptyHint", "Your cart is empty. Add a few favorites to get started."))}</p>
   `;
   if (lastCartMarkupKey === markupKey) {
     return;
@@ -2312,6 +2772,7 @@ function renderCart(cart, detail = {}) {
     const pricing = getProductOfferPricing(product || { id: item.id, price: item.price });
     const inventoryStatus = getInventoryStatus(item.id);
     const quantityLimitNotice = getQuantityLimitNotice(inventoryStatus, item.quantity);
+    const stockStatusText = getCartStockStatusText(inventoryStatus);
 
     return `
       <article class="cart_item" data-cart-product-id="${item.id}">
@@ -2328,15 +2789,15 @@ function renderCart(cart, detail = {}) {
         <div class="cart_item_content">
           <div class="cart_item_header">
             <a href="${buildProductUrl(item.id)}"><strong>${escapeHtml(item.name)}</strong></a>
-            <button class="cart_remove_btn" type="button" data-remove-cart-item="${item.id}">Remove</button>
+            <button class="cart_remove_btn" type="button" data-remove-cart-item="${item.id}">${escapeHtml(getCartUiText("remove", "Remove"))}</button>
           </div>
           <span class="cart_item_price">${pricing.offer ? `<del>${escapeHtml(formatPrice(pricing.originalPrice))}</del> ` : ""}${escapeHtml(formatPrice(pricing.finalPrice))}</span>
-          <span class="product_stock_status${inventoryStatus.isOutOfStock ? " is_out" : ""}${inventoryStatus.isLowStock ? " is_low" : ""}" ${inventoryStatus.message ? "" : "hidden"}>${escapeHtml(inventoryStatus.message)}</span>
+          <span class="product_stock_status${inventoryStatus.isOutOfStock ? " is_out" : ""}${inventoryStatus.isLowStock ? " is_low" : ""}" ${inventoryStatus.message ? "" : "hidden"}>${escapeHtml(stockStatusText)}</span>
           <div class="cart_qty_stack">
             <div class="cart_qty_controls">
-              <button type="button" data-cart-decrease="${item.id}">-</button>
+              <button type="button" data-cart-decrease="${item.id}" aria-label="${escapeHtml(getCartUiText("decreaseQuantity", "Decrease quantity"))}">-</button>
               <span>${item.quantity}</span>
-              <button type="button" data-cart-increase="${item.id}" ${inventoryStatus.tracked && item.quantity >= inventoryStatus.available ? "disabled" : ""}>+</button>
+              <button type="button" data-cart-increase="${item.id}" aria-label="${escapeHtml(getCartUiText("increaseQuantity", "Increase quantity"))}" ${inventoryStatus.tracked && item.quantity >= inventoryStatus.available ? "disabled" : ""}>+</button>
             </div>
             ${quantityLimitNotice ? `<span class="cart_quantity_limit_notice">${escapeHtml(quantityLimitNotice)}</span>` : ""}
           </div>
@@ -2362,19 +2823,23 @@ function setAuthDropdownState(authShell, user) {
 
   if (!user) {
     avatar.innerHTML = renderAvatarContent(null);
-    label.textContent = "Login";
+    label.setAttribute("data-i18n", "auth.login");
+    label.textContent = getLocalizedText("auth.login", "Login");
     dropdown.innerHTML = `
       <div class="auth_dropdown_card">
-        <p>Sign in with Google to manage reviews, save your profile, and keep orders under your account.</p>
-        <button class="auth_dropdown_btn" type="button" data-auth-action="login">Continue with Google</button>
+        <p data-i18n="auth.googleAccountHint">${escapeHtml(getLocalizedText("auth.googleAccountHint", "Sign in with Google to manage reviews, save your profile, and keep orders under your account."))}</p>
+        <button class="auth_dropdown_btn" type="button" data-auth-action="login" data-i18n="auth.continueWithGoogle">${escapeHtml(getLocalizedText("auth.continueWithGoogle", "Continue with Google"))}</button>
       </div>
     `;
+    applyTranslations(authShell);
     updateSideDrawerAccount(user);
     return;
   }
 
   avatar.innerHTML = renderAvatarContent(user);
-  label.textContent = user.displayName || user.email || "My Account";
+  label.removeAttribute("data-i18n");
+  label.textContent = user.displayName || user.email || getLocalizedText("auth.myAccount", "My Account");
+  const signedInWithGoogle = getLocalizedText("auth.signedInWithGoogle", "Signed in with Google");
   dropdown.innerHTML = `
     <div class="auth_dropdown_card auth_dropdown_card_user">
       <div class="auth_dropdown_user">
@@ -2382,18 +2847,19 @@ function setAuthDropdownState(authShell, user) {
           ${renderAvatarContent(user)}
         </span>
         <div class="auth_dropdown_user_meta">
-          <strong>${escapeHtml(user.displayName || "Sushi Box Customer")}</strong>
-          <span title="${escapeHtml(user.email || "Signed in with Google")}">${escapeHtml(user.email || "Signed in with Google")}</span>
+          <strong>${escapeHtml(user.displayName || getLocalizedText("auth.sushiBoxCustomer", "Sushi Box Customer"))}</strong>
+          <span title="${escapeHtml(user.email || signedInWithGoogle)}">${escapeHtml(user.email || signedInWithGoogle)}</span>
         </div>
       </div>
-      <div class="auth_dropdown_actions" aria-label="Account actions">
-        <button class="auth_dropdown_icon_button" type="button" data-auth-action="logout" title="Logout">
+      <div class="auth_dropdown_actions" aria-label="${escapeHtml(getLocalizedText("auth.accountActions", "Account actions"))}" data-i18n-attr="aria-label:auth.accountActions">
+        <button class="auth_dropdown_icon_button" type="button" data-auth-action="logout" title="${escapeHtml(getLocalizedText("auth.logout", "Logout"))}" data-i18n-attr="title:auth.logout">
           <i class="fa fa-sign-out" aria-hidden="true"></i>
-          <span>Logout</span>
+          <span data-i18n="auth.logout">${escapeHtml(getLocalizedText("auth.logout", "Logout"))}</span>
         </button>
       </div>
     </div>
   `;
+  applyTranslations(dropdown);
   updateSideDrawerAccount(user);
 }
 
@@ -2433,23 +2899,24 @@ function ensureMobileAuthModal() {
     <div class="mobile_auth_modal" hidden>
       <div class="mobile_auth_backdrop" data-close-mobile-auth="true"></div>
       <section class="mobile_auth_dialog" role="dialog" aria-modal="true" aria-labelledby="mobileAuthTitle" aria-describedby="mobileAuthSubtitle" tabindex="-1">
-        <button class="mobile_auth_close" type="button" data-close-mobile-auth="true" aria-label="Close sign in">
+        <button class="mobile_auth_close" type="button" data-close-mobile-auth="true" aria-label="${escapeHtml(getLocalizedText("auth.closeSignIn", "Close sign in"))}" data-i18n-attr="aria-label:auth.closeSignIn">
           <i class="fa fa-times" aria-hidden="true"></i>
         </button>
         <span class="mobile_auth_icon" aria-hidden="true">
           <i class="fa fa-user"></i>
         </span>
-        <h3 id="mobileAuthTitle">Sign in to Sushi Box</h3>
-        <p id="mobileAuthSubtitle">Continue with your Google account</p>
+        <h3 id="mobileAuthTitle" data-i18n="auth.signInWithGoogleTitle">${escapeHtml(getLocalizedText("auth.signInWithGoogleTitle", "Sign in to Sushi Box"))}</h3>
+        <p id="mobileAuthSubtitle" data-i18n="auth.continueWithGoogleAccount">${escapeHtml(getLocalizedText("auth.continueWithGoogleAccount", "Continue with your Google account"))}</p>
         <button class="mobile_auth_google_btn" type="button" data-auth-action="login">
           <i class="fa fa-google" aria-hidden="true"></i>
-          <span>Continue with Google</span>
+          <span data-i18n="auth.continueWithGoogle">${escapeHtml(getLocalizedText("auth.continueWithGoogle", "Continue with Google"))}</span>
         </button>
       </section>
     </div>
   `);
 
   document.body.appendChild(modal);
+  applyTranslations(modal);
   return modal;
 }
 
@@ -2595,6 +3062,45 @@ function bindGlobalEvents(authShell) {
   window[globalEventsGuardKey] = true;
 
   document.addEventListener("click", async (event) => {
+    const languageToggle = event.target.closest("[data-language-toggle]");
+    if (languageToggle) {
+      event.preventDefault();
+      const switcher = languageToggle.closest(".custom-language-switcher");
+      const menu = switcher && switcher.querySelector(".language-menu");
+      const isOpen = menu && menu.classList.contains("active");
+      document.querySelectorAll(".language-menu.active").forEach((openMenu) => {
+        openMenu.classList.remove("active");
+      });
+      document.querySelectorAll("[data-language-toggle][aria-expanded='true']").forEach((openToggle) => {
+        openToggle.setAttribute("aria-expanded", "false");
+      });
+
+      if (menu && !isOpen) {
+        menu.classList.add("active");
+        languageToggle.setAttribute("aria-expanded", "true");
+      }
+      return;
+    }
+
+    if (event.target.closest("[data-language-option]")) {
+      document.querySelectorAll(".language-menu.active").forEach((openMenu) => {
+        openMenu.classList.remove("active");
+      });
+      document.querySelectorAll("[data-language-toggle][aria-expanded='true']").forEach((openToggle) => {
+        openToggle.setAttribute("aria-expanded", "false");
+      });
+      return;
+    }
+
+    if (!event.target.closest(".custom-language-switcher")) {
+      document.querySelectorAll(".language-menu.active").forEach((openMenu) => {
+        openMenu.classList.remove("active");
+      });
+      document.querySelectorAll("[data-language-toggle][aria-expanded='true']").forEach((openToggle) => {
+        openToggle.setAttribute("aria-expanded", "false");
+      });
+    }
+
     const whatsAppLink = event.target.closest("a[href*='wa.me'], a[href*='api.whatsapp.com'], a[href*='whatsapp://']");
     if (whatsAppLink) {
       const productContext = getProductContextForAnalytics(whatsAppLink);
@@ -2615,11 +3121,11 @@ function bindGlobalEvents(authShell) {
     if (checkoutAction) {
       event.preventDefault();
       if (!isCartReady()) {
-        emitToast("Your cart is still loading. Please try again in a moment.", "info");
+        emitToast(getCartUiText("cartStillLoading", "Your cart is still loading. Please try again in a moment."), "info");
         return;
       }
       if (checkoutAction.classList.contains("is_disabled") || checkoutAction.disabled) {
-        emitToast("Your cart is empty. Add products before checkout.", "info");
+        emitToast(getCartUiText("cartEmptyBeforeCheckout", "Your cart is empty. Add products before checkout."), "info");
         return;
       }
       navigateToCheckoutPage();
@@ -2668,17 +3174,17 @@ function bindGlobalEvents(authShell) {
           await signInWithGoogle();
           closeMobileAuthModal();
           closeSideDrawerMenu();
-          emitToast("Signed in successfully.", "success");
+          emitToast(getLocalizedText("auth.signedInSuccessfully", "Signed in successfully."), "success");
           redirectAfterLoginIfRequested();
         }
 
         if (action === "logout") {
           await signOutUser();
           closeSideDrawerMenu();
-          emitToast("You have been logged out.", "info");
+          emitToast(getLocalizedText("auth.loggedOut", "You have been logged out."), "info");
         }
       } catch (error) {
-        emitToast(error.message || "We could not complete that sign-in action.", "error");
+        emitToast(error.message || getLocalizedText("auth.authActionFailed", "We could not complete that sign-in action."), "error");
       }
 
       return;
@@ -2727,7 +3233,11 @@ function bindGlobalEvents(authShell) {
         const result = toggleWishlistItem(product);
         updateWishlistButtons(result.wishlist);
         animateWishlistToggle(wishlistAction);
-        emitToast(`${product.name} ${result.added ? "added to" : "removed from"} favorites.`, result.added ? "success" : "info");
+        emitToast(getProductUiText(
+          result.added ? "productSavedToFavorites" : "productRemovedFromFavorites",
+          result.added ? "{name} added to favorites." : "{name} removed from favorites.",
+          { name: product.name }
+        ), result.added ? "success" : "info");
       }
 
       return;
@@ -2737,12 +3247,12 @@ function bindGlobalEvents(authShell) {
     if (saveCartItemAction) {
       const product = getExactProduct(saveCartItemAction.getAttribute("data-save-cart-item"));
       if (!product) {
-        emitToast("This product is no longer available.", "info");
+        emitToast(getCartUiText("productUnavailable", "This product is no longer available."), "info");
       } else if (isProductWishlisted(product.id)) {
-        emitToast("Already in favorites.", "info");
+        emitToast(getCartUiText("alreadyInFavorites", "Already in favorites."), "info");
       } else {
         addWishlistItem(product);
-        emitToast("Saved to favorites.", "success");
+        emitToast(getCartUiText("savedToFavorites", "Saved to favorites."), "success");
       }
       return;
     }
@@ -2761,17 +3271,17 @@ function bindGlobalEvents(authShell) {
     const removeAction = event.target.closest("[data-remove-cart-item]");
     if (removeAction) {
       if (!isCartReady()) {
-        emitToast("Your cart is still loading. Please try again in a moment.", "info");
+        emitToast(getCartUiText("cartStillLoading", "Your cart is still loading. Please try again in a moment."), "info");
         return;
       }
       removeCartItem(removeAction.getAttribute("data-remove-cart-item"));
-      emitToast("Item removed from cart.", "info");
+      emitToast(getCartUiText("productRemoved", "Product removed from cart."), "info");
     }
 
     const increaseAction = event.target.closest("[data-cart-increase]");
     if (increaseAction) {
       if (!isCartReady()) {
-        emitToast("Your cart is still loading. Please try again in a moment.", "info");
+        emitToast(getCartUiText("cartStillLoading", "Your cart is still loading. Please try again in a moment."), "info");
         return;
       }
       const productId = increaseAction.getAttribute("data-cart-increase");
@@ -2780,7 +3290,7 @@ function bindGlobalEvents(authShell) {
       const inventoryStatus = getInventoryStatus(productId);
       const quantityLimitNotice = getQuantityLimitNotice(inventoryStatus, currentValue);
       if (quantityLimitNotice) {
-        emitToast(quantityLimitNotice, "error");
+        emitToast(getCartUiText("maxQuantityReached", "You have reached the maximum available quantity."), "error");
         return;
       }
       updateCartItemQuantityWithInventory(productId, currentValue + 1);
@@ -2789,7 +3299,7 @@ function bindGlobalEvents(authShell) {
     const decreaseAction = event.target.closest("[data-cart-decrease]");
     if (decreaseAction) {
       if (!isCartReady()) {
-        emitToast("Your cart is still loading. Please try again in a moment.", "info");
+        emitToast(getCartUiText("cartStillLoading", "Your cart is still loading. Please try again in a moment."), "info");
         return;
       }
       const productId = decreaseAction.getAttribute("data-cart-decrease");
@@ -2835,16 +3345,22 @@ function bindGlobalEvents(authShell) {
   document.addEventListener("click", (event) => {
     if (event.target.id === "cartClearBtn") {
       if (!isCartReady()) {
-        emitToast("Your cart is still loading. Please try again in a moment.", "info");
+        emitToast(getCartUiText("cartStillLoading", "Your cart is still loading. Please try again in a moment."), "info");
         return;
       }
       clearCartByUserAction();
-      emitToast("Cart cleared.", "info");
+      emitToast(getCartUiText("cartCleared", "Cart cleared."), "info");
     }
   });
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
+      document.querySelectorAll(".language-menu.active").forEach((openMenu) => {
+        openMenu.classList.remove("active");
+      });
+      document.querySelectorAll("[data-language-toggle][aria-expanded='true']").forEach((openToggle) => {
+        openToggle.setAttribute("aria-expanded", "false");
+      });
       closeSearchPanel();
       closeCartDrawer();
       closeSideDrawerMenu();
@@ -2911,11 +3427,27 @@ function bindGlobalEvents(authShell) {
   });
 
   window.addEventListener("sushi-box:offers-ready", updateSideDrawerOfferBadge);
+  window.addEventListener("sushi-box:language-change", () => {
+    refreshNiceSelectI18n();
+    updateWishlistButtons(getWishlist());
+    renderCart(getCart(), { ready: isCartReady(), loading: !isCartReady() });
+    const authShell = document.querySelector(".auth_shell");
+    if (authShell) {
+      setAuthDropdownState(authShell, latestAuthUser || getCurrentUser());
+    } else {
+      updateSideDrawerAccount(latestAuthUser || getCurrentUser());
+    }
+    const searchInput = document.getElementById("siteSearchInput");
+    renderSearchResults(searchInput ? searchInput.value : "");
+  });
 }
 
 function initAppShell() {
+  initI18n();
   cleanPrivateStorage();
   initGlobalAnalyticsMonitoring();
+  ensurePrimaryNavI18n();
+  annotatePhase2StaticContent();
   ensureHowToOrderNav();
   ensureWishlistNav();
   ensureOrdersNav();
@@ -2927,6 +3459,7 @@ function initAppShell() {
 
   removeNavbarWishlistAction();
   ensureSearchButton(userOption);
+  ensureLanguageSwitcher(userOption);
   const themeToggle = ensureThemeToggle(userOption);
   const authShell = ensureAuthShell(userOption);
   initThemeToggle(themeToggle);

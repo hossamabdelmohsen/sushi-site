@@ -22806,3 +22806,179 @@ body.checkout-page [hidden],
 body.admin-orders-page [hidden] {
   display: none !important;
 }
+
+/* Phase 1 i18n: scoped RTL support for navigation chrome only. */
+html[dir="rtl"] .custom_nav-container.minimal_navbar .minimal_nav_actions {
+  right: auto !important;
+  left: 0 !important;
+}
+
+html[dir="rtl"] .custom_nav-container.minimal_navbar .navbar_search_shell {
+  direction: rtl !important;
+}
+
+html[dir="rtl"] .custom_nav-container.minimal_navbar .minimal_nav_actions .language-menu {
+  right: auto !important;
+  left: 0 !important;
+  transform-origin: top left !important;
+}
+
+html[dir="rtl"] .language-menu button {
+  padding: 9px 12px 9px 34px !important;
+  text-align: right !important;
+}
+
+html[dir="rtl"] .language-menu button::after {
+  right: auto !important;
+  left: 13px !important;
+}
+
+html[dir="rtl"] .site_side_drawer {
+  right: auto !important;
+  left: 0 !important;
+  border-right: 1px solid rgba(166, 113, 24, 0.16) !important;
+  border-left: 0 !important;
+  box-shadow: 22px 0 54px rgba(33, 23, 13, 0.18) !important;
+  transform: translateX(-100%) !important;
+}
+
+html[dir="rtl"] .site_side_drawer.is_open {
+  transform: translateX(0) !important;
+}
+
+html[dir="rtl"] .side_drawer_edge_close i {
+  transform: rotate(180deg) !important;
+}
+
+html[dir="rtl"] .side_drawer_link,
+html[dir="rtl"] .drawer-language-row,
+html[dir="rtl"] .side_drawer_theme_row,
+html[dir="rtl"] .side_drawer_account_row {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+html[dir="rtl"] .side_drawer_link {
+  grid-template-columns: auto minmax(0, 1fr) 28px !important;
+}
+
+html[dir="rtl"] .side_drawer_icon {
+  grid-column: 3 !important;
+}
+
+html[dir="rtl"] .side_drawer_link span:not(.side_drawer_badge) {
+  grid-column: 2 !important;
+  text-align: start !important;
+}
+
+html[dir="rtl"] .side_drawer_badge {
+  grid-column: 1 !important;
+  justify-self: start !important;
+  margin-inline-start: 0 !important;
+  margin-inline-end: 0 !important;
+}
+
+html[dir="rtl"] .side_drawer_lock {
+  right: auto !important;
+  left: -4px !important;
+}
+
+html[dir="rtl"] .side_drawer_coming_soon::after,
+html[dir="rtl"] .navbar_theme_coming_soon::after {
+  right: auto !important;
+  left: 0 !important;
+}
+
+html[dir="rtl"] .side_drawer_theme_switch_knob {
+  right: 3px !important;
+  left: auto !important;
+}
+
+html[dir="rtl"] .side_drawer_theme_row[aria-checked="true"] .side_drawer_theme_switch_knob,
+html[dir="rtl"] .side_drawer_theme_row[aria-pressed="true"] .side_drawer_theme_switch_knob,
+html[dir="rtl"] .side_drawer_theme_row.is_dark .side_drawer_theme_switch_knob {
+  transform: translateX(-20px) !important;
+}
+
+/* Phase 2 i18n: informational pages and shared footer RTL polish. */
+html[dir="rtl"] .about_article_section,
+html[dir="rtl"] .how_to_order_section,
+html[dir="rtl"] .feedback_hero_section,
+html[dir="rtl"] .feedback_appreciation_section,
+html[dir="rtl"] .policy_page_main,
+html[dir="rtl"] .footer_section {
+  text-align: start !important;
+}
+
+html[dir="rtl"] .about_check_list,
+html[dir="rtl"] .about_highlight_panel ul,
+html[dir="rtl"] .policy_section ul {
+  padding-inline-start: 0 !important;
+  padding-inline-end: 1.25rem !important;
+}
+
+html[dir="rtl"] .feedback_field label,
+html[dir="rtl"] .feedback_field input,
+html[dir="rtl"] .feedback_field textarea,
+html[dir="rtl"] .feedback_field select,
+html[dir="rtl"] .feedback_status,
+html[dir="rtl"] .nice-select {
+  text-align: start !important;
+}
+
+html[dir="rtl"] .feedback_field input,
+html[dir="rtl"] .feedback_field textarea,
+html[dir="rtl"] .feedback_field select {
+  direction: rtl !important;
+}
+
+html[dir="rtl"] #feedbackEmail {
+  direction: ltr !important;
+  text-align: start !important;
+}
+
+html[dir="rtl"] .feedback_direct_support a,
+html[dir="rtl"] .wholesale_contact_btn,
+html[dir="rtl"] .contact_link_box a,
+html[dir="rtl"] .footer-info-item {
+  flex-direction: row-reverse !important;
+}
+
+html[dir="rtl"] .feedback_support_list,
+html[dir="rtl"] .contact_link_box,
+html[dir="rtl"] .delivery-list {
+  padding-inline-start: 0 !important;
+}
+
+html[dir="rtl"] .footer_section .footer_policy_links a::before {
+  margin-inline-start: 7px !important;
+  margin-inline-end: 0 !important;
+}
+
+/* Phase 3 i18n: product-card and listing UI RTL polish only. */
+html[dir="rtl"] .product-card,
+html[dir="rtl"] .offers_page_card,
+html[dir="rtl"] .wishlist_card,
+html[dir="rtl"] .recommendation_card,
+html[dir="rtl"] .site_search_result,
+html[dir="rtl"] .product_grid_empty,
+html[dir="rtl"] .offers_page_empty,
+html[dir="rtl"] .recommendations_empty {
+  text-align: start !important;
+}
+
+html[dir="rtl"] .product_action_group,
+html[dir="rtl"] .offers_page_actions,
+html[dir="rtl"] .wishlist_card_actions,
+html[dir="rtl"] .recommendation_card_actions {
+  direction: rtl !important;
+}
+
+html[dir="rtl"] .product_stock_status,
+html[dir="rtl"] .product_offer_badge {
+  direction: rtl !important;
+}
+
+html[dir="rtl"] .site_search_result_link {
+  text-align: start !important;
+}

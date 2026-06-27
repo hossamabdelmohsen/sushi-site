@@ -113,7 +113,7 @@ function ProductDetails() {
         <div className="container product_page_container">
           <a href="/menu.html" className="return_menu_btn product_back_link">
             <i className="fa fa-angle-left" aria-hidden="true" />
-            Return to Products
+            <span data-i18n="productUi.backToProducts">Back to products</span>
           </a>
           <div className="row product_details_layout">
             <div className="col-lg-7 product_gallery_column">
@@ -128,25 +128,25 @@ function ProductDetails() {
             </div>
             <div className="col-lg-5 product_info_column">
               <div className="product_info_card">
-                <button id="productShareBtn" type="button" className="product_share_detail_btn" aria-label="Share product" title="Share">
+                <button id="productShareBtn" type="button" className="product_share_detail_btn" aria-label="Share product" title="Share" data-i18n-title="productUi.share">
                   <i className="fa fa-share-alt" aria-hidden="true" />
                 </button>
                 <button id="productFavoriteBtn" type="button" className="product_favorite_detail_btn" data-wishlist-product-id="" aria-label="Add product to favorites" aria-pressed="false" title="Add to favorites">
                   <i className="fa fa-heart-o" aria-hidden="true" />
                 </button>
                 <span id="productCategory" className="product_category_label" />
-                <h1 id="productName" />
+                <h1 id="productName" data-i18n="productUi.loadingProduct">Loading product</h1>
                 <div className="product_rating_meta">
                   <div id="productRatingStars" className="rating_stars_wrap" />
                   <span id="productRatingText" hidden />
                 </div>
                 <p id="productDescription" />
                 <div id="productComponentsSection" className="product_meta_section" hidden>
-                  <h2 className="product_meta_title">Components</h2>
+                  <h2 className="product_meta_title" data-i18n="productUi.components">Components</h2>
                   <ul id="productComponentsList" className="product_feature_list" />
                 </div>
                 <div id="productItemDetailsSection" className="product_meta_section" hidden>
-                  <h2 className="product_meta_title">Item Details</h2>
+                  <h2 className="product_meta_title" data-i18n="productUi.productDetails">Product Details</h2>
                   <dl id="productItemDetailsList" className="product_spec_list" />
                 </div>
                 <div className="product_price_row">
@@ -156,7 +156,7 @@ function ProductDetails() {
                 </div>
 
                 <div className="quantity_wrap">
-                  <span>Quantity</span>
+                  <span data-i18n="productUi.quantity">Quantity</span>
                   <div className="qty_controls">
                     <button id="qtyMinus" type="button">-</button>
                     <input id="qtyInput" type="text" value="1" readOnly />
@@ -169,7 +169,7 @@ function ProductDetails() {
                 <div className="product_action_row">
                   <button id="addToCartBtn" type="button" className="product_cart_primary_btn">
                     <i className="fa fa-shopping-basket" aria-hidden="true" />
-                    Add to Cart
+                    <span data-product-button-label="" data-i18n="productUi.addToCart">Add to Cart</span>
                   </button>
                   <button id="productCheckoutBtn" type="button" className="product_checkout_btn">
                     <i className="fa fa-credit-card" aria-hidden="true" />
@@ -214,12 +214,12 @@ function ProductStory() {
       <div className="container product_page_container">
         <div className="product_story_card">
           <div className="product_detail_tabs" aria-label="Product detail sections">
-            <a className="product_detail_tab active" href="#productStorySection">Description</a>
-            <a className="product_detail_tab" href="#productComponentsSection">Components</a>
-            <a className="product_detail_tab" href="#productReviewsSection">Reviews</a>
+            <a className="product_detail_tab active" href="#productStorySection" data-i18n="productUi.description">Description</a>
+            <a className="product_detail_tab" href="#productComponentsSection" data-i18n="productUi.components">Components</a>
+            <a className="product_detail_tab" href="#productReviewsSection" data-i18n="productUi.reviews">Reviews</a>
           </div>
           <div className="heading_container">
-            <h2>Product Description</h2>
+            <h2 data-i18n="productUi.productDetails">Product Details</h2>
           </div>
           <h3 id="productStoryTitle" className="product_story_title" />
           <p id="productStoryLead" className="product_story_lead" />
@@ -236,16 +236,16 @@ function ProductReviews() {
       <div className="container product_page_container">
         <div className="product_reviews_stack">
           <div className="reviews_summary_card">
-            <span className="reviews_kicker">Live customer reviews</span>
-            <h2>What customers think</h2>
+            <span className="reviews_kicker" data-i18n="productUi.reviews">Reviews</span>
+            <h2 data-i18n="productUi.customerReviews">Customer Reviews</h2>
             <div className="rating_overview">
               <div className="rating_overview_score" id="averageRatingValue">0.0</div>
               <div className="rating_overview_meta">
                 <div id="averageRatingStars" className="rating_stars_wrap" />
-                <p><span id="reviewCountValue">0</span> ratings</p>
+                <p><span id="reviewCountValue">0</span> <span data-i18n="productUi.ratings">Ratings</span></p>
               </div>
             </div>
-            <p className="reviews_summary_text" id="ratingSummaryText">Be the first to rate this product and help future customers choose with confidence.</p>
+            <p className="reviews_summary_text" id="ratingSummaryText" data-i18n="productUi.ratingSummaryEmpty">No reviews yet. Be the first to rate this product and help future customers choose with confidence.</p>
           </div>
 
           <div id="reviewsList" className="reviews_list" />
@@ -253,15 +253,15 @@ function ProductReviews() {
           <div className="reviews_panel">
             <div className="reviews_panel_head">
               <div>
-                <span className="reviews_kicker">Share your experience</span>
-                <h3>Leave a review</h3>
+                <span className="reviews_kicker" data-i18n="productUi.reviews">Reviews</span>
+                <h3 data-i18n="productUi.writeReview">Write a Review</h3>
               </div>
             </div>
 
             <form id="reviewForm" className="review_form">
               <div className="review_field">
-                <label>Rating</label>
-                <div className="review_star_picker" aria-label="Choose a star rating from one to five">
+                <label data-i18n="productUi.ratings">Ratings</label>
+                <div className="review_star_picker" aria-label="Choose a star rating from one to five" data-i18n-aria-label="productUi.chooseRating">
                   {[1, 2, 3, 4, 5].map((rating) => (
                     <button key={rating} type="button" className="review_star_btn" data-rating={rating} aria-label={`Rate ${rating} star${rating === 1 ? "" : "s"}`}>
                       <i className="fa fa-star" aria-hidden="true" />
@@ -271,16 +271,16 @@ function ProductReviews() {
               </div>
 
               <div className="review_field">
-                <label htmlFor="reviewComment">Comment</label>
-                <textarea id="reviewComment" rows="5" placeholder="Tell other customers what stood out about this product." />
+                <label htmlFor="reviewComment" data-i18n="productUi.reviewComment">Comment</label>
+                <textarea id="reviewComment" rows="5" placeholder="Tell other customers what stood out about this product." data-i18n-placeholder="productUi.reviewCommentPlaceholder" />
               </div>
 
               <div className="review_form_actions">
-                <button id="reviewSubmitBtn" type="submit" className="review_submit_btn">Publish Review</button>
-                <button id="reviewDeleteBtn" type="button" className="review_delete_btn" hidden>Delete My Review</button>
+                <button id="reviewSubmitBtn" type="submit" className="review_submit_btn" data-i18n="productUi.submitReview">Submit Review</button>
+                <button id="reviewDeleteBtn" type="button" className="review_delete_btn" hidden data-i18n="productUi.reviewDelete">Delete My Review</button>
               </div>
 
-              <p id="reviewFormStatus" className="review_form_status">Please sign in first to review this product.</p>
+              <p id="reviewFormStatus" className="review_form_status" data-i18n="productUi.signInToWriteReview">Sign in to write a review</p>
             </form>
             <div id="reviewAuthNotice" className="review_auth_notice" />
           </div>
@@ -295,8 +295,8 @@ function Recommendations() {
     <section className="product_recommendations_section products-section layout_padding-bottom">
       <div className="container product_page_container">
         <div className="heading_container">
-          <h2>You Might Also Like</h2>
-          <p>Handpicked pairings for this product.</p>
+          <h2 data-i18n="productUi.youMightAlsoLike">You Might Also Like</h2>
+          <p data-i18n="productUi.handpickedPairings">Handpicked pairings for this product.</p>
         </div>
         <div id="recommendedProducts" className="recommendations_grid products-grid" />
       </div>
@@ -378,7 +378,7 @@ function ProductScripts() {
       <Script src="/js/custom.js?v=20260603a" strategy="afterInteractive" />
       <Script type="module" src="/js/navbar-offers.js?v=20260518c" strategy="afterInteractive" />
       <Script type="module" src="/js/app-shell.js?v=20260617b" strategy="afterInteractive" />
-      <Script type="module" src="/js/product-page.js?v=20260618b" strategy="afterInteractive" />
+      <Script type="module" src="/js/product-page.js?v=20260627a" strategy="afterInteractive" />
     </>
   );
 }

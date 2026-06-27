@@ -34,16 +34,26 @@ import {
   formatReviewDate,
   primeRatingsCache,
   shareProduct
-} from "./ui-utils.js?v=20260523a"
+} from "./ui-utils.js?v=20260627a"
 import {
   getActiveOfferForProduct,
   getOfferDisplayData,
   getProductOfferPricing,
   subscribeToProductOffers
 } from "./offers-data.js?v=20260624a"
+import { t } from "./i18n/i18n.js"
 
 const FALLBACK_IMAGE = "images/optimized/Logo.webp"
 let offerPricingWarningShown = false
+
+function getProductUiText(key, fallback = "", values = {}) {
+  return t(`productUi.${key}`, fallback, values)
+}
+
+function getProductUiCountText(key, count, fallback = "", values = {}) {
+  const suffix = Number(count) === 1 ? "" : "_plural"
+  return getProductUiText(`${key}${suffix}`, fallback, { count, ...values })
+}
 
 function resolveProductOfferPricing(product) {
   const catalogPrice = Math.max(0, Number(product?.price) || 0)
@@ -228,7 +238,7 @@ function renderItemDetails(sectionEl, listEl, itemDetails) {
     row.className = "product_spec_row"
 
     const term = document.createElement("dt")
-    term.textContent = detail.label
+    term.textContent = getProductDetailLabel(detail.label)
 
     const value = document.createElement("dd")
     value.textContent = detail.value
@@ -237,6 +247,18 @@ function renderItemDetails(sectionEl, listEl, itemDetails) {
     row.appendChild(value)
     listEl.appendChild(row)
   })
+}
+
+function getProductDetailLabel(label) {
+  const normalizedLabel = String(label || "").trim().replace(/:$/, "").toLowerCase()
+  const labelKeyMap = {
+    ingredients: "ingredients",
+    components: "components",
+    "how to use": "howToUse",
+    "storage instructions": "storageInstructions"
+  }
+  const key = labelKeyMap[normalizedLabel]
+  return key ? getProductUiText(key, label) : label
 }
 
 function appendInlineSegments(parentEl, segments) {
@@ -322,22 +344,22 @@ function getRecommendationLabel(summary, cartQuantity) {
   const averageRating = summary ? summary.averageRating : 0
 
   if (cartQuantity > 0) {
-    return "Popular in cart"
+    return getProductUiText("popularInCart", "Popular in cart")
   }
 
   if (averageRating >= 4.5 && totalReviews >= 2) {
-    return "Top rated"
+    return getProductUiText("topRated", "Top rated")
   }
 
   if (totalReviews >= 3) {
-    return "Best reviewed"
+    return getProductUiText("bestReviewed", "Best reviewed")
   }
 
   if (averageRating >= 4) {
-    return "Highly rated"
+    return getProductUiText("highlyRated", "Highly rated")
   }
 
-  return "Fresh pick"
+  return getProductUiText("freshPick", "Fresh pick")
 }
 
 function getRecommendationScore(summary, cartQuantity) {
@@ -354,12 +376,36 @@ function getRecommendationPriceMarkup(product) {
 }
 
 function getProductDetailStockMessage(status) {
+  if (!status) {
+    return ""
+  }
+
+  if (status.isOutOfStock) {
+    return getProductUiText("outOfStock", "Out of Stock")
+  }
+
+  if (status.isLowStock && Number.isFinite(status.available)) {
+    return getProductUiText("onlyLeft", "Only {count} left", { count: status.available })
+  }
+
+  if (status.tracked && Number.isFinite(status.available) && status.available > 0) {
+    return getProductUiText("inStock", "In Stock")
+  }
+
+  return status.message || ""
+}
+
+function getProductCardStockStatusText(status) {
   if (!status || !status.message) {
     return ""
   }
 
+  if (status.isOutOfStock) {
+    return getProductUiText("outOfStock", "Out of Stock")
+  }
+
   if (status.isLowStock && Number.isFinite(status.available)) {
-    return `Only ${status.available} left in stock`
+    return getProductUiText("onlyLeft", "Only {count} left", { count: status.available })
   }
 
   return status.message
@@ -370,7 +416,11 @@ function getQuantityLimitMessage(status) {
     return ""
   }
 
-  return `Only ${status.available} item${status.available === 1 ? "" : "s"} available.`
+  return getProductUiCountText(
+    "onlyItemsAvailable",
+    status.available,
+    `Only ${status.available} item${status.available === 1 ? "" : "s"} available.`
+  )
 }
 
 function renderRecommendations(container, currentProduct, products, reviewSummaries, cart) {
@@ -413,7 +463,7 @@ function renderRecommendations(container, currentProduct, products, reviewSummar
   if (!recommendations.length) {
     container.innerHTML = `
       <div class="recommendations_empty">
-        <p>No recommendations are available right now.</p>
+        <p>${escapeHtml(getProductUiText("noRecommendations", "No recommendations are available right now."))}</p>
       </div>
     `
     return
@@ -422,6 +472,7 @@ function renderRecommendations(container, currentProduct, products, reviewSummar
   container.innerHTML = recommendations.map(({ candidate, summary, cartQuantity }) => {
     const productUrl = buildProductUrl(candidate.id)
     const inventoryStatus = getInventoryStatus(candidate.id)
+    const stockStatusText = getProductCardStockStatusText(inventoryStatus)
     const offer = getActiveOfferForProduct(candidate.id)
     const offerBadge = offer ? getOfferDisplayData(offer).discountLabel : ""
 
@@ -439,11 +490,11 @@ function renderRecommendations(container, currentProduct, products, reviewSummar
             })}
           </a>
           ${offerBadge ? `<span class="product_offer_badge">${escapeHtml(offerBadge)}</span>` : ""}
-          <span class="product_stock_status${inventoryStatus.isOutOfStock ? " is_out" : ""}${inventoryStatus.isLowStock ? " is_low" : ""}" ${inventoryStatus.message ? "" : "hidden"}>${escapeHtml(inventoryStatus.message)}</span>
-          <button class="product-share-btn recommendation_share_btn" type="button" data-recommend-share-product-id="${escapeHtml(candidate.id)}" aria-label="Share ${escapeHtml(candidate.name)}" title="Share">
+          <span class="product_stock_status${inventoryStatus.isOutOfStock ? " is_out" : ""}${inventoryStatus.isLowStock ? " is_low" : ""}" ${inventoryStatus.message ? "" : "hidden"}>${escapeHtml(stockStatusText)}</span>
+          <button class="product-share-btn recommendation_share_btn" type="button" data-recommend-share-product-id="${escapeHtml(candidate.id)}" aria-label="${escapeHtml(getProductUiText("shareProduct", "Share {name}", { name: candidate.name }))}" title="${escapeHtml(getProductUiText("share", "Share"))}">
             <i class="fa fa-share-alt" aria-hidden="true"></i>
           </button>
-          <button class="product-wishlist-btn recommendation_wishlist_btn" type="button" data-wishlist-product-id="${escapeHtml(candidate.id)}" aria-label="Add ${escapeHtml(candidate.name)} to favorites" aria-pressed="false" title="Add to favorites">
+          <button class="product-wishlist-btn recommendation_wishlist_btn" type="button" data-wishlist-product-id="${escapeHtml(candidate.id)}" aria-label="${escapeHtml(getProductUiText("addProductToFavorites", "Add {name} to favorites", { name: candidate.name }))}" aria-pressed="false" title="${escapeHtml(getProductUiText("addToFavorites", "Add to favorites"))}">
             <i class="fa fa-heart-o" aria-hidden="true"></i>
           </button>
         </div>
@@ -457,8 +508,8 @@ function renderRecommendations(container, currentProduct, products, reviewSummar
           <div class="recommendation_card_footer product-footer">
             <span class="recommendation_card_price${offer ? " product_card_price--offer" : ""}">${getRecommendationPriceMarkup(candidate)}</span>
             <div class="recommendation_card_actions">
-              <a class="recommendation_link" href="${escapeHtml(productUrl)}">View details</a>
-              <button type="button" class="recommendation_add_btn" data-recommend-product-id="${escapeHtml(candidate.id)}" ${inventoryStatus.isOutOfStock ? "disabled aria-disabled=\"true\"" : ""}>Add to cart</button>
+              <a class="recommendation_link" href="${escapeHtml(productUrl)}">${escapeHtml(getProductUiText("viewDetailsLower", "View details"))}</a>
+              <button type="button" class="recommendation_add_btn" data-recommend-product-id="${escapeHtml(candidate.id)}" ${inventoryStatus.isOutOfStock ? "disabled aria-disabled=\"true\"" : ""}>${escapeHtml(getProductUiText("addToCartLower", "Add to cart"))}</button>
             </div>
           </div>
         </div>
@@ -483,7 +534,7 @@ function renderRecommendations(container, currentProduct, products, reviewSummar
 
       if (recommendedProduct) {
         addCartItemWithInventory(recommendedProduct, 1, {
-          successMessage: "Product added to cart successfully"
+          successMessage: getProductUiText("addedToCart", "Product added to cart successfully")
         })
       }
     })
@@ -550,10 +601,49 @@ function initProductPage() {
   const lightboxZoomOutBtn = document.getElementById("productImageZoomOut")
   const lightboxZoomValue = document.getElementById("productImageZoomValue")
 
+  function renderProductNotFound() {
+    if (nameEl) {
+      nameEl.removeAttribute("data-i18n")
+      nameEl.textContent = getProductUiText("productNotFound", "Product not found")
+    }
+    if (descEl) {
+      descEl.textContent = getProductUiText("backToProducts", "Back to products")
+      descEl.hidden = false
+    }
+    ;[addToCartBtn, productCheckoutBtn, qtyMinus, qtyPlus].forEach((control) => {
+      if (control) {
+        control.disabled = true
+        control.setAttribute("aria-disabled", "true")
+      }
+    })
+    document.querySelectorAll("#productStorySection, #productReviewsSection, .product_recommendations_section").forEach((section) => {
+      section.hidden = true
+    })
+  }
+
+  if (!product) {
+    renderProductNotFound()
+    return
+  }
+
   let activeImageSrc = ""
   let activeImageFallbackSrc = ""
   let activeImageAlt = product.name || "Selected product image"
   let lightboxZoom = 1
+
+  function setButtonLabel(button, text) {
+    if (!button) {
+      return
+    }
+
+    const label = button.querySelector("[data-product-button-label]")
+    if (label) {
+      label.textContent = text
+      return
+    }
+
+    button.textContent = text
+  }
 
   function getOrCreateStockStatusElement() {
     let stockStatusEl = document.getElementById("productStockStatus")
@@ -626,6 +716,9 @@ function initProductPage() {
     if (addToCartBtn) {
       addToCartBtn.disabled = status.isOutOfStock
       addToCartBtn.setAttribute("aria-disabled", String(status.isOutOfStock))
+      setButtonLabel(addToCartBtn, status.isOutOfStock
+        ? getProductUiText("outOfStock", "Out of Stock")
+        : getProductUiText("addToCart", "Add to Cart"))
     }
     if (productCheckoutBtn) {
       productCheckoutBtn.disabled = status.isOutOfStock
@@ -823,12 +916,12 @@ function initProductPage() {
       reviewDeleteBtn.hidden = true
       reviewAuthNotice.innerHTML = `
         <div class="review_notice_card">
-          <p>You can rate with stars now. Sign in with Google to write a review.</p>
-          <button class="auth_dropdown_btn review_google_signin_btn" type="button" data-auth-action="login"><i class="fa fa-google" aria-hidden="true"></i><span>Sign in with Google to review</span></button>
+          <p>${escapeHtml(getProductUiText("guestsCanRateOnly", "Guests can rate only"))}. ${escapeHtml(getProductUiText("signInToWriteReview", "Sign in to write a review"))}.</p>
+          <button class="auth_dropdown_btn review_google_signin_btn" type="button" data-auth-action="login"><i class="fa fa-google" aria-hidden="true"></i><span>${escapeHtml(getProductUiText("signInWithGoogleToReview", "Sign in with Google to review"))}</span></button>
         </div>
       `
-      reviewFormStatus.textContent = "Choose a star rating to rate this product. Please sign in to write a review."
-      reviewSubmitBtn.textContent = "Submit Rating"
+      reviewFormStatus.textContent = `${getProductUiText("guestsCanRateOnly", "Guests can rate only")}. ${getProductUiText("signInToWriteReview", "Sign in to write a review")}.`
+      reviewSubmitBtn.textContent = getProductUiText("submitRating", "Submit Rating")
       setFormEnabled(true)
       return
     }
@@ -839,14 +932,18 @@ function initProductPage() {
           ${activeUser.photoURL ? `<img src="${activeUser.photoURL}" alt="${escapeHtml(activeUser.displayName || "User")}" width="96" height="96" loading="lazy" decoding="async">` : '<i class="fa fa-user" aria-hidden="true"></i>'}
         </span>
         <div>
-          <strong>${escapeHtml(activeUser.displayName || "Sushi Box Customer")}</strong>
-          <p>Your review will update live for everyone viewing this product.</p>
+          <strong>${escapeHtml(activeUser.displayName || getProductUiText("sushiBoxCustomer", "Sushi Box Customer"))}</strong>
+          <p>${escapeHtml(getProductUiText("reviewUserLiveHint", "Your review will update live for everyone viewing this product."))}</p>
         </div>
       </div>
     `
-    reviewFormStatus.textContent = ownReview ? "You can edit or remove your review at any time." : "Your review will appear instantly after you publish it."
+    reviewFormStatus.textContent = ownReview
+      ? getProductUiText("reviewEditHint", "You can edit or remove your review at any time.")
+      : getProductUiText("reviewPublishHint", "Your review will appear instantly after you publish it.")
     reviewDeleteBtn.hidden = !ownReview
-    reviewSubmitBtn.textContent = ownReview ? "Update Review" : "Publish Review"
+    reviewSubmitBtn.textContent = ownReview
+      ? getProductUiText("updateReview", "Update Review")
+      : getProductUiText("submitReview", "Submit Review")
     setFormEnabled(true)
 
     if (ownReview) {
@@ -865,15 +962,24 @@ function renderReviewSummary() {
     productRatingStars.innerHTML = buildStarMarkup(summary.averageRating, "compact")
     productRatingText.hidden = !hasReviews
     productRatingText.textContent = hasReviews
-      ? `${summary.averageRating.toFixed(1)} average - ${summary.totalReviews} rating${summary.totalReviews === 1 ? "" : "s"}`
+      ? getProductUiCountText(
+        "averageRating",
+        summary.totalReviews,
+        `${summary.averageRating.toFixed(1)} average - ${summary.totalReviews} rating${summary.totalReviews === 1 ? "" : "s"}`,
+        { average: summary.averageRating.toFixed(1) }
+      )
       : ""
 
     averageRatingValue.textContent = hasReviews ? summary.averageRating.toFixed(1) : "0.0"
     averageRatingStars.innerHTML = buildStarMarkup(summary.averageRating, "large")
     reviewCountValue.textContent = String(summary.totalReviews)
     ratingSummaryText.textContent = hasReviews
-      ? `Customers have shared ${summary.totalReviews} rating${summary.totalReviews === 1 ? "" : "s"} for ${product.name}.`
-      : "Be the first to rate this product and help future customers choose with confidence."
+      ? getProductUiCountText(
+        "ratingSummary",
+        summary.totalReviews,
+        `Customers have shared ${summary.totalReviews} rating${summary.totalReviews === 1 ? "" : "s"} for this product.`
+      )
+      : getProductUiText("ratingSummaryEmpty", "No reviews yet. Be the first to rate this product and help future customers choose with confidence.")
   }
 
   function bindProductDetailTabs() {
@@ -944,7 +1050,7 @@ function renderReviewSummary() {
       reviewsList.innerHTML = `
         <div class="review_empty_state">
           <div class="review_empty_icon"><i class="fa fa-comments-o" aria-hidden="true"></i></div>
-          <p>Be the first to share your Sushi Box experience.</p>
+          <p>${escapeHtml(getProductUiText("reviewEmptyHint", "No reviews yet. Be the first to share your Sushi Box experience."))}</p>
         </div>
       `
       return
@@ -960,13 +1066,13 @@ function renderReviewSummary() {
                 ${review.userPhoto ? `<img src="${review.userPhoto}" alt="${escapeHtml(review.userName || "User")}" width="96" height="96" loading="lazy" decoding="async">` : '<i class="fa fa-user" aria-hidden="true"></i>'}
               </span>
               <div>
-                <strong>${escapeHtml(review.userName || "Sushi Box Customer")}</strong>
+                <strong>${escapeHtml(review.userName || getProductUiText("sushiBoxCustomer", "Sushi Box Customer"))}</strong>
                 <span>${formatReviewDate(review.updatedAt || review.createdAt)}</span>
               </div>
             </div>
             <div class="review_card_meta">
               ${buildStarMarkup(review.rating)}
-              ${isOwnReview ? '<span class="review_owner_badge">Your review</span>' : ""}
+              ${isOwnReview ? `<span class="review_owner_badge">${escapeHtml(getProductUiText("yourReview", "Your review"))}</span>` : ""}
             </div>
           </div>
           <p>${escapeHtml(review.comment)}</p>
@@ -980,6 +1086,7 @@ function renderReviewSummary() {
 }
 
   function renderProductContent() {
+    nameEl.removeAttribute("data-i18n")
     nameEl.textContent = product.name
     if (categoryEl) {
       categoryEl.textContent = product.category || "Sushi Box"
@@ -994,14 +1101,14 @@ function renderReviewSummary() {
     }
 
     if (productShareBtn) {
-      productShareBtn.setAttribute("aria-label", `Share ${product.name}`)
-      productShareBtn.setAttribute("title", "Share")
+      productShareBtn.setAttribute("aria-label", getProductUiText("shareProduct", "Share {name}", { name: product.name }))
+      productShareBtn.setAttribute("title", getProductUiText("share", "Share"))
     }
 
     if (productFavoriteBtn) {
       productFavoriteBtn.setAttribute("data-wishlist-product-id", product.id)
-      productFavoriteBtn.setAttribute("aria-label", `Add ${product.name} to favorites`)
-      productFavoriteBtn.setAttribute("title", "Add to favorites")
+      productFavoriteBtn.setAttribute("aria-label", getProductUiText("addProductToFavorites", "Add {name} to favorites", { name: product.name }))
+      productFavoriteBtn.setAttribute("title", getProductUiText("addToFavorites", "Add to favorites"))
       window.dispatchEvent(new CustomEvent("sushi-box:wishlist-controls-ready"))
     }
 
@@ -1103,7 +1210,7 @@ function renderReviewSummary() {
   qtyPlus.addEventListener("click", () => {
     const status = getInventoryStatus(product.id)
     if (status.tracked && quantity >= status.available) {
-      emitToast(getQuantityLimitMessage(status) || "You have reached the maximum available quantity.", "error")
+      emitToast(getQuantityLimitMessage(status) || getProductUiText("onlyItemsAvailable", "Only {count} item available.", { count: status.available }), "error")
       syncProductInventoryUi()
       return
     }
@@ -1113,14 +1220,14 @@ function renderReviewSummary() {
 
   addToCartBtn.addEventListener("click", async () => {
     await addCartItemWithInventory(product, quantity, {
-      successMessage: "Product added to cart successfully"
+      successMessage: getProductUiText("addedToCart", "Product added to cart successfully")
     })
   })
 
   if (productCheckoutBtn) {
     productCheckoutBtn.addEventListener("click", async () => {
       const result = await addCartItemWithInventory(product, quantity, {
-        successMessage: "Product added to cart successfully"
+        successMessage: getProductUiText("addedToCart", "Product added to cart successfully")
       })
       if (result.ok) {
         window.location.href = "/checkout.html"
@@ -1159,7 +1266,7 @@ function renderReviewSummary() {
 
       if (recommendedProduct) {
         addCartItemWithInventory(recommendedProduct, 1, {
-          successMessage: "Product added to cart successfully"
+          successMessage: getProductUiText("addedToCart", "Product added to cart successfully")
         })
       }
     })
@@ -1177,8 +1284,8 @@ function renderReviewSummary() {
     const authenticatedUser = getCurrentUser()
 
     if (selectedRating < 1) {
-      reviewFormStatus.textContent = "Please select a rating first."
-      emitToast("Please select a rating first.", "info")
+      reviewFormStatus.textContent = getProductUiText("selectRatingFirst", "Please select a rating first.")
+      emitToast(getProductUiText("selectRatingFirst", "Please select a rating first."), "info")
       return
     }
 
@@ -1189,18 +1296,18 @@ function renderReviewSummary() {
 
       if (comment) {
         syncReviewForm()
-        reviewFormStatus.textContent = "Please sign in to write a review."
-        emitToast("Please sign in to write a review.", "info")
+        reviewFormStatus.textContent = getProductUiText("signInRequiredReview", "Please sign in to write a review.")
+        emitToast(getProductUiText("signInRequiredReview", "Please sign in to write a review."), "info")
         return
       }
 
-      reviewFormStatus.textContent = "Saving your rating..."
+      reviewFormStatus.textContent = getProductUiText("ratingSaving", "Saving your rating...")
       reviewSubmitBtn.disabled = true
 
       try {
         await saveGuestRating(product, selectedRating)
-        reviewFormStatus.textContent = "Thanks for rating this product."
-        emitToast("Thanks for rating this product.", "success")
+        reviewFormStatus.textContent = getProductUiText("ratingSaved", "Thanks for rating this product.")
+        emitToast(getProductUiText("ratingSaved", "Thanks for rating this product."), "success")
       } catch (error) {
         reviewFormStatus.textContent = error.message || "We could not save your rating."
         emitToast(error.message || "We could not save your rating.", "error")
@@ -1211,7 +1318,7 @@ function renderReviewSummary() {
     }
 
     activeUser = authenticatedUser
-    reviewFormStatus.textContent = "Saving your review..."
+    reviewFormStatus.textContent = getProductUiText("reviewSaving", "Saving your review...")
     reviewSubmitBtn.disabled = true
 
     try {
@@ -1219,8 +1326,8 @@ function renderReviewSummary() {
         rating: selectedRating,
         comment
       })
-      reviewFormStatus.textContent = "Review saved successfully."
-      emitToast("Your review is live now.", "success")
+      reviewFormStatus.textContent = getProductUiText("reviewSaved", "Review saved successfully.")
+      emitToast(getProductUiText("reviewLive", "Your review is live now."), "success")
     } catch (error) {
       reviewFormStatus.textContent = error.message || "We could not save your review."
       emitToast(error.message || "We could not save your review.", "error")
@@ -1234,13 +1341,13 @@ function renderReviewSummary() {
       return
     }
 
-    reviewFormStatus.textContent = "Removing your review..."
+    reviewFormStatus.textContent = getProductUiText("reviewRemoveLoading", "Removing your review...")
     reviewDeleteBtn.disabled = true
 
     try {
       await deleteReview(product.id, activeUser.uid)
-      reviewFormStatus.textContent = "Your review has been removed."
-      emitToast("Review deleted.", "info")
+      reviewFormStatus.textContent = getProductUiText("reviewRemoved", "Your review has been removed.")
+      emitToast(getProductUiText("reviewDeleted", "Review deleted."), "info")
     } catch (error) {
       reviewFormStatus.textContent = error.message || "We could not delete your review."
       emitToast(error.message || "We could not delete your review.", "error")
@@ -1262,7 +1369,7 @@ function renderReviewSummary() {
     syncReviewForm()
   }, (error) => {
     console.error("Reviews listener failed.", error)
-    reviewFormStatus.textContent = "Reviews are temporarily unavailable. Please check your Firebase setup."
+    reviewFormStatus.textContent = getProductUiText("reviewUnavailable", "Reviews are temporarily unavailable. Please check your Firebase setup.")
   })
 
   subscribeToProductReviewSummary(product.id, (summary) => {
@@ -1290,6 +1397,15 @@ function renderReviewSummary() {
     refreshRecommendations()
   }, (error) => {
     console.error("Product page inventory listener failed.", error)
+  })
+
+  window.addEventListener("sushi-box:language-change", () => {
+    renderProductContent()
+    syncProductInventoryUi()
+    renderReviewSummary()
+    renderReviewsList()
+    syncReviewForm()
+    refreshRecommendations()
   })
 }
 

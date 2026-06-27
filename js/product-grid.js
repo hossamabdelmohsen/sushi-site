@@ -26,6 +26,7 @@ import {
   shareProduct
 } from "./ui-utils.js?v=20260523a";
 import { getActiveOfferForProduct, getOfferDisplayData, subscribeToProductOffers } from "./offers-data.js?v=20260620a";
+import { t } from "./i18n/i18n.js";
 
 let productTitleTooltip = null;
 let productTitleTooltipHideTimer = null;
@@ -33,6 +34,26 @@ let productTitleTooltipShowTimer = null;
 let activeTouchTitle = null;
 const FALLBACK_IMAGE = "images/optimized/Logo.webp";
 const PRODUCT_TITLE_TOOLTIP_DELAY = 1000;
+
+function getProductUiText(key, fallback = "", values = {}) {
+  return t(`productUi.${key}`, fallback, values);
+}
+
+function getProductStockStatusText(status) {
+  if (!status || !status.message) {
+    return "";
+  }
+
+  if (status.isOutOfStock) {
+    return getProductUiText("outOfStock", "Out of Stock");
+  }
+
+  if (status.isLowStock && Number.isFinite(status.available)) {
+    return getProductUiText("onlyLeft", "Only {count} left", { count: status.available });
+  }
+
+  return status.message;
+}
 
 function bindImageFallback(image) {
   if (!image || image.dataset.fallbackBound === "true") {
@@ -88,7 +109,7 @@ function renderProductCard(product, index = 0) {
             <p>${escapeHtml(product.description)}</p>
             <div class="options">
               <h6 class="product_card_price${getActiveOfferForProduct(product.id) ? " product_card_price--offer" : ""}">${getProductCardPriceMarkup(product)}</h6>
-              <a href="${escapeHtml(productUrl)}" class="product-link-btn">View Details</a>
+              <a href="${escapeHtml(productUrl)}" class="product-link-btn">${escapeHtml(getProductUiText("viewDetails", "View Details"))}</a>
             </div>
           </div>
         </div>
@@ -107,7 +128,7 @@ function renderProductGrids() {
     const products = getGridProducts(grid);
     grid.innerHTML = products.length
       ? products.map((product, index) => renderProductCard(product, index)).join("")
-      : '<div class="col-12"><p class="product_grid_empty">No products are available right now.</p></div>';
+      : `<div class="col-12"><p class="product_grid_empty">${escapeHtml(getProductUiText("noProductsAvailable", "No products are available right now."))}</p></div>`;
     grid.setAttribute("data-product-rendered", "true");
   });
 }
@@ -297,8 +318,12 @@ function syncWishlistButton(button, product) {
 
   button.classList.toggle("is_active", isActive);
   button.setAttribute("aria-pressed", String(isActive));
-  button.setAttribute("aria-label", `${isActive ? "Remove" : "Add"} ${product.name} ${isActive ? "from" : "to"} favorites`);
-  button.setAttribute("title", isActive ? "Remove from favorites" : "Add to favorites");
+  button.setAttribute("aria-label", getProductUiText(
+    isActive ? "removeProductFromFavorites" : "addProductToFavorites",
+    isActive ? "Remove {name} from favorites" : "Add {name} to favorites",
+    { name: product.name }
+  ));
+  button.setAttribute("title", getProductUiText(isActive ? "removeFromFavoritesLower" : "addToFavorites", isActive ? "Remove from favorites" : "Add to favorites"));
 
   if (icon) {
     icon.className = `fa ${isActive ? "fa-heart" : "fa-heart-o"}`;
@@ -338,7 +363,11 @@ function ensureWishlistButton(card, product) {
     const result = toggleWishlistItem(product);
     syncWishlistButton(wishlistButton, product);
     animateWishlistToggle(wishlistButton);
-    emitToast(`${product.name} ${result.added ? "added to" : "removed from"} favorites.`, result.added ? "success" : "info");
+    emitToast(getProductUiText(
+      result.added ? "productSavedToFavorites" : "productRemovedFromFavorites",
+      result.added ? "{name} added to favorites." : "{name} removed from favorites.",
+      { name: product.name }
+    ), result.added ? "success" : "info");
   };
 }
 
@@ -357,8 +386,8 @@ function ensureShareButton(card, product, productUrl) {
     imageBox.appendChild(shareButton);
   }
 
-  shareButton.setAttribute("aria-label", `Share ${product.name}`);
-  shareButton.setAttribute("title", "Share");
+  shareButton.setAttribute("aria-label", getProductUiText("shareProduct", "Share {name}", { name: product.name }));
+  shareButton.setAttribute("title", getProductUiText("share", "Share"));
   shareButton.onclick = (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -431,7 +460,7 @@ function enhanceProductCard(card) {
       // ensure anchor points to the product page
       try {
         imageLink.href = productUrl;
-        imageLink.setAttribute("aria-label", `View details for ${product.name}`);
+        imageLink.setAttribute("aria-label", getProductUiText("viewDetailsForProduct", "View details for {name}", { name: product.name }));
       } catch (err) {
         // ignore non-HTML context
       }
@@ -459,7 +488,7 @@ function enhanceProductCard(card) {
     if (!title.querySelector("a")) {
       const titleLink = document.createElement("a");
       titleLink.href = productUrl;
-      titleLink.setAttribute("aria-label", `View details for ${product.name}`);
+      titleLink.setAttribute("aria-label", getProductUiText("viewDetailsForProduct", "View details for {name}", { name: product.name }));
       titleLink.textContent = product.name;
       title.textContent = "";
       title.appendChild(titleLink);
@@ -467,7 +496,7 @@ function enhanceProductCard(card) {
       const existingLink = title.querySelector("a");
       existingLink.href = productUrl;
       existingLink.textContent = product.name;
-      existingLink.setAttribute("aria-label", `View details for ${product.name}`);
+      existingLink.setAttribute("aria-label", getProductUiText("viewDetailsForProduct", "View details for {name}", { name: product.name }));
     }
 
     bindProductTitleReveal(title, product);
@@ -490,8 +519,8 @@ function enhanceProductCard(card) {
 
   if (primaryLink) {
     primaryLink.setAttribute("href", productUrl);
-    primaryLink.setAttribute("aria-label", `View details for ${product.name}`);
-    primaryLink.textContent = "View Details";
+    primaryLink.setAttribute("aria-label", getProductUiText("viewDetailsForProduct", "View details for {name}", { name: product.name }));
+    primaryLink.textContent = getProductUiText("viewDetails", "View Details");
   }
 
   if (detailBox && !detailBox.querySelector(".product_card_rating")) {
@@ -526,13 +555,13 @@ function enhanceProductCard(card) {
     const addButton = document.createElement("button");
     addButton.type = "button";
     addButton.className = "product-cart-btn";
-    addButton.setAttribute("aria-label", `Add ${product.name} to cart`);
+    addButton.setAttribute("aria-label", getProductUiText("addProductToCart", "Add {name} to cart", { name: product.name }));
     addButton.innerHTML = '<i class="fa fa-plus" aria-hidden="true"></i>';
     addButton.addEventListener("click", async (event) => {
       event.preventDefault();
       event.stopPropagation();
       await addCartItemWithInventory(product, 1, {
-        successMessage: "Product added to cart successfully"
+        successMessage: getProductUiText("addedToCart", "Product added to cart successfully")
       });
     });
 
@@ -569,7 +598,7 @@ function updateProductCardInventory(card) {
   const addButton = card.querySelector(".product-cart-btn");
 
   if (stockStatus) {
-    stockStatus.textContent = status.message;
+    stockStatus.textContent = getProductStockStatusText(status);
     stockStatus.hidden = !status.message;
     stockStatus.classList.toggle("is_out", status.isOutOfStock);
     stockStatus.classList.toggle("is_low", status.isLowStock);
@@ -578,7 +607,7 @@ function updateProductCardInventory(card) {
   if (addButton) {
     addButton.disabled = status.isOutOfStock;
     addButton.setAttribute("aria-disabled", String(status.isOutOfStock));
-    addButton.setAttribute("title", status.isOutOfStock ? "Out of stock" : "Add to cart");
+    addButton.setAttribute("title", status.isOutOfStock ? getProductUiText("outOfStock", "Out of Stock") : getProductUiText("addToCartLower", "Add to cart"));
   }
 }
 
@@ -596,6 +625,12 @@ document.addEventListener("DOMContentLoaded", () => {
   renderProductGrids();
 
   const cards = Array.from(document.querySelectorAll(".product-card"));
+  window.addEventListener("sushi-box:language-change", () => {
+    document.querySelectorAll(".product_grid_empty").forEach((message) => {
+      message.textContent = getProductUiText("noProductsAvailable", "No products are available right now.");
+    });
+  });
+
   if (!cards.length) {
     return;
   }
@@ -617,6 +652,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }, (error) => console.error("Product card offers could not be loaded.", error));
 
   window.dispatchEvent(new CustomEvent("sushi-box:wishlist-controls-ready"));
+
+  window.addEventListener("sushi-box:language-change", () => {
+    cards.forEach((card) => {
+      enhanceProductCard(card);
+      updateProductCardInventory(card);
+    });
+  });
 
   if (filterApi && typeof filterApi.refresh === "function") {
     filterApi.refresh();

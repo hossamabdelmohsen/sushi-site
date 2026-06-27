@@ -29,6 +29,7 @@ import {
 import { getGuestSessionId } from "./scoped-storage.js";
 import { emitToast, escapeHtml } from "./ui-utils.js?v=20260502b";
 import { getCartOfferSubtotal, getProductOfferPricing, subscribeToProductOffers } from "./offers-data.js?v=20260620a";
+import { t } from "./i18n/i18n.js";
 
 const CHECKOUT_CUSTOMER_STORAGE_KEY = "sushi-box-checkout-customer";
 const FALLBACK_IMAGE = "images/optimized/Logo.webp";
@@ -47,6 +48,15 @@ let checkoutSettingsReady = false;
 let appliedCoupon = null;
 let couponDiscountCents = 0;
 let couponValidationRequestId = 0;
+
+function getCheckoutUiText(key, fallback = "", values = {}) {
+  return t(`checkoutUi.${key}`, fallback, values);
+}
+
+function getCheckoutUiCountText(key, count, fallbackSingular, fallbackPlural) {
+  const isSingle = count === 1;
+  return getCheckoutUiText(isSingle ? key : `${key}_plural`, isSingle ? fallbackSingular : fallbackPlural, { count });
+}
 
 function getInitialCheckoutStep() {
   let storedStep = "";
@@ -71,10 +81,33 @@ function getQuantityLimitNotice(inventoryStatus, quantity) {
   }
 
   if (inventoryStatus.available <= 0) {
-    return "Out of stock.";
+    return getCheckoutUiText("outOfStock", "Out of stock.");
   }
 
-  return `Only ${inventoryStatus.available} item${inventoryStatus.available === 1 ? "" : "s"} available.`;
+  return getCheckoutUiCountText(
+    "onlyItemsAvailable",
+    inventoryStatus.available,
+    `Only ${inventoryStatus.available} item available.`,
+    `Only ${inventoryStatus.available} items available.`
+  );
+}
+
+function getCheckoutStockStatusText(inventoryStatus) {
+  if (!inventoryStatus || !inventoryStatus.message) {
+    return "";
+  }
+
+  if (inventoryStatus.isOutOfStock) {
+    return getCheckoutUiText("outOfStockShort", "Out of stock");
+  }
+
+  if (inventoryStatus.isLowStock && Number.isFinite(inventoryStatus.available)) {
+    return getCheckoutUiText("sorryOnlyLeft", "Sorry, only {count} left in stock.", {
+      count: inventoryStatus.available
+    });
+  }
+
+  return inventoryStatus.message;
 }
 
 const deliveryCities = [
@@ -171,13 +204,13 @@ function renderCheckoutTotals() {
 
   if (!isCartReady() || !checkoutSettingsReady) {
     subtotalEls.forEach((el) => {
-      el.textContent = "Loading...";
+      el.textContent = getCheckoutUiText("loading", "Loading...");
     });
     shippingEls.forEach((el) => {
-      el.textContent = selectedCity ? "Loading..." : "Choose city";
+      el.textContent = selectedCity ? getCheckoutUiText("loading", "Loading...") : getCheckoutUiText("selectCity", "Select city");
     });
     beforeDiscountEls.forEach((el) => {
-      el.textContent = "Loading...";
+      el.textContent = getCheckoutUiText("loading", "Loading...");
     });
     discountEls.forEach((el) => {
       el.textContent = `-${formatPrice(0)}`;
@@ -186,7 +219,7 @@ function renderCheckoutTotals() {
       row.hidden = true;
     });
     finalTotalEls.forEach((el) => {
-      el.textContent = "Loading...";
+      el.textContent = getCheckoutUiText("loading", "Loading...");
     });
     return;
   }
@@ -198,11 +231,11 @@ function renderCheckoutTotals() {
   });
 
   shippingEls.forEach((el) => {
-    el.textContent = selectedCity ? formatPrice(centsToAmount(shippingCents)) : "Choose city";
+    el.textContent = selectedCity ? formatPrice(centsToAmount(shippingCents)) : getCheckoutUiText("selectCity", "Select city");
   });
 
   beforeDiscountEls.forEach((el) => {
-    el.textContent = selectedCity ? formatPrice(centsToAmount(beforeDiscountCents)) : "Choose city";
+    el.textContent = selectedCity ? formatPrice(centsToAmount(beforeDiscountCents)) : getCheckoutUiText("selectCity", "Select city");
   });
 
   discountEls.forEach((el) => {
@@ -267,7 +300,7 @@ async function loadCheckoutSettings() {
 
   document.querySelectorAll("[data-city-shipping]").forEach((el) => {
     const rate = getShippingRate(el.getAttribute("data-city-shipping"));
-    el.textContent = rate ? formatPrice(rate.amount) : "Unavailable";
+    el.textContent = rate ? formatPrice(rate.amount) : getCheckoutUiText("unavailable", "Unavailable");
   });
   renderCheckoutTotals();
 }
@@ -284,13 +317,13 @@ async function validateCoupon(code, options = {}) {
 
   if (!city) {
     setAppliedCoupon(null, 0);
-    setCouponMessage("Choose your delivery city before applying a promo code.", "error");
+    setCouponMessage(getCheckoutUiText("selectCityBeforeCoupon", "Choose your delivery city before applying a promo code."), "error");
     return;
   }
 
   if (!isCartReady() || !checkoutSettingsReady) {
     setAppliedCoupon(null, 0);
-    setCouponMessage("Checkout totals are still loading. Please try again in a moment.", "info");
+    setCouponMessage(getCheckoutUiText("checkoutTotalsLoading", "Checkout totals are still loading. Please try again in a moment."), "info");
     renderCheckoutTotals();
     return;
   }
@@ -299,7 +332,7 @@ async function validateCoupon(code, options = {}) {
   const requestCityId = city.id;
   const requestSubtotal = getEffectiveCartSubtotal();
   if (!options.silent) {
-    setCouponMessage("Checking promo code...", "info");
+    setCouponMessage(getCheckoutUiText("checkingPromoCode", "Checking promo code..."), "info");
   }
 
   try {
@@ -323,18 +356,18 @@ async function validateCoupon(code, options = {}) {
     }
     if (!response.ok || !body.valid) {
       setAppliedCoupon(null, 0);
-      setCouponMessage(body.error || "Invalid promo code.", "error");
+      setCouponMessage(body.error || getCheckoutUiText("invalidCoupon", "Invalid coupon"), "error");
       return;
     }
 
     setAppliedCoupon(body.coupon, body.discountCents);
-    setCouponMessage(body.message || "Promo code applied.", "success");
+    setCouponMessage(body.message || getCheckoutUiText("couponApplied", "Coupon applied"), "success");
   } catch (error) {
     if (requestId !== couponValidationRequestId) {
       return;
     }
     setAppliedCoupon(null, 0);
-    setCouponMessage(error.message || "Promo code could not be checked.", "error");
+    setCouponMessage(error.message || getCheckoutUiText("promoCodeCheckFailed", "Promo code could not be checked."), "error");
   }
 }
 
@@ -446,7 +479,7 @@ function clearSavedCustomerInfo() {
   } catch (error) {}
 
   updateSavedAddressControls();
-  emitToast("Saved address cleared.", "info");
+  emitToast(getCheckoutUiText("savedAddressCleared", "Saved address cleared."), "info");
 }
 
 function setValidationMessage(message) {
@@ -457,6 +490,15 @@ function setValidationMessage(message) {
 
   messageEl.textContent = message || "";
   messageEl.hidden = !message;
+}
+
+function updatePaymentSubmitLabel() {
+  const submitButton = getCheckoutDom().form?.querySelector(".checkout_confirm_btn");
+  if (submitButton) {
+    submitButton.textContent = paymentSubmitting
+      ? getCheckoutUiText("processingPayment", "Processing payment")
+      : getCheckoutUiText("payNow", "Pay Now");
+  }
 }
 
 function setPaymentSubmitting(isSubmitting) {
@@ -472,7 +514,7 @@ function setPaymentSubmitting(isSubmitting) {
   }
 
   if (submitButton) {
-    submitButton.textContent = paymentSubmitting ? "Creating order..." : "Pay now";
+    updatePaymentSubmitLabel();
     submitButton.classList.toggle("is_loading", paymentSubmitting);
   }
 }
@@ -499,26 +541,26 @@ function setStep(nextStep) {
 
 function validateStep(step) {
   if (!isCartReady()) {
-    return { valid: false, message: "Your cart is still loading. Please try again in a moment." };
+    return { valid: false, message: getCheckoutUiText("cartStillLoading", "Your cart is still loading. Please try again in a moment.") };
   }
 
   if (!getCart().length) {
-    return { valid: false, message: "Your cart is empty. Please add products before checkout." };
+    return { valid: false, message: getCheckoutUiText("cartEmptyBeforeCheckout", "Your cart is empty. Please add products before checkout.") };
   }
 
   if (step === 2 && !getSelectedCity()) {
-    return { valid: false, message: "Please choose your delivery city." };
+    return { valid: false, message: getCheckoutUiText("pleaseSelectDeliveryCity", "Please select a delivery city.") };
   }
 
   if (step === 3) {
     const values = getAddressValues();
     const requiredFields = [
-      ["name", "Please enter your name.", "checkoutCustomerName"],
-      ["phone", "Please enter your phone number.", "checkoutCustomerPhone"],
-      ["area", "Please enter your area.", "checkoutCustomerArea"],
-      ["fullAddress", "Please enter your full address.", "checkoutCustomerAddress"],
-      ["building", "Please enter your building number.", "checkoutCustomerBuilding"],
-      ["floorApartment", "Please enter your floor / apartment.", "checkoutCustomerFloorApartment"]
+      ["name", getCheckoutUiText("pleaseEnterName", "Please enter your name."), "checkoutCustomerName"],
+      ["phone", getCheckoutUiText("pleaseEnterPhoneNumber", "Please enter your phone number."), "checkoutCustomerPhone"],
+      ["area", getCheckoutUiText("pleaseEnterArea", "Please enter your area."), "checkoutCustomerArea"],
+      ["fullAddress", getCheckoutUiText("pleaseEnterAddress", "Please enter your address."), "checkoutCustomerAddress"],
+      ["building", getCheckoutUiText("pleaseEnterBuildingNumber", "Please enter your building number."), "checkoutCustomerBuilding"],
+      ["floorApartment", getCheckoutUiText("pleaseEnterFloorApartment", "Please enter your floor / apartment."), "checkoutCustomerFloorApartment"]
     ];
     const missing = requiredFields.find(([key]) => !values[key]);
 
@@ -527,7 +569,7 @@ function validateStep(step) {
     }
 
     if (values.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
-      return { valid: false, message: "Please enter a valid email address, or leave it empty.", fieldId: "checkoutCustomerEmail" };
+      return { valid: false, message: getCheckoutUiText("pleaseEnterValidEmail", "Please enter a valid email address, or leave it empty."), fieldId: "checkoutCustomerEmail" };
     }
   }
 
@@ -582,10 +624,12 @@ function renderCartItems(cart, detail = {}) {
     const lineTotal = price * quantity;
     const inventoryStatus = getInventoryStatus(item.id);
     const quantityLimitNotice = getQuantityLimitNotice(inventoryStatus, quantity);
+    const stockStatusText = getCheckoutStockStatusText(inventoryStatus);
+    const viewProductLabel = getCheckoutUiText("viewProduct", "View {name}", { name: item.name });
 
     return `
       <article class="checkout_cart_item" data-cart-product-id="${escapeHtml(item.id)}">
-        <a class="checkout_cart_item_image" href="${escapeHtml(buildProductUrl(item.id))}" aria-label="View ${escapeHtml(item.name)}">
+        <a class="checkout_cart_item_image" href="${escapeHtml(buildProductUrl(item.id))}" aria-label="${escapeHtml(viewProductLabel)}">
           ${buildResponsiveImageMarkup({
             product,
             imagePath: image,
@@ -600,22 +644,22 @@ function renderCartItems(cart, detail = {}) {
           <div class="checkout_cart_item_head">
             <div>
               <a href="${escapeHtml(buildProductUrl(item.id))}">${escapeHtml(item.name)}</a>
-              <span class="product_stock_status${inventoryStatus.isOutOfStock ? " is_out" : ""}${inventoryStatus.isLowStock ? " is_low" : ""}" ${inventoryStatus.message ? "" : "hidden"}>${escapeHtml(inventoryStatus.message)}</span>
+              <span class="product_stock_status${inventoryStatus.isOutOfStock ? " is_out" : ""}${inventoryStatus.isLowStock ? " is_low" : ""}" ${stockStatusText ? "" : "hidden"}>${escapeHtml(stockStatusText)}</span>
             </div>
             <button class="checkout_item_remove" type="button" data-checkout-remove="${escapeHtml(item.id)}">
               <i class="fa fa-trash" aria-hidden="true"></i>
-              <span>Remove</span>
+              <span>${escapeHtml(getCheckoutUiText("remove", "Remove"))}</span>
             </button>
           </div>
           <div class="checkout_cart_item_meta">
             <span>${pricing.offer ? `<del>${escapeHtml(formatPrice(pricing.originalPrice))}</del> ` : ""}${escapeHtml(formatPrice(price))}</span>
-            <strong>Total: ${escapeHtml(formatPrice(lineTotal))}</strong>
+            <strong>${escapeHtml(getCheckoutUiText("itemTotal", "Item total"))}: ${escapeHtml(formatPrice(lineTotal))}</strong>
           </div>
           <div class="checkout_item_qty_stack">
-            <div class="checkout_item_qty" aria-label="Quantity controls for ${escapeHtml(item.name)}">
-              <button type="button" data-checkout-decrease="${escapeHtml(item.id)}" aria-label="Decrease quantity">-</button>
+            <div class="checkout_item_qty" aria-label="${escapeHtml(getCheckoutUiText("quantityControlsFor", "Quantity controls for {name}", { name: item.name }))}">
+              <button type="button" data-checkout-decrease="${escapeHtml(item.id)}" aria-label="${escapeHtml(getCheckoutUiText("decreaseQuantity", "Decrease quantity"))}">-</button>
               <span>${quantity}</span>
-              <button type="button" data-checkout-increase="${escapeHtml(item.id)}" aria-label="Increase quantity" ${inventoryStatus.tracked && quantity >= inventoryStatus.available ? "disabled" : ""}>+</button>
+              <button type="button" data-checkout-increase="${escapeHtml(item.id)}" aria-label="${escapeHtml(getCheckoutUiText("increaseQuantity", "Increase quantity"))}" ${inventoryStatus.tracked && quantity >= inventoryStatus.available ? "disabled" : ""}>+</button>
             </div>
             ${quantityLimitNotice ? `<span class="cart_quantity_limit_notice">${escapeHtml(quantityLimitNotice)}</span>` : ""}
           </div>
@@ -643,8 +687,11 @@ function syncCityCards() {
   if (selectedCityName) {
     const rate = selectedCity ? getShippingRate(selectedCity.id) : null;
     selectedCityName.textContent = selectedCity && rate
-      ? `${selectedCity.name} - ${formatPrice(rate.amount)} shipping`
-      : selectedCity ? selectedCity.name : "Choose a city first";
+      ? getCheckoutUiText("selectedCityWithShipping", "{city} - {price} delivery fee", {
+        city: selectedCity.name,
+        price: formatPrice(rate.amount)
+      })
+      : selectedCity ? selectedCity.name : getCheckoutUiText("chooseCityFirst", "Choose a city first");
   }
 
   refreshCouponAndTotals();
@@ -657,22 +704,22 @@ function renderReview() {
   const { reviewCity: cityEl, reviewCustomer: customerEl, reviewAddress: addressEl } = getCheckoutDom();
 
   if (cityEl) {
-    cityEl.textContent = city ? city.name : "City not selected";
+    cityEl.textContent = city ? city.name : getCheckoutUiText("cityNotSelected", "City not selected");
   }
 
   if (customerEl) {
-    customerEl.textContent = [values.name, values.phone].filter(Boolean).join(" - ") || "Customer details not entered";
+    customerEl.textContent = [values.name, values.phone].filter(Boolean).join(" - ") || getCheckoutUiText("customerDetailsNotEntered", "Customer details not entered");
   }
 
   if (addressEl) {
     const addressParts = [
       values.area,
       values.fullAddress,
-      values.building ? `Building ${values.building}` : "",
-      values.floorApartment ? `Floor / Apt ${values.floorApartment}` : "",
+      values.building ? getCheckoutUiText("buildingSummary", "Building {value}", { value: values.building }) : "",
+      values.floorApartment ? getCheckoutUiText("floorApartmentSummary", "Floor / Apt {value}", { value: values.floorApartment }) : "",
       values.notes
     ].filter(Boolean);
-    addressEl.textContent = addressParts.join(", ") || "Address details not entered";
+    addressEl.textContent = addressParts.join(", ") || getCheckoutUiText("addressDetailsNotEntered", "Address details not entered");
   }
 }
 
@@ -805,11 +852,11 @@ async function createPaymentSession(payload) {
       || responseBody.paymobResponse?.message
       || "";
     const rootCause = responseBody.rootCause ? ` (${responseBody.rootCause})` : "";
-    throw new Error(`${paymobReason || responseBody.error || "Unable to start payment. Please try again."}${rootCause}`);
+    throw new Error(`${paymobReason || responseBody.error || getCheckoutUiText("unableToStartPayment", "Unable to start payment. Please try again.")}${rootCause}`);
   }
 
   if (!responseBody.checkoutUrl) {
-    throw new Error("Payment could not start because Paymob did not return a checkout URL.");
+    throw new Error(getCheckoutUiText("paymentMissingCheckoutUrl", "Payment could not start because Paymob did not return a checkout URL."));
   }
 
   return responseBody;
@@ -821,7 +868,7 @@ async function submitOrder() {
   }
 
   if (!isCartReady()) {
-    setValidationMessage("Your cart is still loading. Please try again in a moment.");
+    setValidationMessage(getCheckoutUiText("cartStillLoading", "Your cart is still loading. Please try again in a moment."));
     await whenCartReady();
   }
 
@@ -829,7 +876,7 @@ async function submitOrder() {
   const city = getSelectedCity();
 
   if (!stepValidation.valid || !city || !getCart().length) {
-    setValidationMessage(stepValidation.message || "Please complete your checkout details.");
+    setValidationMessage(stepValidation.message || getCheckoutUiText("pleaseCompleteCheckoutDetails", "Please complete your checkout details."));
     return;
   }
 
@@ -840,14 +887,14 @@ async function submitOrder() {
   try {
     const inventoryValidation = await validateCartInventory(getCart());
     if (!inventoryValidation.valid) {
-      throw new Error(inventoryValidation.message || "Some cart items are no longer available.");
+      throw new Error(inventoryValidation.message || getCheckoutUiText("someCartItemsUnavailable", "Some cart items are no longer available."));
     }
     saveCustomerInfo(city);
     const paymentSession = await createPaymentSession(await buildPaymentPayload(city));
     window.location.href = paymentSession.checkoutUrl;
   } catch (error) {
     setPaymentSubmitting(false);
-    const message = error.message || "Unable to start payment. Please try again.";
+    const message = error.message || getCheckoutUiText("unableToStartPayment", "Unable to start payment. Please try again.");
     setValidationMessage(message);
     emitToast(message, "error");
   }
@@ -894,18 +941,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const removeButton = event.target.closest("[data-checkout-remove]");
     if (removeButton) {
       if (!isCartReady()) {
-        setValidationMessage("Your cart is still loading. Please try again in a moment.");
+        setValidationMessage(getCheckoutUiText("cartStillLoading", "Your cart is still loading. Please try again in a moment."));
         return;
       }
       removeCartItem(removeButton.getAttribute("data-checkout-remove"));
-      emitToast("Item removed from cart.", "info");
+      emitToast(getCheckoutUiText("itemRemoved", "Item removed from cart."), "info");
       return;
     }
 
     const increaseButton = event.target.closest("[data-checkout-increase]");
     if (increaseButton) {
       if (!isCartReady()) {
-        setValidationMessage("Your cart is still loading. Please try again in a moment.");
+        setValidationMessage(getCheckoutUiText("cartStillLoading", "Your cart is still loading. Please try again in a moment."));
         return;
       }
       const productId = increaseButton.getAttribute("data-checkout-increase");
@@ -925,7 +972,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const decreaseButton = event.target.closest("[data-checkout-decrease]");
     if (decreaseButton) {
       if (!isCartReady()) {
-        setValidationMessage("Your cart is still loading. Please try again in a moment.");
+        setValidationMessage(getCheckoutUiText("cartStillLoading", "Your cart is still loading. Please try again in a moment."));
         return;
       }
       const productId = decreaseButton.getAttribute("data-checkout-decrease");
@@ -970,7 +1017,7 @@ document.addEventListener("DOMContentLoaded", () => {
         couponInput.value = "";
       }
       setAppliedCoupon(null, 0);
-      setCouponMessage("Promo code removed.", "info");
+      setCouponMessage(getCheckoutUiText("promoCodeRemoved", "Promo code removed."), "info");
     });
   }
   if (couponInput) {
@@ -986,4 +1033,12 @@ document.addEventListener("DOMContentLoaded", () => {
   loadCheckoutSettings();
   syncCityCards();
   setStep(initialCheckoutStep);
+
+  window.addEventListener("sushi-box:language-change", () => {
+    renderCartItems(getCart(), { ready: isCartReady(), loading: !isCartReady() });
+    renderCheckoutTotals();
+    syncCityCards();
+    renderReview();
+    updatePaymentSubmitLabel();
+  });
 });

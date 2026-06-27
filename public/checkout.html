@@ -101,41 +101,41 @@
     <section class="checkout_page_section">
       <div class="container">
         <div class="checkout_page_header">
-          <span>Secure checkout</span>
-          <h1>Checkout</h1>
-          <p>Continue from your cart with delivery details, address, and secure Paymob payment.</p>
+          <span data-i18n="checkoutUi.secureCheckout">Secure checkout</span>
+          <h1 data-i18n="checkoutUi.checkout">Checkout</h1>
+          <p data-i18n="checkoutUi.checkoutIntro">Continue from your cart with delivery details, address, and secure Paymob payment.</p>
         </div>
 
         <div id="checkoutLoadingState" class="checkout_page_loading" role="status" aria-live="polite">
           <div class="checkout_page_loading_icon"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i></div>
-          <h2>Loading your cart</h2>
-          <p>Checking your saved cart before checkout starts.</p>
+          <h2 data-i18n="checkoutUi.loadingCheckout">Loading checkout</h2>
+          <p data-i18n="checkoutUi.loadingCheckoutHint">Checking your saved cart before checkout starts.</p>
         </div>
 
         <div id="checkoutEmptyState" class="checkout_page_empty" hidden>
           <div class="checkout_page_empty_icon"><i class="fa fa-shopping-basket" aria-hidden="true"></i></div>
-          <h2>Your cart is empty</h2>
-          <p>Add your Sushi Box favorites before starting checkout.</p>
-          <a href="menu.html" class="checkout_menu_btn">Back to products</a>
+          <h2 data-i18n="checkoutUi.cartIsEmpty">Cart is empty</h2>
+          <p data-i18n="checkoutUi.cartEmptyHint">Add your Sushi Box favorites before starting checkout.</p>
+          <a href="cart.html" class="checkout_menu_btn" data-i18n="checkoutUi.returnToCart">Return to cart</a>
         </div>
 
         <div id="checkoutFlow" class="checkout_page_shell" hidden>
-          <ol class="checkout_steps" aria-label="Checkout progress">
+          <ol class="checkout_steps" aria-label="Checkout progress" data-i18n-aria-label="checkoutUi.checkoutProgress">
             <li class="checkout_step" data-checkout-step="1">
               <span class="checkout_step_number">1</span>
-              <span>Cart</span>
+              <span data-i18n="checkoutUi.reviewOrder">Review Order</span>
             </li>
             <li class="checkout_step" data-checkout-step="2">
               <span class="checkout_step_number">2</span>
-              <span>Delivery</span>
+              <span data-i18n="checkoutUi.delivery">Delivery</span>
             </li>
             <li class="checkout_step" data-checkout-step="3">
               <span class="checkout_step_number">3</span>
-              <span>Address</span>
+              <span data-i18n="checkoutUi.address">Address</span>
             </li>
             <li class="checkout_step" data-checkout-step="4">
               <span class="checkout_step_number">4</span>
-              <span>Payment</span>
+              <span data-i18n="checkoutUi.payment">Payment</span>
             </li>
           </ol>
 
@@ -145,153 +145,153 @@
             <section class="checkout_page_panel" data-checkout-panel="1">
               <div class="checkout_panel_head">
                 <div>
-                  <span class="checkout_step_label">Step 1</span>
-                  <h2>Review cart</h2>
+                  <span class="checkout_step_label" data-i18n="checkoutUi.step1">Step 1</span>
+                  <h2 data-i18n="checkoutUi.reviewOrder">Review Order</h2>
                 </div>
                 <strong data-checkout-final-total>&#1580;.&#1605; 0.00</strong>
               </div>
               <div id="checkoutCartItems" class="checkout_cart_items"></div>
               <div class="checkout_order_summary">
                 <div class="checkout_summary_row">
-                  <span>Products Subtotal</span>
+                  <span data-i18n="checkoutUi.subtotal">Subtotal</span>
                   <strong data-checkout-subtotal>&#1580;.&#1605; 0.00</strong>
                 </div>
                 <div class="checkout_summary_row">
-                  <span>Shipping Cost</span>
+                  <span data-i18n="checkoutUi.deliveryFee">Delivery Fee</span>
                   <strong data-checkout-shipping>Choose city</strong>
                 </div>
                 <div class="checkout_summary_row">
-                  <span>Total Before Discount</span>
+                  <span data-i18n="checkoutUi.totalBeforeDiscount">Total Before Discount</span>
                   <strong data-checkout-before-discount>Choose city</strong>
                 </div>
                 <div class="checkout_summary_row checkout_discount_row" data-checkout-discount-row hidden>
-                  <span>Discount</span>
+                  <span data-i18n="checkoutUi.discount">Discount</span>
                   <strong data-checkout-discount>&#1580;.&#1605; 0.00</strong>
                 </div>
                 <div class="checkout_summary_row checkout_summary_total">
-                  <span>Final Total</span>
+                  <span data-i18n="checkoutUi.total">Total</span>
                   <strong data-checkout-final-total>&#1580;.&#1605; 0.00</strong>
                 </div>
               </div>
               <div class="checkout_nav_row">
-                <a class="checkout_back_btn" href="menu.html">Continue shopping</a>
-                <button class="checkout_next_btn" type="button" data-checkout-next>Choose city</button>
+                <a class="checkout_back_btn" href="cart.html" data-i18n="checkoutUi.backToCart">Back to Cart</a>
+                <button class="checkout_next_btn" type="button" data-checkout-next data-i18n="checkoutUi.continue">Continue</button>
               </div>
             </section>
 
             <section class="checkout_page_panel" data-checkout-panel="2" hidden>
               <div class="checkout_panel_head">
                 <div>
-                  <span class="checkout_step_label">Step 2</span>
-                  <h2>Choose delivery city</h2>
+                  <span class="checkout_step_label" data-i18n="checkoutUi.step2">Step 2</span>
+                  <h2 data-i18n="checkoutUi.deliveryCity">Delivery City</h2>
                 </div>
               </div>
               <fieldset class="checkout_city_selector">
-                <legend>Available delivery cities</legend>
-                <p class="checkout_delivery_schedule_note">Delivery is available every Wednesday, Thursday, and Friday.</p>
+                <legend data-i18n="checkoutUi.selectCity">Select city</legend>
+                <p class="checkout_delivery_schedule_note" data-i18n="checkoutUi.deliveryScheduleNote">Delivery is available every Wednesday, Thursday, and Friday.</p>
                 <div class="checkout_city_options">
                   <label class="checkout_city_card" data-checkout-city="kafr-el-sheikh">
                     <input type="radio" name="checkoutCity" value="kafr-el-sheikh" required>
                     <span class="checkout_city_check" aria-hidden="true"></span>
-                    <span class="checkout_city_copy"><strong>Kafr El Sheikh</strong><small>Wednesday, Thursday, Friday</small><em data-city-shipping="kafr-el-sheikh">150 EGP</em></span>
+                    <span class="checkout_city_copy"><strong>Kafr El Sheikh</strong><small data-i18n="checkoutUi.deliverySchedule">Wednesday, Thursday, Friday</small><em data-city-shipping="kafr-el-sheikh">150 EGP</em></span>
                   </label>
                   <label class="checkout_city_card" data-checkout-city="mansoura">
                     <input type="radio" name="checkoutCity" value="mansoura" required>
                     <span class="checkout_city_check" aria-hidden="true"></span>
-                    <span class="checkout_city_copy"><strong>Mansoura</strong><small>Wednesday, Thursday, Friday</small><em data-city-shipping="mansoura">150 EGP</em></span>
+                    <span class="checkout_city_copy"><strong>Mansoura</strong><small data-i18n="checkoutUi.deliverySchedule">Wednesday, Thursday, Friday</small><em data-city-shipping="mansoura">150 EGP</em></span>
                   </label>
                   <label class="checkout_city_card" data-checkout-city="tanta">
                     <input type="radio" name="checkoutCity" value="tanta" required>
                     <span class="checkout_city_check" aria-hidden="true"></span>
-                    <span class="checkout_city_copy"><strong>Tanta</strong><small>Wednesday, Thursday, Friday</small><em data-city-shipping="tanta">150 EGP</em></span>
+                    <span class="checkout_city_copy"><strong>Tanta</strong><small data-i18n="checkoutUi.deliverySchedule">Wednesday, Thursday, Friday</small><em data-city-shipping="tanta">150 EGP</em></span>
                   </label>
                   <label class="checkout_city_card" data-checkout-city="el-mahalla">
                     <input type="radio" name="checkoutCity" value="el-mahalla" required>
                     <span class="checkout_city_check" aria-hidden="true"></span>
-                    <span class="checkout_city_copy"><strong>El Mahalla El Kubra</strong><small>Wednesday, Thursday, Friday</small><em data-city-shipping="el-mahalla">50 EGP</em></span>
+                    <span class="checkout_city_copy"><strong>El Mahalla El Kubra</strong><small data-i18n="checkoutUi.deliverySchedule">Wednesday, Thursday, Friday</small><em data-city-shipping="el-mahalla">50 EGP</em></span>
                   </label>
                 </div>
               </fieldset>
               <div class="checkout_nav_row">
-                <button class="checkout_back_btn" type="button" data-checkout-prev>Back to cart</button>
-                <button class="checkout_next_btn" type="button" data-checkout-next>Address details</button>
+                <button class="checkout_back_btn" type="button" data-checkout-prev data-i18n="checkoutUi.backToCart">Back to Cart</button>
+                <button class="checkout_next_btn" type="button" data-checkout-next data-i18n="checkoutUi.continue">Continue</button>
               </div>
             </section>
 
             <section class="checkout_page_panel" data-checkout-panel="3" hidden>
               <div class="checkout_panel_head">
                 <div>
-                  <span class="checkout_step_label">Step 3</span>
-                  <h2>Enter address details</h2>
+                  <span class="checkout_step_label" data-i18n="checkoutUi.step3">Step 3</span>
+                  <h2 data-i18n="checkoutUi.deliveryAddress">Delivery Address</h2>
                 </div>
               </div>
               <div class="checkout_selected_city">
                 <strong id="checkoutSelectedCityName">Choose a city first</strong>
-                <span>Delivery is available every Wednesday, Thursday, and Friday.</span>
+                <span data-i18n="checkoutUi.deliveryScheduleNote">Delivery is available every Wednesday, Thursday, and Friday.</span>
               </div>
               <div class="checkout_saved_address_bar" id="savedAddressNotice" hidden>
-                <span>Saved address applied. You can edit any field.</span>
-                <button id="clearSavedAddressBtn" class="checkout_clear_saved_btn" type="button" hidden>Clear saved address</button>
+                <span data-i18n="checkoutUi.savedAddressApplied">Saved address applied. You can edit any field.</span>
+                <button id="clearSavedAddressBtn" class="checkout_clear_saved_btn" type="button" hidden data-i18n="checkoutUi.clearSavedAddress">Clear saved address</button>
               </div>
               <div class="checkout_fields checkout_address_fields">
                 <label>
-                  <span>Customer name <span class="required-star" aria-hidden="true">*</span></span>
-                  <input id="checkoutCustomerName" name="customerName" type="text" autocomplete="name" required>
+                  <span><span data-i18n="checkoutUi.fullName">Full Name</span> <span class="required-star" aria-hidden="true">*</span></span>
+                  <input id="checkoutCustomerName" name="customerName" type="text" autocomplete="name" required data-i18n-placeholder="checkoutUi.fullNamePlaceholder">
                 </label>
                 <label>
-                  <span>Phone number <span class="required-star" aria-hidden="true">*</span></span>
-                  <input id="checkoutCustomerPhone" name="customerPhone" type="tel" autocomplete="tel" required>
+                  <span><span data-i18n="checkoutUi.phoneNumber">Phone Number</span> <span class="required-star" aria-hidden="true">*</span></span>
+                  <input id="checkoutCustomerPhone" name="customerPhone" type="tel" autocomplete="tel" required data-i18n-placeholder="checkoutUi.phoneNumberPlaceholder">
                 </label>
                 <label>
-                  <span>Email <em>optional</em></span>
-                  <input id="checkoutCustomerEmail" name="customerEmail" type="email" autocomplete="email">
+                  <span><span data-i18n="checkoutUi.emailAddress">Email Address</span> <em data-i18n="checkoutUi.optional">optional</em></span>
+                  <input id="checkoutCustomerEmail" name="customerEmail" type="email" autocomplete="email" data-i18n-placeholder="checkoutUi.emailAddressPlaceholder">
                 </label>
                 <label>
-                  <span>Area <span class="required-star" aria-hidden="true">*</span></span>
-                  <input id="checkoutCustomerArea" name="customerArea" type="text" autocomplete="address-level3" required>
+                  <span><span data-i18n="checkoutUi.area">Area</span> <span class="required-star" aria-hidden="true">*</span></span>
+                  <input id="checkoutCustomerArea" name="customerArea" type="text" autocomplete="address-level3" required data-i18n-placeholder="checkoutUi.areaPlaceholder">
                 </label>
                 <label class="checkout_full_width">
-                  <span>Full address <span class="required-star" aria-hidden="true">*</span></span>
-                  <textarea id="checkoutCustomerAddress" name="customerAddress" rows="3" autocomplete="street-address" required></textarea>
+                  <span><span data-i18n="checkoutUi.streetAddress">Street Address</span> <span class="required-star" aria-hidden="true">*</span></span>
+                  <textarea id="checkoutCustomerAddress" name="customerAddress" rows="3" autocomplete="street-address" required data-i18n-placeholder="checkoutUi.streetAddressPlaceholder"></textarea>
                 </label>
                 <label>
-                  <span>Building number <span class="required-star" aria-hidden="true">*</span></span>
-                  <input id="checkoutCustomerBuilding" name="customerBuilding" type="text" required>
+                  <span><span data-i18n="checkoutUi.buildingNumber">Building number</span> <span class="required-star" aria-hidden="true">*</span></span>
+                  <input id="checkoutCustomerBuilding" name="customerBuilding" type="text" required data-i18n-placeholder="checkoutUi.buildingNumberPlaceholder">
                 </label>
                 <label>
-                  <span>Floor / apartment <span class="required-star" aria-hidden="true">*</span></span>
-                  <input id="checkoutCustomerFloorApartment" name="customerFloorApartment" type="text" required>
+                  <span><span data-i18n="checkoutUi.floorApartment">Floor / apartment</span> <span class="required-star" aria-hidden="true">*</span></span>
+                  <input id="checkoutCustomerFloorApartment" name="customerFloorApartment" type="text" required data-i18n-placeholder="checkoutUi.floorApartmentPlaceholder">
                 </label>
                 <label class="checkout_full_width">
-                  <span>Landmark / notes <em>optional</em></span>
-                  <textarea id="checkoutCustomerNotes" name="customerNotes" rows="2"></textarea>
+                  <span><span data-i18n="checkoutUi.orderNotes">Order Notes</span> <em data-i18n="checkoutUi.optional">optional</em></span>
+                  <textarea id="checkoutCustomerNotes" name="customerNotes" rows="2" data-i18n-placeholder="checkoutUi.notesPlaceholder"></textarea>
                 </label>
               </div>
               <div class="checkout_nav_row">
-                <button class="checkout_back_btn" type="button" data-checkout-prev>Back</button>
-                <button class="checkout_next_btn" type="button" data-checkout-next>Review & pay</button>
+                <button class="checkout_back_btn" type="button" data-checkout-prev data-i18n="checkoutUi.back">Back</button>
+                <button class="checkout_next_btn" type="button" data-checkout-next data-i18n="checkoutUi.continueToPayment">Continue to Payment</button>
               </div>
             </section>
 
             <section class="checkout_page_panel" data-checkout-panel="4" hidden>
               <div class="checkout_panel_head">
                 <div>
-                  <span class="checkout_step_label">Step 4</span>
-                  <h2>Review order & pay</h2>
+                  <span class="checkout_step_label" data-i18n="checkoutUi.step4">Step 4</span>
+                  <h2 data-i18n="checkoutUi.reviewOrder">Review Order</h2>
                 </div>
                 <strong data-checkout-final-total>&#1580;.&#1605; 0.00</strong>
               </div>
               <div class="checkout_review_cards">
                 <div class="checkout_review_card">
-                  <span>Delivery city</span>
+                  <span data-i18n="checkoutUi.deliveryCity">Delivery City</span>
                   <strong id="checkoutReviewCity">City not selected</strong>
                 </div>
                 <div class="checkout_review_card">
-                  <span>Customer</span>
+                  <span data-i18n="checkoutUi.customerInformation">Customer Information</span>
                   <strong id="checkoutReviewCustomer">Customer details not entered</strong>
                 </div>
                 <div class="checkout_review_card checkout_full_width">
-                  <span>Address</span>
+                  <span data-i18n="checkoutUi.address">Address</span>
                   <strong id="checkoutReviewAddress">Address details not entered</strong>
                 </div>
               </div>
@@ -299,22 +299,22 @@
                 <input type="radio" name="checkoutPaymentMethod" value="paymob-checkout" checked>
                 <span class="checkout_payment_icon"><i class="fa fa-credit-card" aria-hidden="true"></i></span>
                 <span>
-                  <strong>Secure online payment</strong>
-                  <small>Visa / Mastercard, mobile wallets, and kiosk / Fawry are handled by Paymob.</small>
+                  <strong data-i18n="checkoutUi.paymentMethod">Payment Method</strong>
+                  <small data-i18n="checkoutUi.paymobPaymentMethods">Visa / Mastercard / Meeza, mobile wallets, and kiosk / Fawry are handled by Paymob.</small>
                 </span>
               </label>
-              <div class="checkout_payment_trust" aria-label="Secure payment information">
+              <div class="checkout_payment_trust" aria-label="Secure payment information" data-i18n-aria-label="checkoutUi.securePaymentInformation">
                 <div class="checkout_payment_trust_head">
                   <span class="checkout_paymob_logo_mark">
                     <img src="images/paymobLogo.png" alt="Paymob" width="148" height="40" loading="lazy" decoding="async" onerror="this.closest('.checkout_paymob_logo_mark').classList.add('is_missing'); this.hidden = true;">
                     <span>Paymob</span>
                   </span>
                   <div>
-                    <strong>Secure payment powered by Paymob</strong>
-                    <p>Your payment is processed securely through Paymob. You can pay safely using bank cards and supported mobile wallets.</p>
+                    <strong data-i18n="checkoutUi.securePaymentPoweredByPaymob">Secure payment powered by Paymob</strong>
+                    <p data-i18n="checkoutUi.paymentEncryptedSecure">Your payment is encrypted and secure.</p>
                   </div>
                 </div>
-                <div class="checkout_payment_logo_strip" aria-label="Available payment methods">
+                <div class="checkout_payment_logo_strip" aria-label="Available payment methods" data-i18n-aria-label="checkoutUi.availablePaymentMethods">
                   <span class="checkout_payment_logo_item">
                     <img src="images/Visa.png" alt="Visa" loading="lazy" decoding="async" onerror="this.closest('.checkout_payment_logo_item').classList.add('is_missing'); this.hidden = true;">
                     <span>Visa</span>
@@ -333,46 +333,46 @@
                   </span>
                   <span class="checkout_payment_logo_item">
                     <img src="images/Mahafez.png" alt="Mobile wallets" loading="lazy" decoding="async" onerror="this.closest('.checkout_payment_logo_item').classList.add('is_missing'); this.hidden = true;">
-                    <span>Mobile Wallets</span>
+                    <span data-i18n="checkoutUi.mobileWallet">Mobile Wallet</span>
                   </span>
                 </div>
               </div>
               <div class="checkout_coupon_box">
-                <label for="checkoutCouponCode">Promo code</label>
+                <label for="checkoutCouponCode" data-i18n="checkoutUi.promoCode">Promo Code</label>
                 <div class="checkout_coupon_controls">
-                  <input id="checkoutCouponCode" name="couponCode" type="text" autocomplete="off" placeholder="">
-                  <button id="checkoutApplyCouponBtn" type="button">Apply</button>
-                  <button id="checkoutRemoveCouponBtn" type="button" hidden>Remove</button>
+                  <input id="checkoutCouponCode" name="couponCode" type="text" autocomplete="off" placeholder="" data-i18n-placeholder="checkoutUi.promoCodePlaceholder">
+                  <button id="checkoutApplyCouponBtn" type="button" data-i18n="checkoutUi.apply">Apply</button>
+                  <button id="checkoutRemoveCouponBtn" type="button" hidden data-i18n="checkoutUi.removeCoupon">Remove Coupon</button>
                 </div>
                 <p id="checkoutCouponMessage" class="checkout_coupon_message" role="status" aria-live="polite" hidden></p>
               </div>
               <div class="checkout_order_summary">
                 <div class="checkout_summary_row">
-                  <span>Products Subtotal</span>
+                  <span data-i18n="checkoutUi.subtotal">Subtotal</span>
                   <strong data-checkout-subtotal>&#1580;.&#1605; 0.00</strong>
                 </div>
                 <div class="checkout_summary_row">
-                  <span>Shipping Cost</span>
+                  <span data-i18n="checkoutUi.deliveryFee">Delivery Fee</span>
                   <strong data-checkout-shipping>Choose city</strong>
                 </div>
                 <div class="checkout_summary_row">
-                  <span>Total Before Discount</span>
+                  <span data-i18n="checkoutUi.totalBeforeDiscount">Total Before Discount</span>
                   <strong data-checkout-before-discount>Choose city</strong>
                 </div>
                 <div class="checkout_summary_row checkout_discount_row" data-checkout-discount-row hidden>
-                  <span>Discount</span>
+                  <span data-i18n="checkoutUi.discount">Discount</span>
                   <strong data-checkout-discount>&#1580;.&#1605; 0.00</strong>
                 </div>
                 <div class="checkout_summary_row checkout_summary_total">
-                  <span>Final Total</span>
+                  <span data-i18n="checkoutUi.total">Total</span>
                   <strong data-checkout-final-total>&#1580;.&#1605; 0.00</strong>
                 </div>
               </div>
               <div class="checkout_nav_row">
-                <button class="checkout_back_btn" type="button" data-checkout-prev>Back</button>
+                <button class="checkout_back_btn" type="button" data-checkout-prev data-i18n="checkoutUi.back">Back</button>
                 <div class="checkout_pay_action">
-                  <p><i class="fa fa-lock" aria-hidden="true"></i> Your payment details are encrypted and processed securely by Paymob.</p>
-                  <button class="checkout_confirm_btn" type="submit">Pay now</button>
+                  <p><i class="fa fa-lock" aria-hidden="true"></i> <span data-i18n="checkoutUi.paymentEncryptedSecure">Your payment is encrypted and secure.</span></p>
+                  <button class="checkout_confirm_btn" type="submit" data-i18n="checkoutUi.payNow">Pay Now</button>
                 </div>
               </div>
             </section>
@@ -476,7 +476,7 @@
   <script defer src="js/custom.js?v=20260603a"></script>
   <script type="module" src="js/navbar-offers.js?v=20260518c" defer></script>
   <script type="module" src="js/app-shell.js?v=20260619a" defer></script>
-  <script type="module" src="js/checkout-page.js?v=20260619a" defer></script>
+  <script type="module" src="js/checkout-page.js?v=20260627c" defer></script>
 </body>
 
 </html>

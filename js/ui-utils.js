@@ -1,3 +1,5 @@
+import { t } from "./i18n/i18n.js";
+
 function normalizeRating(rating) {
   return Math.max(0, Math.min(5, Number(rating) || 0));
 }
@@ -324,9 +326,9 @@ export async function shareProduct(product, productUrl) {
 
   try {
     await copyTextToClipboard(shareUrl);
-    emitToast("Link copied!", "success");
+    emitToast(t("productUi.linkCopied", "Link copied"), "success");
   } catch (error) {
-    emitToast("Could not copy the link. Please copy it from the address bar.", "error");
+    emitToast(t("productUi.linkCopyFailed", "Could not copy the link. Please copy it from the address bar."), "error");
   }
 }
 

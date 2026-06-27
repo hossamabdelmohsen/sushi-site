@@ -21,8 +21,18 @@ import { addWishlistItem, isProductWishlisted } from "./wishlist-store.js?v=2026
 import { trackBeginCheckout, trackViewCart } from "./analytics-events.js?v=20260602c";
 import { emitToast, escapeHtml } from "./ui-utils.js?v=20260502b";
 import { getCartOfferSubtotal, getProductOfferPricing, subscribeToProductOffers } from "./offers-data.js?v=20260620a";
+import { t } from "./i18n/i18n.js";
 
 const FALLBACK_IMAGE = "images/optimized/Logo.webp";
+
+function getCartUiText(key, fallback = "", values = {}) {
+  return t(`cartUi.${key}`, fallback, values);
+}
+
+function getCartUiCountText(key, count, fallback = "") {
+  const suffix = Number(count) === 1 ? "" : "_plural";
+  return getCartUiText(`${key}${suffix}`, fallback, { count });
+}
 
 function getExactProduct(productId) {
   return getExactProductById(productId);
@@ -34,10 +44,32 @@ function getQuantityLimitNotice(inventoryStatus, quantity) {
   }
 
   if (inventoryStatus.available <= 0) {
-    return "Out of stock.";
+    return getCartUiText("outOfStock", "Out of stock.");
   }
 
-  return `Only ${inventoryStatus.available} item${inventoryStatus.available === 1 ? "" : "s"} available.`;
+  return getCartUiCountText(
+    "onlyItemsAvailable",
+    inventoryStatus.available,
+    `Only ${inventoryStatus.available} item${inventoryStatus.available === 1 ? "" : "s"} available.`
+  );
+}
+
+function getCartStockStatusText(inventoryStatus) {
+  if (!inventoryStatus || !inventoryStatus.message) {
+    return "";
+  }
+
+  if (inventoryStatus.isOutOfStock) {
+    return getCartUiText("outOfStockShort", "Out of stock");
+  }
+
+  if (inventoryStatus.isLowStock && Number.isFinite(inventoryStatus.available)) {
+    return getCartUiText("sorryOnlyLeft", "Sorry, only {count} left in stock.", {
+      count: inventoryStatus.available
+    });
+  }
+
+  return inventoryStatus.message;
 }
 
 function renderCartPage(cart, detail = {}) {
@@ -88,7 +120,11 @@ function renderCartPage(cart, detail = {}) {
   });
 
   countEls.forEach((countEl) => {
-    countEl.textContent = `${itemCount} item${itemCount === 1 ? "" : "s"}`;
+    countEl.textContent = getCartUiCountText(
+      "itemCount",
+      itemCount,
+      `${itemCount} item${itemCount === 1 ? "" : "s"}`
+    );
   });
 
   if (checkoutButton) {
@@ -123,10 +159,11 @@ function renderCartPage(cart, detail = {}) {
     const lineTotal = price * quantity;
     const inventoryStatus = getInventoryStatus(item.id);
     const quantityLimitNotice = getQuantityLimitNotice(inventoryStatus, quantity);
+    const stockStatusText = getCartStockStatusText(inventoryStatus);
 
     return `
       <article class="cart_page_item" data-cart-product-id="${escapeHtml(item.id)}">
-        <a class="cart_page_item_image" href="${escapeHtml(productUrl)}" aria-label="View ${escapeHtml(item.name)}">
+        <a class="cart_page_item_image" href="${escapeHtml(productUrl)}" aria-label="${escapeHtml(getCartUiText("viewProduct", "View {name}", { name: item.name }))}">
           ${buildResponsiveImageMarkup({
             product,
             imagePath: image,
@@ -141,40 +178,40 @@ function renderCartPage(cart, detail = {}) {
           <div class="cart_page_item_head">
             <div>
               <a href="${escapeHtml(productUrl)}">${escapeHtml(displayProduct.name || item.name)}</a>
-              <span class="cart_page_item_kicker">Premium sushi ingredients</span>
-              <span class="product_stock_status${inventoryStatus.isOutOfStock ? " is_out" : ""}${inventoryStatus.isLowStock ? " is_low" : ""}" ${inventoryStatus.message ? "" : "hidden"}>${escapeHtml(inventoryStatus.message)}</span>
+              <span class="cart_page_item_kicker">${escapeHtml(getCartUiText("premiumIngredients", "Premium sushi ingredients"))}</span>
+              <span class="product_stock_status${inventoryStatus.isOutOfStock ? " is_out" : ""}${inventoryStatus.isLowStock ? " is_low" : ""}" ${inventoryStatus.message ? "" : "hidden"}>${escapeHtml(stockStatusText)}</span>
             </div>
             <div class="cart_page_item_actions">
               <button class="cart_page_save_btn" type="button" data-cart-page-save-favorite="${escapeHtml(item.id)}">
                 <i class="fa fa-heart-o" aria-hidden="true"></i>
-                <span>Save for later</span>
+                <span>${escapeHtml(getCartUiText("saveToFavorites", "Save to Favorites"))}</span>
               </button>
               <button class="cart_page_remove_btn" type="button" data-cart-page-remove="${escapeHtml(item.id)}">
                 <i class="fa fa-trash" aria-hidden="true"></i>
-                <span>Remove</span>
+                <span>${escapeHtml(getCartUiText("remove", "Remove"))}</span>
               </button>
             </div>
           </div>
           <div class="cart_page_item_prices">
             <div>
-              <span>Unit price</span>
+              <span>${escapeHtml(getCartUiText("unitPrice", "Unit price"))}</span>
               ${pricing.offer ? `<del>${escapeHtml(formatPrice(pricing.originalPrice))}</del>` : ""}<strong>${escapeHtml(formatPrice(price))}</strong>
             </div>
             <div>
-              <span>Item total</span>
-              <strong>${escapeHtml(formatPrice(lineTotal))}</strong>${pricing.offer ? `<small>Save ${escapeHtml(formatPrice(pricing.savings * quantity))}</small>` : ""}
+              <span>${escapeHtml(getCartUiText("itemTotal", "Item total"))}</span>
+              <strong>${escapeHtml(formatPrice(lineTotal))}</strong>${pricing.offer ? `<small>${escapeHtml(getCartUiText("saveAmount", "Save {amount}", { amount: formatPrice(pricing.savings * quantity) }))}</small>` : ""}
             </div>
           </div>
           <div class="cart_page_item_bottom">
             <div class="cart_page_qty_stack">
-              <div class="cart_page_qty" aria-label="Quantity controls for ${escapeHtml(item.name)}">
-                <button type="button" data-cart-page-decrease="${escapeHtml(item.id)}" aria-label="Decrease quantity">-</button>
+              <div class="cart_page_qty" aria-label="${escapeHtml(getCartUiText("quantityControlsFor", "Quantity controls for {name}", { name: item.name }))}">
+                <button type="button" data-cart-page-decrease="${escapeHtml(item.id)}" aria-label="${escapeHtml(getCartUiText("decreaseQuantity", "Decrease quantity"))}">-</button>
                 <span>${quantity}</span>
-                <button type="button" data-cart-page-increase="${escapeHtml(item.id)}" aria-label="Increase quantity" ${inventoryStatus.tracked && quantity >= inventoryStatus.available ? "disabled" : ""}>+</button>
+                <button type="button" data-cart-page-increase="${escapeHtml(item.id)}" aria-label="${escapeHtml(getCartUiText("increaseQuantity", "Increase quantity"))}" ${inventoryStatus.tracked && quantity >= inventoryStatus.available ? "disabled" : ""}>+</button>
               </div>
               ${quantityLimitNotice ? `<span class="cart_quantity_limit_notice">${escapeHtml(quantityLimitNotice)}</span>` : ""}
             </div>
-            <span class="cart_page_line_label">Adjust quantity</span>
+            <span class="cart_page_line_label">${escapeHtml(getCartUiText("adjustQuantity", "Adjust quantity"))}</span>
           </div>
         </div>
       </article>
@@ -193,7 +230,7 @@ function guardCartReady() {
     return true;
   }
 
-  emitToast("Your cart is still loading. Please try again in a moment.", "info");
+  emitToast(getCartUiText("cartStillLoading", "Your cart is still loading. Please try again in a moment."), "info");
   return false;
 }
 
@@ -214,15 +251,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const productId = saveFavoriteButton.getAttribute("data-cart-page-save-favorite");
       const product = getExactProduct(productId);
       if (!product) {
-        emitToast("This product is no longer available.", "info");
+        emitToast(getCartUiText("productUnavailable", "This product is no longer available."), "info");
         return;
       }
       if (isProductWishlisted(product.id)) {
-        emitToast("Already in favorites.", "info");
+        emitToast(getCartUiText("alreadyInFavorites", "Already in favorites."), "info");
         return;
       }
       addWishlistItem(product);
-      emitToast("Saved to favorites.", "success");
+      emitToast(getCartUiText("savedToFavorites", "Saved to favorites."), "success");
       return;
     }
 
@@ -232,7 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       removeCartItem(removeButton.getAttribute("data-cart-page-remove"));
-      emitToast("Item removed from cart.", "info");
+      emitToast(getCartUiText("productRemoved", "Product removed from cart."), "info");
       return;
     }
 
@@ -247,7 +284,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const inventoryStatus = getInventoryStatus(productId);
       const quantityLimitNotice = getQuantityLimitNotice(inventoryStatus, quantity);
       if (quantityLimitNotice) {
-        emitToast(quantityLimitNotice, "error");
+        emitToast(getCartUiText("maxQuantityReached", "You have reached the maximum available quantity."), "error");
         return;
       }
       updateCartItemQuantityWithInventory(productId, quantity + 1);
@@ -270,7 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       clearCartByUserAction();
-      emitToast("Cart cleared.", "info");
+      emitToast(getCartUiText("cartCleared", "Cart cleared."), "info");
       return;
     }
 
@@ -279,7 +316,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       if (!getCart().length) {
-        emitToast("Your cart is empty. Add products before checkout.", "info");
+        emitToast(getCartUiText("cartEmptyBeforeCheckout", "Your cart is empty. Add products before checkout."), "info");
         return;
       }
 
@@ -300,4 +337,8 @@ document.addEventListener("DOMContentLoaded", () => {
   subscribeToProductOffers(() => {
     renderCartPage(getCart(), { ready: isCartReady(), loading: !isCartReady() });
   }, (error) => console.error("Cart offers could not be loaded.", error));
+
+  window.addEventListener("sushi-box:language-change", () => {
+    renderCartPage(getCart(), { ready: isCartReady(), loading: !isCartReady() });
+  });
 });

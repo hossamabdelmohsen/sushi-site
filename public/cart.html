@@ -101,29 +101,29 @@
     <section class="cart_page_section">
       <div class="container">
         <div class="cart_page_header">
-          <span>Step 1 - Cart</span>
-          <h1>Shopping cart</h1>
-          <p>Review quantities, remove items, and continue to checkout when everything looks right.</p>
+          <span data-i18n="cartUi.step1Cart">Step 1 - Cart</span>
+          <h1 data-i18n="cartUi.shoppingCart">Shopping Cart</h1>
+          <p data-i18n="cartUi.cartIntro">Review quantities, remove items, and continue to checkout when everything looks right.</p>
         </div>
 
-        <nav class="cart_checkout_progress" aria-label="Checkout journey">
-          <span class="is_active"><strong>Cart</strong></span>
-          <span><strong>Delivery</strong></span>
-          <span><strong>Address</strong></span>
-          <span><strong>Payment</strong></span>
+        <nav class="cart_checkout_progress" aria-label="Checkout journey" data-i18n-aria-label="cartUi.reviewOrderPay">
+          <span class="is_active"><strong data-i18n="cartUi.cart">Cart</strong></span>
+          <span><strong data-i18n="cartUi.deliveryStep">Delivery</strong></span>
+          <span><strong data-i18n="cartUi.addressStep">Address</strong></span>
+          <span><strong data-i18n="cartUi.paymentStep">Payment</strong></span>
         </nav>
 
         <div id="cartPageLoading" class="cart_page_loading" role="status" aria-live="polite">
           <div class="cart_page_loading_icon"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i></div>
-          <h2>Loading your cart</h2>
-          <p>Checking your saved cart before showing checkout details.</p>
+          <h2 data-i18n="cartUi.loadingCartTitle">Loading your cart</h2>
+          <p data-i18n="cartUi.loadingCartHint">Checking your saved cart before showing checkout details.</p>
         </div>
 
         <div id="cartPageEmpty" class="cart_page_empty" hidden>
           <div class="cart_page_empty_icon"><i class="fa fa-shopping-basket" aria-hidden="true"></i></div>
-          <h2>Your cart is empty</h2>
-          <p>Add your favorite sushi products and come back to checkout.</p>
-          <a href="menu.html" class="cart_page_primary_link">Browse Menu</a>
+          <h2 data-i18n="cartUi.yourCartIsEmpty">Your cart is empty</h2>
+          <p data-i18n="cartUi.emptyCartHint">Add your favorite sushi products and come back to checkout.</p>
+          <a href="menu.html" class="cart_page_primary_link" data-i18n="cartUi.startShopping">Start Shopping</a>
         </div>
 
         <div id="cartPageContent" class="cart_page_shell" hidden>
@@ -131,41 +131,41 @@
             <div class="cart_page_panel_head">
               <div>
                 <span id="cartPageCount" data-cart-page-count>0 items</span>
-                <h2 id="cartItemsTitle">Cart items</h2>
+                <h2 id="cartItemsTitle" data-i18n="cartUi.reviewCart">Review Cart</h2>
               </div>
               <strong data-cart-page-subtotal>&#1580;.&#1605; 0.00</strong>
             </div>
             <div id="cartPageItems" class="cart_page_items"></div>
           </section>
 
-          <aside class="cart_page_summary" aria-label="Cart summary">
+          <aside class="cart_page_summary" aria-label="Cart summary" data-i18n-aria-label="cartUi.orderSummary">
             <div class="cart_page_summary_card">
               <div class="cart_summary_head">
-                <span>Ready for checkout</span>
-                <h2>Order Summary</h2>
+                <span data-i18n="cartUi.readyForCheckout">Ready for checkout</span>
+                <h2 data-i18n="cartUi.orderSummary">Order Summary</h2>
               </div>
               <div class="cart_summary_rows">
                 <div class="cart_summary_row">
-                  <span>Products subtotal</span>
+                  <span data-i18n="cartUi.productsSubtotal">Products subtotal</span>
                   <strong data-cart-page-subtotal>&#1580;.&#1605; 0.00</strong>
                 </div>
                 <div class="cart_summary_row">
-                  <span>Shipping</span>
-                  <strong>Calculated at checkout</strong>
+                  <span data-i18n="cartUi.delivery">Delivery</span>
+                  <strong data-i18n="cartUi.calculatedAtCheckout">Calculated at checkout</strong>
                 </div>
                 <div class="cart_summary_row">
-                  <span>Number of items</span>
+                  <span data-i18n="cartUi.numberOfItems">Number of items</span>
                   <strong data-cart-page-count>0 items</strong>
                 </div>
                 <div class="cart_summary_row cart_summary_total">
-                  <span>Estimated total</span>
+                  <span data-i18n="cartUi.estimatedTotal">Estimated total</span>
                   <strong data-cart-page-subtotal>&#1580;.&#1605; 0.00</strong>
                 </div>
               </div>
-              <p>Delivery, promo codes, and secure payment are completed on the checkout page.</p>
+              <p data-i18n="cartUi.checkoutNote">Delivery, promo codes, and secure payment are completed on the checkout page.</p>
               <div class="cart_trust_panel" aria-label="Secure checkout information">
                 <div class="cart_trust_badges">
-                  <span><i class="fa fa-lock" aria-hidden="true"></i> Secure Checkout</span>
+                  <span><i class="fa fa-lock" aria-hidden="true"></i> <span data-i18n="cartUi.secureCheckout">Secure Checkout</span></span>
                   <span class="cart_paymob_powered">Powered by <img src="images/paymobLogo.png" alt="Paymob" loading="lazy" decoding="async"></span>
                   <span>Cards &amp; Mobile Wallets</span>
                 </div>
@@ -177,9 +177,9 @@
                 </div>
               </div>
               <div class="cart_page_actions">
-                <a class="cart_page_secondary_link" href="menu.html">Continue Shopping</a>
-                <button id="cartPageClearBtn" class="cart_page_clear_btn" type="button">Clear Cart</button>
-                <button id="cartPageCheckoutBtn" class="cart_page_checkout_btn" type="button">Continue to Delivery <span aria-hidden="true">&rarr;</span></button>
+                <a class="cart_page_secondary_link" href="menu.html" data-i18n="cartUi.continueShopping">Continue Shopping</a>
+                <button id="cartPageClearBtn" class="cart_page_clear_btn" type="button" data-i18n="cartUi.emptyCart">Empty Cart</button>
+                <button id="cartPageCheckoutBtn" class="cart_page_checkout_btn" type="button"><span data-i18n="cartUi.proceedToSecureCheckout">Proceed to Secure Checkout</span> <span aria-hidden="true">&rarr;</span></button>
               </div>
             </div>
           </aside>
@@ -281,8 +281,8 @@
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/js/jquery.nice-select.min.js"></script>
   <script defer src="js/custom.js?v=20260603a"></script>
   <script type="module" src="js/navbar-offers.js?v=20260518c" defer></script>
-  <script type="module" src="js/app-shell.js?v=20260619a" defer></script>
-  <script type="module" src="js/cart-page.js?v=20260619a" defer></script>
+  <script type="module" src="js/app-shell.js?v=20260627b" defer></script>
+  <script type="module" src="js/cart-page.js?v=20260627b" defer></script>
 </body>
 
 </html>

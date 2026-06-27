@@ -5,8 +5,14 @@
   var EMAILJS_TEMPLATE_ID = "template_ibctpck";
   var EMAILJS_PUBLIC_KEY = "1zJOrN6rWGpU4sugt";
   var DESTINATION_EMAIL = "sushib0ooo0x@gmail.com";
-  var SUCCESS_MESSAGE = "Thank you for helping Sushi Box improve 💛";
+  var SUCCESS_MESSAGE_KEY = "feedbackPage.success";
   var emailJsReady = false;
+
+  function i18nText(key, fallback) {
+    return window.SushiBoxI18n && typeof window.SushiBoxI18n.t === "function"
+      ? window.SushiBoxI18n.t(key, fallback)
+      : fallback;
+  }
 
   function getElement(id) {
     return document.getElementById(id);
@@ -100,27 +106,27 @@
 
     if (name.length < 2) {
       setFieldInvalid(nameField, true);
-      return { field: nameField, message: "Please enter your full name." };
+      return { field: nameField, message: i18nText("feedbackPage.validationName", "Please enter your full name.") };
     }
 
     if (!isValidEmail(email)) {
       setFieldInvalid(emailField, true);
-      return { field: emailField, message: "Please enter a valid email address." };
+      return { field: emailField, message: i18nText("feedbackPage.validationEmail", "Please enter a valid email address.") };
     }
 
     if (!typeField || !typeField.value) {
       setFieldInvalid(typeField, true);
-      return { field: typeField, message: "Please choose a feedback type." };
+      return { field: typeField, message: i18nText("feedbackPage.validationType", "Please choose a feedback type.") };
     }
 
     if (subject.length < 3) {
       setFieldInvalid(subjectField, true);
-      return { field: subjectField, message: "Please add a short subject." };
+      return { field: subjectField, message: i18nText("feedbackPage.validationSubject", "Please add a short subject.") };
     }
 
     if (message.length < 10) {
       setFieldInvalid(messageField, true);
-      return { field: messageField, message: "Please write a little more detail before sending." };
+      return { field: messageField, message: i18nText("feedbackPage.validationMessage", "Please write a little more detail before sending.") };
     }
 
     return null;
@@ -201,7 +207,9 @@
     }
 
     if (buttonText) {
-      buttonText.textContent = isSending ? "Sending..." : "Send Feedback";
+      buttonText.textContent = isSending
+        ? i18nText("feedbackPage.sending", "Sending...")
+        : i18nText("feedbackPage.send", "Send Feedback");
     }
   }
 
@@ -262,8 +270,8 @@
       if (honeypot && honeypot.value.trim()) {
         form.reset();
         updateNiceSelect(form);
-        setStatus(SUCCESS_MESSAGE, "success");
-        dispatchToast(SUCCESS_MESSAGE, "success");
+        setStatus(i18nText(SUCCESS_MESSAGE_KEY, "Thank you for helping Sushi Box improve"), "success");
+        dispatchToast(i18nText(SUCCESS_MESSAGE_KEY, "Thank you for helping Sushi Box improve"), "success");
         return;
       }
 
@@ -275,14 +283,14 @@
       }
 
       if (!initEmailJs()) {
-        setStatus("Feedback service is still loading. Please check your connection and try again.", "error");
-        dispatchToast("Feedback service could not load. Please try again.", "error");
+        setStatus(i18nText("feedbackPage.serviceLoading", "Feedback service is still loading. Please check your connection and try again."), "error");
+        dispatchToast(i18nText("feedbackPage.serviceLoadToast", "Feedback service could not load. Please try again."), "error");
         return;
       }
 
       syncTemplateAliases();
       setSendingState(form, true);
-      setStatus("Sending your feedback securely...", "info");
+      setStatus(i18nText("feedbackPage.sendingStatus", "Sending your feedback securely..."), "info");
 
       window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
   name: getFieldValue("feedbackName"),
@@ -296,13 +304,13 @@
           autoresizeTextarea(textarea);
           updateNiceSelect(form);
           clearInvalidState(form);
-          setStatus(SUCCESS_MESSAGE, "success");
-          dispatchToast(SUCCESS_MESSAGE, "success");
+          setStatus(i18nText(SUCCESS_MESSAGE_KEY, "Thank you for helping Sushi Box improve"), "success");
+          dispatchToast(i18nText(SUCCESS_MESSAGE_KEY, "Thank you for helping Sushi Box improve"), "success");
         })
         .catch(function (error) {
           console.error("Sushi Box feedback email failed:", error);
-          setStatus("We could not send your feedback right now. Please try again in a moment or contact Sushi Box on WhatsApp.", "error");
-          dispatchToast("We could not send your feedback. Please try again.", "error");
+          setStatus(i18nText("feedbackPage.errorStatus", "We could not send your feedback right now. Please try again in a moment or contact Sushi Box on WhatsApp."), "error");
+          dispatchToast(i18nText("feedbackPage.errorToast", "We could not send your feedback. Please try again."), "error");
         })
         .finally(function () {
           setSendingState(form, false);
