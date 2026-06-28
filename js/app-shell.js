@@ -53,6 +53,7 @@ import {
   initI18n,
   t
 } from "./i18n/i18n.js";
+import { getProductDisplayData } from "./i18n/product-display.js";
 
 const THEME_STORAGE_KEY = "theme";
 const LEGACY_THEME_STORAGE_KEY = "sushiBoxTheme";
@@ -639,7 +640,7 @@ function updateWishlistButtons(wishlist) {
     const isActive = wishlistIds.has(productId);
     const icon = button.querySelector("i");
     const product = getProductById(productId);
-    const productName = product ? product.name : "this product";
+    const productName = product ? getProductDisplayData(product).name : "this product";
 
     button.classList.toggle("is_active", isActive);
     button.setAttribute("aria-pressed", String(isActive));
@@ -1807,6 +1808,7 @@ function renderCheckoutSummary(modal) {
   summary.innerHTML = cart.map((item) => {
     const quantity = Number(item.quantity) || 1;
     const product = getExactProduct(item.id);
+    const displayProduct = getProductDisplayData(product || item);
     const pricing = getProductOfferPricing(product || { id: item.id, price: item.price });
     const lineTotal = pricing.finalPrice * quantity;
     const inventoryStatus = getInventoryStatus(item.id);
@@ -1816,20 +1818,20 @@ function renderCheckoutSummary(modal) {
         ${renderProductThumb({
           product,
           imagePath: item.image,
-          alt: item.name,
+          alt: displayProduct.name || item.name,
           width: 72,
           height: 72,
           sizes: "72px"
         })}
         <div>
-          <strong>${escapeHtml(item.name)}</strong>
+          <strong>${escapeHtml(displayProduct.name || item.name)}</strong>
           <span>${pricing.offer ? `<del>${escapeHtml(formatPrice(pricing.originalPrice))}</del> ` : ""}${quantity} x ${escapeHtml(formatPrice(pricing.finalPrice))}</span>
           <span class="product_stock_status${inventoryStatus.isOutOfStock ? " is_out" : ""}${inventoryStatus.isLowStock ? " is_low" : ""}" ${inventoryStatus.message ? "" : "hidden"}>${escapeHtml(inventoryStatus.message)}</span>
           <div class="checkout_qty_stack">
             <div class="checkout_qty_controls">
-              <button type="button" data-cart-decrease="${escapeHtml(item.id)}" aria-label="Decrease ${escapeHtml(item.name)} quantity">-</button>
+              <button type="button" data-cart-decrease="${escapeHtml(item.id)}" aria-label="Decrease ${escapeHtml(displayProduct.name || item.name)} quantity">-</button>
               <span>${quantity}</span>
-              <button type="button" data-cart-increase="${escapeHtml(item.id)}" aria-label="Increase ${escapeHtml(item.name)} quantity" ${inventoryStatus.tracked && quantity >= inventoryStatus.available ? "disabled" : ""}>+</button>
+              <button type="button" data-cart-increase="${escapeHtml(item.id)}" aria-label="Increase ${escapeHtml(displayProduct.name || item.name)} quantity" ${inventoryStatus.tracked && quantity >= inventoryStatus.available ? "disabled" : ""}>+</button>
               <button type="button" class="cart_save_btn" data-save-cart-item="${escapeHtml(item.id)}">Save for later</button>
               <button type="button" class="checkout_remove_btn" data-remove-cart-item="${escapeHtml(item.id)}">Remove</button>
             </div>
@@ -2544,26 +2546,27 @@ function showToast(message, tone = "info") {
 
 function getSearchResultMarkup(product, index = 0) {
   const productUrl = buildProductUrl(product.id);
+  const displayProduct = getProductDisplayData(product);
 
   return `
     <article class="site_search_result" role="option" aria-selected="${index === 0 ? "true" : "false"}" data-product-id="${escapeHtml(product.id)}" data-product-url="${escapeHtml(productUrl)}">
-      <a href="${escapeHtml(productUrl)}" class="site_search_result_link" aria-label="${escapeHtml(getProductUiText("viewProductAria", "View {name}", { name: product.name }))}">
+      <a href="${escapeHtml(productUrl)}" class="site_search_result_link" aria-label="${escapeHtml(getProductUiText("viewProductAria", "View {name}", { name: displayProduct.name }))}">
         ${renderProductThumb({
           product,
-          alt: product.name,
+          alt: displayProduct.name,
           width: 220,
           height: 160,
           sizes: "(max-width: 767px) 42vw, (max-width: 1199px) 28vw, 220px",
           loading: "eager"
         })}
         <div class="site_search_result_body">
-          <span class="site_search_result_category">${escapeHtml(product.category)}</span>
-          <strong>${escapeHtml(product.name)}</strong>
+          <span class="site_search_result_category">${escapeHtml(displayProduct.category)}</span>
+          <strong>${escapeHtml(displayProduct.name)}</strong>
           ${buildRatingSummaryMarkup(latestReviewSummaries[product.id], "site_search_rating", { productId: product.id })}
           <span class="site_search_result_meta">${formatPrice(product.price)}</span>
         </div>
       </a>
-      <button class="product-wishlist-btn site_search_wishlist_btn" type="button" data-wishlist-product-id="${escapeHtml(product.id)}" aria-label="${escapeHtml(getProductUiText("addProductToFavorites", "Add {name} to favorites", { name: product.name }))}" aria-pressed="false" title="${escapeHtml(getProductUiText("addToFavorites", "Add to favorites"))}">
+      <button class="product-wishlist-btn site_search_wishlist_btn" type="button" data-wishlist-product-id="${escapeHtml(product.id)}" aria-label="${escapeHtml(getProductUiText("addProductToFavorites", "Add {name} to favorites", { name: displayProduct.name }))}" aria-pressed="false" title="${escapeHtml(getProductUiText("addToFavorites", "Add to favorites"))}">
         <i class="fa fa-heart-o" aria-hidden="true"></i>
       </button>
     </article>
@@ -2769,6 +2772,7 @@ function renderCart(cart, detail = {}) {
   lastCartMarkupKey = markupKey;
   cartItems.innerHTML = cart.map((item) => {
     const product = getExactProduct(item.id);
+    const displayProduct = getProductDisplayData(product || item);
     const pricing = getProductOfferPricing(product || { id: item.id, price: item.price });
     const inventoryStatus = getInventoryStatus(item.id);
     const quantityLimitNotice = getQuantityLimitNotice(inventoryStatus, item.quantity);
@@ -2780,7 +2784,7 @@ function renderCart(cart, detail = {}) {
           ${renderProductThumb({
             product,
             imagePath: item.image,
-            alt: item.name,
+            alt: displayProduct.name || item.name,
             width: 72,
             height: 72,
             sizes: "72px"
@@ -2788,7 +2792,7 @@ function renderCart(cart, detail = {}) {
         </a>
         <div class="cart_item_content">
           <div class="cart_item_header">
-            <a href="${buildProductUrl(item.id)}"><strong>${escapeHtml(item.name)}</strong></a>
+            <a href="${buildProductUrl(item.id)}"><strong>${escapeHtml(displayProduct.name || item.name)}</strong></a>
             <button class="cart_remove_btn" type="button" data-remove-cart-item="${item.id}">${escapeHtml(getCartUiText("remove", "Remove"))}</button>
           </div>
           <span class="cart_item_price">${pricing.offer ? `<del>${escapeHtml(formatPrice(pricing.originalPrice))}</del> ` : ""}${escapeHtml(formatPrice(pricing.finalPrice))}</span>
@@ -3236,7 +3240,7 @@ function bindGlobalEvents(authShell) {
         emitToast(getProductUiText(
           result.added ? "productSavedToFavorites" : "productRemovedFromFavorites",
           result.added ? "{name} added to favorites." : "{name} removed from favorites.",
-          { name: product.name }
+          { name: getProductDisplayData(product).name }
         ), result.added ? "success" : "info");
       }
 

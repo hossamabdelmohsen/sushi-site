@@ -4,6 +4,7 @@ import { subscribeToReviewSummaries } from "./firebase-reviews.js?v=20260618b";
 import { addCartItemWithInventory, getInventoryStatus, subscribeToInventory } from "./inventory-store.js?v=20260619a";
 import { bindCardNavigation, buildRatingSummaryMarkup, escapeHtml, primeRatingsCache, shareProduct } from "./ui-utils.js?v=20260523a";
 import { t } from "./i18n/i18n.js";
+import { getProductDisplayData } from "./i18n/product-display.js";
 
 let latestReviewSummaries = {};
 
@@ -42,6 +43,12 @@ function getProductStockStatusText(status) {
 }
 
 function renderOfferCard(offer) {
+  const displayProduct = getProductDisplayData(offer.product || {
+    id: offer.productId,
+    name: offer.title,
+    category: offer.category,
+    image: offer.image
+  });
   const inventoryStatus = getInventoryStatus(offer.productId);
   const stockStatusText = getProductStockStatusText(inventoryStatus);
 
@@ -52,7 +59,7 @@ function renderOfferCard(offer) {
           ${buildResponsiveImageMarkup({
             product: offer.product,
             imagePath: offer.image,
-            alt: offer.title,
+            alt: displayProduct.name,
             width: 600,
             height: 600,
             loading: "lazy",
@@ -61,17 +68,17 @@ function renderOfferCard(offer) {
         </a>
         <span class="product_offer_badge offers_page_badge">${escapeHtml(offer.discountLabel)}</span>
         <span class="product_stock_status${inventoryStatus.isOutOfStock ? " is_out" : ""}${inventoryStatus.isLowStock ? " is_low" : ""}" ${inventoryStatus.message ? "" : "hidden"}>${escapeHtml(stockStatusText)}</span>
-        <button class="product-share-btn offers_page_share_btn" type="button" data-offer-share-product-id="${escapeHtml(offer.productId)}" aria-label="${escapeHtml(getProductUiText("shareProduct", "Share {name}", { name: offer.title }))}" title="${escapeHtml(getProductUiText("share", "Share"))}">
+        <button class="product-share-btn offers_page_share_btn" type="button" data-offer-share-product-id="${escapeHtml(offer.productId)}" aria-label="${escapeHtml(getProductUiText("shareProduct", "Share {name}", { name: displayProduct.name }))}" title="${escapeHtml(getProductUiText("share", "Share"))}">
           <i class="fa fa-share-alt" aria-hidden="true"></i>
         </button>
-        <button class="product-wishlist-btn offers_page_wishlist_btn" type="button" data-wishlist-product-id="${escapeHtml(offer.productId)}" aria-label="${escapeHtml(getProductUiText("addProductToFavorites", "Add {name} to favorites", { name: offer.title }))}" aria-pressed="false" title="${escapeHtml(getProductUiText("addToFavorites", "Add to favorites"))}">
+        <button class="product-wishlist-btn offers_page_wishlist_btn" type="button" data-wishlist-product-id="${escapeHtml(offer.productId)}" aria-label="${escapeHtml(getProductUiText("addProductToFavorites", "Add {name} to favorites", { name: displayProduct.name }))}" aria-pressed="false" title="${escapeHtml(getProductUiText("addToFavorites", "Add to favorites"))}">
           <i class="fa fa-heart-o" aria-hidden="true"></i>
         </button>
       </div>
       <div class="offers_page_body">
-        <span class="offers_page_category">${escapeHtml(offer.category)}</span>
+        <span class="offers_page_category">${escapeHtml(displayProduct.category || offer.category)}</span>
         ${offer.marketingTitle ? `<span class="offers_page_offer_title">${escapeHtml(offer.marketingTitle)}</span>` : ""}
-        <h3>${escapeHtml(offer.title)}</h3>
+        <h3>${escapeHtml(displayProduct.name || offer.title)}</h3>
         ${buildRatingSummaryMarkup(latestReviewSummaries[offer.productId], "offers_page_rating", { productId: offer.productId })}
         <div class="offers_page_price_row">
           <del>${escapeHtml(offer.originalPriceText)}</del>
@@ -79,7 +86,7 @@ function renderOfferCard(offer) {
         </div>
         <div class="offers_page_actions">
           <a class="offers_page_view_btn" href="${escapeHtml(offer.productUrl)}">${escapeHtml(getOffersUiText("viewDetails", "View Details"))}</a>
-          <button class="product-cart-btn offers_page_add_btn" type="button" data-offer-add-cart="${escapeHtml(offer.productId)}" aria-label="${escapeHtml(getProductUiText("addProductToCart", "Add {name} to cart", { name: offer.title }))}" title="${escapeHtml(inventoryStatus.isOutOfStock ? getOffersUiText("outOfStock", "Out of Stock") : getOffersUiText("addToCart", "Add to Cart"))}" ${inventoryStatus.isOutOfStock ? "disabled aria-disabled=\"true\"" : ""}>
+          <button class="product-cart-btn offers_page_add_btn" type="button" data-offer-add-cart="${escapeHtml(offer.productId)}" aria-label="${escapeHtml(getProductUiText("addProductToCart", "Add {name} to cart", { name: displayProduct.name || offer.title }))}" title="${escapeHtml(inventoryStatus.isOutOfStock ? getOffersUiText("outOfStock", "Out of Stock") : getOffersUiText("addToCart", "Add to Cart"))}" ${inventoryStatus.isOutOfStock ? "disabled aria-disabled=\"true\"" : ""}>
             <i class="fa fa-plus" aria-hidden="true"></i>
           </button>
         </div>

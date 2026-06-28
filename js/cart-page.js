@@ -22,6 +22,7 @@ import { trackBeginCheckout, trackViewCart } from "./analytics-events.js?v=20260
 import { emitToast, escapeHtml } from "./ui-utils.js?v=20260502b";
 import { getCartOfferSubtotal, getProductOfferPricing, subscribeToProductOffers } from "./offers-data.js?v=20260620a";
 import { t } from "./i18n/i18n.js";
+import { getProductDisplayData } from "./i18n/product-display.js";
 
 const FALLBACK_IMAGE = "images/optimized/Logo.webp";
 
@@ -151,7 +152,7 @@ function renderCartPage(cart, detail = {}) {
   list.innerHTML = safeCart.map((item) => {
     const quantity = Number(item.quantity) || 1;
     const product = getExactProduct(item.id);
-    const displayProduct = product || item;
+    const displayProduct = getProductDisplayData(product || item);
     const productUrl = buildProductUrl(item.id);
     const image = product?.images?.[0] || item.image || FALLBACK_IMAGE;
     const pricing = getProductOfferPricing(product || { id: item.id, price: item.price });
@@ -163,7 +164,7 @@ function renderCartPage(cart, detail = {}) {
 
     return `
       <article class="cart_page_item" data-cart-product-id="${escapeHtml(item.id)}">
-        <a class="cart_page_item_image" href="${escapeHtml(productUrl)}" aria-label="${escapeHtml(getCartUiText("viewProduct", "View {name}", { name: item.name }))}">
+        <a class="cart_page_item_image" href="${escapeHtml(productUrl)}" aria-label="${escapeHtml(getCartUiText("viewProduct", "View {name}", { name: displayProduct.name }))}">
           ${buildResponsiveImageMarkup({
             product,
             imagePath: image,
@@ -204,7 +205,7 @@ function renderCartPage(cart, detail = {}) {
           </div>
           <div class="cart_page_item_bottom">
             <div class="cart_page_qty_stack">
-              <div class="cart_page_qty" aria-label="${escapeHtml(getCartUiText("quantityControlsFor", "Quantity controls for {name}", { name: item.name }))}">
+              <div class="cart_page_qty" aria-label="${escapeHtml(getCartUiText("quantityControlsFor", "Quantity controls for {name}", { name: displayProduct.name || item.name }))}">
                 <button type="button" data-cart-page-decrease="${escapeHtml(item.id)}" aria-label="${escapeHtml(getCartUiText("decreaseQuantity", "Decrease quantity"))}">-</button>
                 <span>${quantity}</span>
                 <button type="button" data-cart-page-increase="${escapeHtml(item.id)}" aria-label="${escapeHtml(getCartUiText("increaseQuantity", "Increase quantity"))}" ${inventoryStatus.tracked && quantity >= inventoryStatus.available ? "disabled" : ""}>+</button>

@@ -42,6 +42,7 @@ import {
   subscribeToProductOffers
 } from "./offers-data.js?v=20260624a"
 import { t } from "./i18n/i18n.js"
+import { getProductDisplayData } from "./i18n/product-display.js"
 
 const FALLBACK_IMAGE = "images/optimized/Logo.webp"
 let offerPricingWarningShown = false
@@ -471,6 +472,7 @@ function renderRecommendations(container, currentProduct, products, reviewSummar
 
   container.innerHTML = recommendations.map(({ candidate, summary, cartQuantity }) => {
     const productUrl = buildProductUrl(candidate.id)
+    const displayCandidate = getProductDisplayData(candidate)
     const inventoryStatus = getInventoryStatus(candidate.id)
     const stockStatusText = getProductCardStockStatusText(inventoryStatus)
     const offer = getActiveOfferForProduct(candidate.id)
@@ -482,7 +484,7 @@ function renderRecommendations(container, currentProduct, products, reviewSummar
           <a class="recommendation_card_image product-image product-card-image" href="${escapeHtml(productUrl)}">
             ${buildResponsiveImageMarkup({
               product: candidate,
-              alt: candidate.name,
+              alt: displayCandidate.name,
               width: 600,
               height: 600,
               loading: "lazy",
@@ -491,19 +493,19 @@ function renderRecommendations(container, currentProduct, products, reviewSummar
           </a>
           ${offerBadge ? `<span class="product_offer_badge">${escapeHtml(offerBadge)}</span>` : ""}
           <span class="product_stock_status${inventoryStatus.isOutOfStock ? " is_out" : ""}${inventoryStatus.isLowStock ? " is_low" : ""}" ${inventoryStatus.message ? "" : "hidden"}>${escapeHtml(stockStatusText)}</span>
-          <button class="product-share-btn recommendation_share_btn" type="button" data-recommend-share-product-id="${escapeHtml(candidate.id)}" aria-label="${escapeHtml(getProductUiText("shareProduct", "Share {name}", { name: candidate.name }))}" title="${escapeHtml(getProductUiText("share", "Share"))}">
+          <button class="product-share-btn recommendation_share_btn" type="button" data-recommend-share-product-id="${escapeHtml(candidate.id)}" aria-label="${escapeHtml(getProductUiText("shareProduct", "Share {name}", { name: displayCandidate.name }))}" title="${escapeHtml(getProductUiText("share", "Share"))}">
             <i class="fa fa-share-alt" aria-hidden="true"></i>
           </button>
-          <button class="product-wishlist-btn recommendation_wishlist_btn" type="button" data-wishlist-product-id="${escapeHtml(candidate.id)}" aria-label="${escapeHtml(getProductUiText("addProductToFavorites", "Add {name} to favorites", { name: candidate.name }))}" aria-pressed="false" title="${escapeHtml(getProductUiText("addToFavorites", "Add to favorites"))}">
+          <button class="product-wishlist-btn recommendation_wishlist_btn" type="button" data-wishlist-product-id="${escapeHtml(candidate.id)}" aria-label="${escapeHtml(getProductUiText("addProductToFavorites", "Add {name} to favorites", { name: displayCandidate.name }))}" aria-pressed="false" title="${escapeHtml(getProductUiText("addToFavorites", "Add to favorites"))}">
             <i class="fa fa-heart-o" aria-hidden="true"></i>
           </button>
         </div>
         <div class="recommendation_card_body product-content">
           <span class="recommendation_card_label">${escapeHtml(getRecommendationLabel(summary, cartQuantity))}</span>
           <div class="recommendation_card_copy">
-            <h3 class="product-title"><a href="${escapeHtml(productUrl)}">${escapeHtml(candidate.name)}</a></h3>
+            <h3 class="product-title"><a href="${escapeHtml(productUrl)}">${escapeHtml(displayCandidate.name)}</a></h3>
             ${buildRatingSummaryMarkup(summary, "recommendation_card_rating", { productId: candidate.id })}
-            <p class="product-description">${escapeHtml(candidate.description)}</p>
+            <p class="product-description">${escapeHtml(displayCandidate.description)}</p>
           </div>
           <div class="recommendation_card_footer product-footer">
             <span class="recommendation_card_price${offer ? " product_card_price--offer" : ""}">${getRecommendationPriceMarkup(candidate)}</span>
@@ -628,7 +630,7 @@ function initProductPage() {
 
   let activeImageSrc = ""
   let activeImageFallbackSrc = ""
-  let activeImageAlt = product.name || "Selected product image"
+  let activeImageAlt = getProductDisplayData(product).name || "Selected product image"
   let lightboxZoom = 1
 
   function setButtonLabel(button, text) {
@@ -731,7 +733,7 @@ function initProductPage() {
   function syncActiveImage(src, altText, fallbackSrc) {
     activeImageSrc = src || ""
     activeImageFallbackSrc = fallbackSrc || src || ""
-    activeImageAlt = altText || product.name || "Selected product image"
+    activeImageAlt = altText || getProductDisplayData(product).name || "Selected product image"
   }
 
   function updateLightboxZoomUi() {
@@ -1086,13 +1088,14 @@ function renderReviewSummary() {
 }
 
   function renderProductContent() {
+    const displayProduct = getProductDisplayData(product)
     nameEl.removeAttribute("data-i18n")
-    nameEl.textContent = product.name
+    nameEl.textContent = displayProduct.name
     if (categoryEl) {
-      categoryEl.textContent = product.category || "Sushi Box"
+      categoryEl.textContent = displayProduct.category || "Sushi Box"
       categoryEl.hidden = !categoryEl.textContent
     }
-    descEl.textContent = product.description || ""
+    descEl.textContent = displayProduct.description || ""
     descEl.hidden = !descEl.textContent
     document.title = `Sushi Box - ${product.name}`
 
@@ -1101,21 +1104,21 @@ function renderReviewSummary() {
     }
 
     if (productShareBtn) {
-      productShareBtn.setAttribute("aria-label", getProductUiText("shareProduct", "Share {name}", { name: product.name }))
+      productShareBtn.setAttribute("aria-label", getProductUiText("shareProduct", "Share {name}", { name: displayProduct.name }))
       productShareBtn.setAttribute("title", getProductUiText("share", "Share"))
     }
 
     if (productFavoriteBtn) {
       productFavoriteBtn.setAttribute("data-wishlist-product-id", product.id)
-      productFavoriteBtn.setAttribute("aria-label", getProductUiText("addProductToFavorites", "Add {name} to favorites", { name: product.name }))
+      productFavoriteBtn.setAttribute("aria-label", getProductUiText("addProductToFavorites", "Add {name} to favorites", { name: displayProduct.name }))
       productFavoriteBtn.setAttribute("title", getProductUiText("addToFavorites", "Add to favorites"))
       window.dispatchEvent(new CustomEvent("sushi-box:wishlist-controls-ready"))
     }
 
-    renderThumbnails(getProductImageSources(product), mainImageEl, product.name, syncActiveImage)
-    renderComponents(productComponentsSection, productComponentsList, product.components)
-    renderItemDetails(productItemDetailsSection, productItemDetailsList, product.itemDetails)
-    renderDescriptionSection(productStorySection, productStoryTitle, productStoryLead, productStoryBody, product)
+    renderThumbnails(getProductImageSources(product), mainImageEl, displayProduct.name, syncActiveImage)
+    renderComponents(productComponentsSection, productComponentsList, displayProduct.components)
+    renderItemDetails(productItemDetailsSection, productItemDetailsList, displayProduct.itemDetails)
+    renderDescriptionSection(productStorySection, productStoryTitle, productStoryLead, productStoryBody, displayProduct)
   }
 
   function refreshRecommendations() {
@@ -1145,7 +1148,7 @@ function renderReviewSummary() {
   if (mainImageFrame) {
     mainImageFrame.setAttribute("role", "button")
     mainImageFrame.setAttribute("tabindex", "0")
-    mainImageFrame.setAttribute("aria-label", `Open a larger preview of ${product.name}`)
+    mainImageFrame.setAttribute("aria-label", `Open a larger preview of ${getProductDisplayData(product).name}`)
     mainImageFrame.addEventListener("click", openLightbox)
     mainImageFrame.addEventListener("keydown", (event) => {
       if (event.key === "Enter" || event.key === " ") {

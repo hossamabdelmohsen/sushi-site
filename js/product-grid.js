@@ -27,6 +27,7 @@ import {
 } from "./ui-utils.js?v=20260523a";
 import { getActiveOfferForProduct, getOfferDisplayData, subscribeToProductOffers } from "./offers-data.js?v=20260620a";
 import { t } from "./i18n/i18n.js";
+import { getProductDisplayData } from "./i18n/product-display.js";
 
 let productTitleTooltip = null;
 let productTitleTooltipHideTimer = null;
@@ -87,6 +88,7 @@ function renderProductCard(product, index = 0) {
   const productUrl = buildProductUrl(product.id);
   const filterClass = getProductFilterClass(product);
   const isPriorityImage = index === 0;
+  const displayProduct = getProductDisplayData(product);
 
   return `
     <div class="col-sm-6 col-lg-4 all ${escapeHtml(filterClass)}" data-product-id="${escapeHtml(product.id)}" data-search="${escapeHtml(getProductSearchText(product))}">
@@ -95,7 +97,7 @@ function renderProductCard(product, index = 0) {
           <div class="img-box">
             ${buildResponsiveImageMarkup({
               product,
-              alt: product.name,
+              alt: displayProduct.name,
               width: 600,
               height: 600,
               loading: isPriorityImage ? "eager" : "lazy",
@@ -104,9 +106,9 @@ function renderProductCard(product, index = 0) {
             })}
           </div>
           <div class="detail-box">
-            <h5><a href="${escapeHtml(productUrl)}">${escapeHtml(product.name)}</a></h5>
+            <h5><a href="${escapeHtml(productUrl)}">${escapeHtml(displayProduct.name)}</a></h5>
             ${buildRatingSummaryMarkup(null, "", { productId: product.id })}
-            <p>${escapeHtml(product.description)}</p>
+            <p>${escapeHtml(displayProduct.description)}</p>
             <div class="options">
               <h6 class="product_card_price${getActiveOfferForProduct(product.id) ? " product_card_price--offer" : ""}">${getProductCardPriceMarkup(product)}</h6>
               <a href="${escapeHtml(productUrl)}" class="product-link-btn">${escapeHtml(getProductUiText("viewDetails", "View Details"))}</a>
@@ -341,6 +343,7 @@ function animateWishlistToggle(button) {
 }
 
 function ensureWishlistButton(card, product) {
+  const displayProduct = getProductDisplayData(product);
   const imageBox = card.querySelector(".img-box");
   if (!imageBox) {
     return;
@@ -356,22 +359,23 @@ function ensureWishlistButton(card, product) {
   }
 
   wishlistButton.setAttribute("data-wishlist-product-id", product.id);
-  syncWishlistButton(wishlistButton, product);
+  syncWishlistButton(wishlistButton, displayProduct);
   wishlistButton.onclick = (event) => {
     event.preventDefault();
     event.stopPropagation();
     const result = toggleWishlistItem(product);
-    syncWishlistButton(wishlistButton, product);
+    syncWishlistButton(wishlistButton, getProductDisplayData(product));
     animateWishlistToggle(wishlistButton);
     emitToast(getProductUiText(
       result.added ? "productSavedToFavorites" : "productRemovedFromFavorites",
       result.added ? "{name} added to favorites." : "{name} removed from favorites.",
-      { name: product.name }
+      { name: getProductDisplayData(product).name }
     ), result.added ? "success" : "info");
   };
 }
 
 function ensureShareButton(card, product, productUrl) {
+  const displayProduct = getProductDisplayData(product);
   const imageBox = card.querySelector(".img-box");
   if (!imageBox) {
     return;
@@ -386,7 +390,7 @@ function ensureShareButton(card, product, productUrl) {
     imageBox.appendChild(shareButton);
   }
 
-  shareButton.setAttribute("aria-label", getProductUiText("shareProduct", "Share {name}", { name: product.name }));
+  shareButton.setAttribute("aria-label", getProductUiText("shareProduct", "Share {name}", { name: displayProduct.name }));
   shareButton.setAttribute("title", getProductUiText("share", "Share"));
   shareButton.onclick = (event) => {
     event.preventDefault();
@@ -398,6 +402,7 @@ function ensureShareButton(card, product, productUrl) {
 function enhanceProductCard(card) {
   const productId = getProductIdFromCard(card);
   const product = getProductById(productId);
+  const displayProduct = getProductDisplayData(product);
   const cardContainer = card.closest(".all") || card.parentElement;
   const detailBox = card.querySelector(".detail-box");
   const image = card.querySelector(".img-box img");
@@ -430,7 +435,7 @@ function enhanceProductCard(card) {
 
   if (image) {
     applyResponsiveImage(image, product.originalImages?.[0] || product.images[0] || "", {
-      alt: product.name,
+      alt: displayProduct.name,
       width: 600,
       height: 600,
       loading: image.getAttribute("loading") || "lazy",
@@ -460,7 +465,7 @@ function enhanceProductCard(card) {
       // ensure anchor points to the product page
       try {
         imageLink.href = productUrl;
-        imageLink.setAttribute("aria-label", getProductUiText("viewDetailsForProduct", "View details for {name}", { name: product.name }));
+        imageLink.setAttribute("aria-label", getProductUiText("viewDetailsForProduct", "View details for {name}", { name: displayProduct.name }));
       } catch (err) {
         // ignore non-HTML context
       }
@@ -488,22 +493,22 @@ function enhanceProductCard(card) {
     if (!title.querySelector("a")) {
       const titleLink = document.createElement("a");
       titleLink.href = productUrl;
-      titleLink.setAttribute("aria-label", getProductUiText("viewDetailsForProduct", "View details for {name}", { name: product.name }));
-      titleLink.textContent = product.name;
+      titleLink.setAttribute("aria-label", getProductUiText("viewDetailsForProduct", "View details for {name}", { name: displayProduct.name }));
+      titleLink.textContent = displayProduct.name;
       title.textContent = "";
       title.appendChild(titleLink);
     } else {
       const existingLink = title.querySelector("a");
       existingLink.href = productUrl;
-      existingLink.textContent = product.name;
-      existingLink.setAttribute("aria-label", getProductUiText("viewDetailsForProduct", "View details for {name}", { name: product.name }));
+      existingLink.textContent = displayProduct.name;
+      existingLink.setAttribute("aria-label", getProductUiText("viewDetailsForProduct", "View details for {name}", { name: displayProduct.name }));
     }
 
-    bindProductTitleReveal(title, product);
+    bindProductTitleReveal(title, displayProduct);
   }
 
   if (description) {
-    description.textContent = product.description;
+    description.textContent = displayProduct.description;
   }
 
   applyProductOfferToCard(card, product);
@@ -519,7 +524,7 @@ function enhanceProductCard(card) {
 
   if (primaryLink) {
     primaryLink.setAttribute("href", productUrl);
-    primaryLink.setAttribute("aria-label", getProductUiText("viewDetailsForProduct", "View details for {name}", { name: product.name }));
+    primaryLink.setAttribute("aria-label", getProductUiText("viewDetailsForProduct", "View details for {name}", { name: displayProduct.name }));
     primaryLink.textContent = getProductUiText("viewDetails", "View Details");
   }
 
@@ -555,7 +560,7 @@ function enhanceProductCard(card) {
     const addButton = document.createElement("button");
     addButton.type = "button";
     addButton.className = "product-cart-btn";
-    addButton.setAttribute("aria-label", getProductUiText("addProductToCart", "Add {name} to cart", { name: product.name }));
+    addButton.setAttribute("aria-label", getProductUiText("addProductToCart", "Add {name} to cart", { name: displayProduct.name }));
     addButton.innerHTML = '<i class="fa fa-plus" aria-hidden="true"></i>';
     addButton.addEventListener("click", async (event) => {
       event.preventDefault();

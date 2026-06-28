@@ -7,22 +7,23 @@ import { auth, db } from "./firebase-config.js?v=20260502b";
 import { isAdminUser } from "./admin-access.js?v=20260520a";
 import { formatPrice, getAllProducts } from "./product-catalog.js?v=20260602c";
 import { emitToast, escapeHtml, timestampToDate } from "./ui-utils.js?v=20260523a";
+import { t } from "./i18n/i18n.js";
 
 const ORDER_STATUSES = [
-  { value: "pending", label: "Pending" },
-  { value: "preparing", label: "Preparing" },
-  { value: "out_for_delivery", label: "Out for delivery" },
-  { value: "delivered", label: "Delivered" },
-  { value: "cancelled", label: "Cancelled" }
+  { value: "pending", labelKey: "pending", fallback: "Pending" },
+  { value: "preparing", labelKey: "preparing", fallback: "Preparing" },
+  { value: "out_for_delivery", labelKey: "outForDelivery", fallback: "Out for delivery" },
+  { value: "delivered", labelKey: "delivered", fallback: "Delivered" },
+  { value: "cancelled", labelKey: "cancelled", fallback: "Cancelled" }
 ];
 
 const FILTER_LABELS = {
-  all: "All",
-  pending: "Pending",
-  preparing: "Preparing",
-  out_for_delivery: "Out for delivery",
-  delivered: "Delivered",
-  cancelled: "Cancelled"
+  all: "all",
+  pending: "pending",
+  preparing: "preparing",
+  out_for_delivery: "outForDelivery",
+  delivered: "delivered",
+  cancelled: "cancelled"
 };
 
 const STATUS_VALUES = new Set(ORDER_STATUSES.map((status) => status.value));
@@ -57,6 +58,20 @@ function getElement(id) {
   return document.getElementById(id);
 }
 
+function getAdminText(key, fallback = "", values = {}) {
+  return t(`adminUi.${key}`, fallback, values);
+}
+
+function getAdminCountText(key, count, fallbackSingular = "", fallbackPlural = fallbackSingular) {
+  const keySuffix = Number(count) === 1 ? key : `${key}_plural`;
+  return getAdminText(keySuffix, Number(count) === 1 ? fallbackSingular : fallbackPlural, { count });
+}
+
+function getFilterLabel(filterValue) {
+  const key = FILTER_LABELS[filterValue] || "all";
+  return getAdminText(key, filterValue || "All");
+}
+
 function escapeSelectorValue(value) {
   return window.CSS && typeof window.CSS.escape === "function"
     ? window.CSS.escape(String(value || ""))
@@ -79,7 +94,8 @@ function normalizeStatus(value) {
 
 function getStatusLabel(value) {
   const normalized = normalizeStatus(value);
-  return ORDER_STATUSES.find((status) => status.value === normalized)?.label || "Pending";
+  const status = ORDER_STATUSES.find((item) => item.value === normalized);
+  return status ? getAdminText(status.labelKey, status.fallback) : getAdminText("pending", "Pending");
 }
 
 function getStatusClass(value) {
@@ -94,7 +110,7 @@ function getOrderTimestamp(order) {
 function formatOrderDate(value) {
   const date = timestampToDate(value);
   if (!date) {
-    return "Date unavailable";
+    return getAdminText("dateUnavailable", "Date unavailable");
   }
 
   return new Intl.DateTimeFormat("en", {
@@ -106,7 +122,7 @@ function formatOrderDate(value) {
 function formatShortOrderId(orderId) {
   const safeOrderId = String(orderId || "").trim();
   if (!safeOrderId) {
-    return "No ID";
+    return getAdminText("noId", "No ID");
   }
 
   return safeOrderId.slice(-8);
@@ -140,13 +156,13 @@ function renderOrderTotals(order) {
 
   return `
     <div class="admin_order_totals_panel">
-      <span class="admin_order_section_label">TOTALS</span>
-      <div class="admin_order_total_row"><span>Products Subtotal</span><strong>${escapeHtml(formatPrice(subtotal))}</strong></div>
-      <div class="admin_order_total_row"><span>Shipping Cost</span><strong>${escapeHtml(formatPrice(shipping))}</strong></div>
-      <div class="admin_order_total_row"><span>Total Before Discount</span><strong>${escapeHtml(formatPrice(totalBeforeDiscount))}</strong></div>
-      <div class="admin_order_total_row"><span>Discount</span><strong>${escapeHtml(`-${formatPrice(discount)}`)}</strong></div>
-      <div class="admin_order_total_row"><span>Coupon code used</span><strong>${escapeHtml(couponCode || "None")}</strong></div>
-      <div class="admin_order_total_row admin_order_total_row_final"><span>Final Total</span><strong>${escapeHtml(formatPrice(finalTotal))}</strong></div>
+      <span class="admin_order_section_label">${escapeHtml(getAdminText("totals", "Totals"))}</span>
+      <div class="admin_order_total_row"><span>${escapeHtml(getAdminText("productsSubtotal", "Products Subtotal"))}</span><strong>${escapeHtml(formatPrice(subtotal))}</strong></div>
+      <div class="admin_order_total_row"><span>${escapeHtml(getAdminText("shippingCost", "Shipping Cost"))}</span><strong>${escapeHtml(formatPrice(shipping))}</strong></div>
+      <div class="admin_order_total_row"><span>${escapeHtml(getAdminText("totalBeforeDiscount", "Total Before Discount"))}</span><strong>${escapeHtml(formatPrice(totalBeforeDiscount))}</strong></div>
+      <div class="admin_order_total_row"><span>${escapeHtml(getAdminText("discount", "Discount"))}</span><strong>${escapeHtml(`-${formatPrice(discount)}`)}</strong></div>
+      <div class="admin_order_total_row"><span>${escapeHtml(getAdminText("couponCodeUsed", "Coupon code used"))}</span><strong>${escapeHtml(couponCode || getAdminText("none", "None"))}</strong></div>
+      <div class="admin_order_total_row admin_order_total_row_final"><span>${escapeHtml(getAdminText("finalTotal", "Final Total"))}</span><strong>${escapeHtml(formatPrice(finalTotal))}</strong></div>
     </div>
   `;
 }
@@ -175,19 +191,19 @@ function buildAddressFromCustomer(customer) {
   ].filter(Boolean).join(", ");
 }
 
-function getOrderField(order, primaryKey, customerKey, fallback = "Not available") {
+function getOrderField(order, primaryKey, customerKey, fallback = getAdminText("notAvailable", "Not available")) {
   const customer = getCustomer(order);
   return order?.[primaryKey] || customer?.[customerKey] || fallback;
 }
 
 function getOrderAddress(order) {
   const customer = getCustomer(order);
-  return order?.address || customer.address || buildAddressFromCustomer(customer) || "Not available";
+  return order?.address || customer.address || buildAddressFromCustomer(customer) || getAdminText("notAvailable", "Not available");
 }
 
 function getOrderCity(order) {
   const customer = getCustomer(order);
-  return order?.city || customer.cityName || customer.city || "Not available";
+  return order?.city || customer.cityName || customer.city || getAdminText("notAvailable", "Not available");
 }
 
 function formatStatusText(value) {
@@ -201,7 +217,11 @@ function getPaymentStatusMeta(order) {
   const isFailed = ["failed", "fail", "declined", "cancelled", "canceled"].includes(normalized);
 
   return {
-    label: isSuccess ? "Payment Success" : isFailed ? "Payment Failed" : `Payment ${formatStatusText(rawStatus)}`,
+    label: isSuccess
+      ? getAdminText("paymentSuccess", "Payment Success")
+      : isFailed
+        ? getAdminText("paymentFailed", "Payment Failed")
+        : getAdminText("payment", "Payment {status}", { status: formatStatusText(rawStatus) }),
     className: isSuccess ? "success" : isFailed ? "failed" : "neutral"
   };
 }
@@ -219,7 +239,7 @@ function getWhatsAppUrl(order) {
 function renderStatusOptions(selectedStatus) {
   const normalizedStatus = normalizeStatus(selectedStatus);
   return ORDER_STATUSES.map((status) => `
-    <option value="${status.value}" ${status.value === normalizedStatus ? "selected" : ""}>${status.label}</option>
+    <option value="${status.value}" ${status.value === normalizedStatus ? "selected" : ""}>${escapeHtml(getAdminText(status.labelKey, status.fallback))}</option>
   `).join("");
 }
 
@@ -242,12 +262,12 @@ function formatItemPrice(item) {
 function renderOrderItems(order) {
   const items = getOrderItems(order);
   if (!items.length) {
-    return '<p class="orders_item_empty">No item details available.</p>';
+    return `<p class="orders_item_empty">${escapeHtml(getAdminText("noItemDetails", "No item details available."))}</p>`;
   }
 
   return `
     <div class="admin_order_items_panel">
-      <span class="admin_order_section_label">ITEMS</span>
+      <span class="admin_order_section_label">${escapeHtml(getAdminText("items", "Items"))}</span>
       <ul class="admin_order_items">
       ${items.map((item) => {
         const quantity = Math.max(1, Number(item?.quantity) || 1);
@@ -255,7 +275,7 @@ function renderOrderItems(order) {
 
         return `
           <li class="admin_order_item_row">
-            <span class="admin_order_item_name">${escapeHtml(item?.name || item?.productId || item?.id || "Product")}</span>
+            <span class="admin_order_item_name">${escapeHtml(item?.name || item?.productId || item?.id || getAdminText("product", "Product"))}</span>
             <span class="admin_order_item_spacer" aria-hidden="true"></span>
             <strong class="admin_order_item_price">${escapeHtml(`${quantity} x ${itemTotal}`)}</strong>
           </li>
@@ -298,7 +318,7 @@ function setIntroText(message) {
 }
 
 function redirectToLogin() {
-  setIntroText("Redirecting to sign in before opening the admin dashboard.");
+  setIntroText(getAdminText("redirectingSignIn", "Redirecting to sign in before opening the admin dashboard."));
   window.setTimeout(() => {
     const redirect = encodeURIComponent("admin-orders.html");
     window.location.href = `index.html?auth=login&redirect=${redirect}`;
@@ -423,7 +443,7 @@ function renderFilterButtons() {
     if (badge) {
       badge.textContent = String(statusCounts[filterValue] || 0);
     } else {
-      button.innerHTML = `${escapeHtml(FILTER_LABELS[filterValue] || "All")} <span class="admin_filter_badge">${statusCounts[filterValue] || 0}</span>`;
+      button.innerHTML = `${escapeHtml(getFilterLabel(filterValue))} <span class="admin_filter_badge">${statusCounts[filterValue] || 0}</span>`;
     }
   });
 }
@@ -489,10 +509,10 @@ function renderOrderCard(order) {
 
         <div class="admin_order_identity_row">
           <span class="admin_order_short_id">${escapeHtml(formatShortOrderId(orderId))}</span>
-          <button class="admin_order_copy_btn" type="button" data-copy-order-id="${escapeHtml(orderId)}" aria-label="Copy Order ID" title="Copy Order ID">
+          <button class="admin_order_copy_btn" type="button" data-copy-order-id="${escapeHtml(orderId)}" aria-label="${escapeHtml(getAdminText("copyOrderId", "Copy Order ID"))}" title="${escapeHtml(getAdminText("copyOrderId", "Copy Order ID"))}">
             <i class="fa fa-clipboard" aria-hidden="true"></i>
           </button>
-          ${whatsappUrl ? `<a class="admin_order_whatsapp_btn" href="${escapeHtml(whatsappUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Contact customer on WhatsApp" title="Contact on WhatsApp"><i class="fa fa-whatsapp" aria-hidden="true"></i></a>` : ""}
+          ${whatsappUrl ? `<a class="admin_order_whatsapp_btn" href="${escapeHtml(whatsappUrl)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(getAdminText("contactCustomerWhatsapp", "Contact customer on WhatsApp"))}" title="${escapeHtml(getAdminText("contactOnWhatsapp", "Contact on WhatsApp"))}"><i class="fa fa-whatsapp" aria-hidden="true"></i></a>` : ""}
         </div>
 
         <div class="admin_order_address_row">
@@ -502,7 +522,7 @@ function renderOrderCard(order) {
 
         <div class="admin_order_full_id_block">
           <button class="admin_order_id_toggle" type="button" data-toggle-order-id="${escapeHtml(order.id)}" aria-expanded="false" aria-controls="adminOrderFullId-${escapeHtml(order.id)}">
-            Order ID <span aria-hidden="true">▼</span>
+            ${escapeHtml(getAdminText("orderId", "Order ID"))} <span aria-hidden="true">▼</span>
           </button>
           <div class="admin_order_full_id_value" id="adminOrderFullId-${escapeHtml(order.id)}" hidden>
             ${escapeHtml(orderId)}
@@ -513,11 +533,11 @@ function renderOrderCard(order) {
         ${renderOrderTotals(order)}
 
         <div class="admin_order_status_form">
-          <select data-admin-order-status="${escapeHtml(order.id)}" ${isUpdating ? "disabled" : ""} aria-label="Update order status">
+          <select data-admin-order-status="${escapeHtml(order.id)}" ${isUpdating ? "disabled" : ""} aria-label="${escapeHtml(getAdminText("updateStatus", "Update order status"))}">
             ${renderStatusOptions(status)}
           </select>
           <button type="button" data-admin-order-update="${escapeHtml(order.id)}" disabled>
-            ${isUpdating ? "Updating..." : "Save"}
+            ${isUpdating ? escapeHtml(getAdminText("updating", "Updating...")) : escapeHtml(getAdminText("save", "Save"))}
           </button>
         </div>
       </article>
@@ -526,16 +546,16 @@ function renderOrderCard(order) {
 
 function getCouponTypeLabel(type) {
   const labels = {
-    free_shipping: "Free Shipping",
-    fixed_discount: "Fixed Discount",
-    percentage_discount: "Percentage Discount"
+    free_shipping: getAdminText("freeShipping", "Free Shipping"),
+    fixed_discount: getAdminText("fixedDiscount", "Fixed Discount"),
+    percentage_discount: getAdminText("percentageDiscount", "Percentage Discount")
   };
-  return labels[type] || "Free Shipping";
+  return labels[type] || getAdminText("freeShipping", "Free Shipping");
 }
 
 function formatCouponValue(coupon) {
   if (coupon.type === "free_shipping") {
-    return "Shipping only";
+    return getAdminText("shippingOnly", "Shipping only");
   }
   if (coupon.type === "percentage_discount") {
     return `${Number(coupon.value) || 0}%`;
@@ -545,12 +565,12 @@ function formatCouponValue(coupon) {
 
 function formatCouponDate(value) {
   if (!value) {
-    return "No expiration";
+    return getAdminText("noExpiration", "No expiration");
   }
   const date = new Date(value);
   return Number.isFinite(date.getTime())
     ? new Intl.DateTimeFormat("en", { dateStyle: "medium" }).format(date)
-    : "No expiration";
+    : getAdminText("noExpiration", "No expiration");
 }
 
 function normalizeCouponCode(value) {
@@ -570,15 +590,15 @@ function normalizeInventoryRecord(product, record = {}) {
 
 function getInventoryStatusLabel(record) {
   if (!record.trackStock) {
-    return "Not tracked";
+    return getAdminText("notTracked", "Not tracked");
   }
   if (record.stockQuantity <= 0) {
-    return "Out of stock";
+    return getAdminText("outOfStock", "Out of stock");
   }
   if (record.stockQuantity <= record.lowStockThreshold) {
-    return `Only ${record.stockQuantity} left`;
+    return getAdminText("onlyLeft", "Only {count} left", { count: record.stockQuantity });
   }
-  return "In stock";
+  return getAdminText("inStock", "In stock");
 }
 
 function ensureInventoryToolbarActions() {
@@ -588,7 +608,7 @@ function ensureInventoryToolbarActions() {
   if (!getElement("adminInventoryTrackAll")) {
     const trackAll = document.createElement("label");
     trackAll.className = "admin_inventory_track_all";
-    trackAll.innerHTML = '<span>Track Stock All</span><input id="adminInventoryTrackAll" type="checkbox">';
+    trackAll.innerHTML = `<span>${escapeHtml(getAdminText("trackStockAll", "Track Stock All"))}</span><input id="adminInventoryTrackAll" type="checkbox">`;
     toolbar.appendChild(trackAll);
   }
 
@@ -597,7 +617,7 @@ function ensureInventoryToolbarActions() {
     saveAll.id = "adminInventorySaveAllBtn";
     saveAll.className = "admin_inventory_save_all";
     saveAll.type = "button";
-    saveAll.textContent = "Save All Inventory";
+    saveAll.textContent = getAdminText("saveAllInventory", "Save All Inventory");
     toolbar.appendChild(saveAll);
   }
 }
@@ -622,7 +642,7 @@ function renderInventoryEditor() {
 
   const products = getAllProducts().filter(productMatchesInventorySearch);
   if (countEl) {
-    countEl.textContent = `${products.length} product${products.length === 1 ? "" : "s"}`;
+    countEl.textContent = getAdminCountText("productCount", products.length, "{count} product", "{count} products");
   }
   if (emptyEl) {
     emptyEl.hidden = products.length > 0;
@@ -644,16 +664,16 @@ function renderInventoryEditor() {
         </div>
         <div class="admin_inventory_controls">
         <label class="admin_inventory_field">
-          <span>Stock</span>
+          <span>${escapeHtml(getAdminText("stockQuantity", "Stock Quantity"))}</span>
           <input type="number" min="0" step="1" value="${escapeHtml(String(record.stockQuantity))}" data-inventory-stock="${escapeHtml(product.id)}">
         </label>
         <label class="admin_inventory_field">
-          <span>Low stock threshold</span>
+          <span>${escapeHtml(getAdminText("lowStockThreshold", "Low stock threshold"))}</span>
           <input type="number" min="0" step="1" value="${escapeHtml(String(record.lowStockThreshold))}" data-inventory-threshold="${escapeHtml(product.id)}">
         </label>
         <label class="admin_inventory_toggle">
           <input type="checkbox" ${record.trackStock ? "checked" : ""} data-inventory-track="${escapeHtml(product.id)}">
-          <span>Track stock</span>
+          <span>${escapeHtml(getAdminText("trackStock", "Track stock"))}</span>
         </label>
         </div>
       </article>
@@ -695,7 +715,7 @@ function subscribeToAdminInventory() {
     },
     (error) => {
       console.error("Admin inventory listener failed.", error);
-      emitToast("Inventory could not be loaded.", "error");
+      emitToast(getAdminText("inventoryCouldNotLoad", "Inventory could not be loaded."), "error");
     }
   );
 }
@@ -707,19 +727,19 @@ function getInventoryRowValues(productId) {
   const stockQuantity = Number(stockInput?.value);
   const lowStockThreshold = Number(thresholdInput?.value);
   if (!Number.isFinite(stockQuantity) || stockQuantity < 0 || !Number.isFinite(lowStockThreshold) || lowStockThreshold < 0) {
-    throw new Error("Stock and low stock threshold must be non-negative numbers.");
+    throw new Error(getAdminText("nonNegativeStock", "Stock and low stock threshold must be non-negative numbers."));
   }
   return { stockQuantity, lowStockThreshold, trackStock: trackInput?.checked === true };
 }
 
 async function saveInventoryFromRow(productId, values = null) {
   if (!currentUser || typeof currentUser.getIdToken !== "function") {
-    throw new Error("Please sign in again before updating inventory.");
+    throw new Error(getAdminText("signInAgainInventory", "Please sign in again before updating inventory."));
   }
 
   const product = getAllProducts().find((item) => item.id === productId);
   if (!product) {
-    throw new Error("Product was not found in the catalog.");
+    throw new Error(getAdminText("productNotFoundCatalog", "Product was not found in the catalog."));
   }
 
   const inventoryValues = values || getInventoryRowValues(productId);
@@ -742,7 +762,7 @@ async function saveInventoryFromRow(productId, values = null) {
   });
   const body = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(body.error || "Inventory could not be saved.");
+    throw new Error(body.error || getAdminText("inventoryCouldNotSave", "Inventory could not be saved."));
   }
   inventoryRecords.set(product.id, body.inventory);
   renderInventoryEditor();
@@ -758,15 +778,20 @@ async function saveAllVisibleInventory() {
     catch (error) { invalid.push({ productId: product.id, error }); }
   });
   if (invalid.length) {
-    throw new Error(`${invalid.length} row${invalid.length === 1 ? " has" : "s have"} invalid stock values. Fix them before saving.`);
+    throw new Error(getAdminCountText(
+      "invalidInventoryRows",
+      invalid.length,
+      "{count} row has invalid stock values. Fix them before saving.",
+      "{count} rows have invalid stock values. Fix them before saving."
+    ));
   }
   if (!pending.length) return;
-  if (saveAllButton) { saveAllButton.disabled = true; saveAllButton.textContent = "Saving..."; }
+  if (saveAllButton) { saveAllButton.disabled = true; saveAllButton.textContent = getAdminText("saving", "Saving..."); }
   const results = await Promise.allSettled(pending.map(({ productId, values }) => saveInventoryFromRow(productId, values)));
   const failed = results.filter((result) => result.status === "rejected");
-  if (saveAllButton) { saveAllButton.textContent = failed.length ? "Failed to save some items" : "Saved"; }
-  if (failed.length) throw new Error(`${failed.length} of ${pending.length} inventory item${pending.length === 1 ? "" : "s"} could not be saved.`);
-  emitToast(`${pending.length} inventory item${pending.length === 1 ? "" : "s"} saved.`, "success");
+  if (saveAllButton) { saveAllButton.textContent = failed.length ? getAdminText("failedSaveSomeItems", "Failed to save some items") : getAdminText("saved", "Saved"); }
+  if (failed.length) throw new Error(getAdminText("inventoryItemsSaveFailed", "{failed} of {total} inventory items could not be saved.", { failed: failed.length, total: pending.length }));
+  emitToast(getAdminCountText("inventoryItemsSaved", pending.length, "{count} inventory item saved.", "{count} inventory items saved."), "success");
 }
 
 function renderShippingRatesEditor() {
@@ -787,7 +812,7 @@ function renderShippingRatesEditor() {
 function resetCouponForm() {
   const formTitle = getElement("adminCouponFormTitle");
   if (formTitle) {
-    formTitle.textContent = "Create Promo Code";
+    formTitle.textContent = getAdminText("createPromoCode", "Create Promo Code");
   }
   const originalCode = getElement("adminCouponOriginalCode");
   const code = getElement("adminCouponCode");
@@ -809,7 +834,7 @@ function resetCouponForm() {
 function fillCouponForm(coupon) {
   const formTitle = getElement("adminCouponFormTitle");
   if (formTitle) {
-    formTitle.textContent = `Edit ${coupon.code}`;
+    formTitle.textContent = getAdminText("editCode", "Edit {code}", { code: coupon.code });
   }
   getElement("adminCouponOriginalCode").value = coupon.code;
   getElement("adminCouponCode").value = coupon.code;
@@ -828,7 +853,7 @@ function renderCouponsEditor() {
 
   const coupons = checkoutSettings.coupons || [];
   if (!coupons.length) {
-    listEl.innerHTML = '<p class="orders_item_empty">No promo codes yet.</p>';
+    listEl.innerHTML = `<p class="orders_item_empty">${escapeHtml(getAdminText("noPromoCodesYet", "No promo codes yet."))}</p>`;
     return;
   }
 
@@ -839,14 +864,14 @@ function renderCouponsEditor() {
         <span>${escapeHtml(getCouponTypeLabel(coupon.type))} - ${escapeHtml(formatCouponValue(coupon))}</span>
       </div>
       <div class="admin_coupon_meta">
-        <span>${coupon.enabled === false ? "Disabled" : "Enabled"}</span>
+        <span>${escapeHtml(coupon.enabled === false ? getAdminText("disabled", "Disabled") : getAdminText("enabled", "Enabled"))}</span>
         <span>${escapeHtml(formatCouponDate(coupon.expiresAt))}</span>
-        <span>Used ${escapeHtml(String(Number(coupon.usageCount) || 0))}${coupon.usageLimit > 0 ? ` / ${escapeHtml(String(coupon.usageLimit))}` : ""}</span>
+        <span>${escapeHtml(getAdminText("used", "Used {count}", { count: Number(coupon.usageCount) || 0 }))}${coupon.usageLimit > 0 ? ` / ${escapeHtml(String(coupon.usageLimit))}` : ""}</span>
       </div>
       <div class="admin_coupon_card_actions">
-        <button type="button" data-admin-coupon-edit="${escapeHtml(coupon.code)}">Edit</button>
-        <button type="button" data-admin-coupon-toggle="${escapeHtml(coupon.code)}">${coupon.enabled === false ? "Enable" : "Disable"}</button>
-        <button type="button" data-admin-coupon-delete="${escapeHtml(coupon.code)}">Delete</button>
+        <button type="button" data-admin-coupon-edit="${escapeHtml(coupon.code)}">${escapeHtml(getAdminText("edit", "Edit"))}</button>
+        <button type="button" data-admin-coupon-toggle="${escapeHtml(coupon.code)}">${escapeHtml(coupon.enabled === false ? getAdminText("enable", "Enable") : getAdminText("disable", "Disable"))}</button>
+        <button type="button" data-admin-coupon-delete="${escapeHtml(coupon.code)}">${escapeHtml(getAdminText("delete", "Delete"))}</button>
       </div>
     </article>
   `).join("");
@@ -869,7 +894,7 @@ async function fetchAdminCheckoutSettings() {
   });
   const body = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(body.error || "Checkout settings could not be loaded.");
+    throw new Error(body.error || getAdminText("checkoutSettingsCouldNotLoad", "Checkout settings could not be loaded."));
   }
   checkoutSettings = {
     shippingRates: body.shippingRates || {},
@@ -891,7 +916,7 @@ async function syncAdminCheckoutSettings(action, payload = {}) {
   });
   const body = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(body.error || "Checkout settings could not be saved.");
+    throw new Error(body.error || getAdminText("somethingWentWrong", "Something went wrong"));
   }
   return body;
 }
@@ -911,7 +936,7 @@ async function saveShippingRatesFromForm() {
   const result = await syncAdminCheckoutSettings("saveShippingRates", { shippingRates });
   checkoutSettings.shippingRates = result.shippingRates || shippingRates;
   renderShippingRatesEditor();
-  emitToast("Shipping rates saved.", "success");
+  emitToast(getAdminText("shippingRatesSaved", "Shipping rates saved."), "success");
 }
 
 async function saveCouponFromForm() {
@@ -931,13 +956,13 @@ async function saveCouponFromForm() {
   await syncAdminCheckoutSettings("saveCoupon", { coupon });
   await fetchAdminCheckoutSettings();
   resetCouponForm();
-  emitToast("Promo code saved.", "success");
+  emitToast(getAdminText("promoCodeSaved", "Promo code saved."), "success");
 }
 
 async function toggleCoupon(code) {
   const coupon = (checkoutSettings.coupons || []).find((item) => item.code === code);
   if (!coupon) {
-    emitToast("Promo code was not found.", "error");
+    emitToast(getAdminText("promoCodeNotFound", "Promo code was not found."), "error");
     return;
   }
   await syncAdminCheckoutSettings("saveCoupon", {
@@ -947,14 +972,14 @@ async function toggleCoupon(code) {
     }
   });
   await fetchAdminCheckoutSettings();
-  emitToast("Promo code updated.", "success");
+  emitToast(getAdminText("promoCodeUpdated", "Promo code updated."), "success");
 }
 
 async function deleteCouponFromSettings(code) {
   await syncAdminCheckoutSettings("deleteCoupon", { code });
   await fetchAdminCheckoutSettings();
   resetCouponForm();
-  emitToast("Promo code deleted.", "success");
+  emitToast(getAdminText("promoCodeDeleted", "Promo code deleted."), "success");
 }
 
 function productOfferInputDate(value) {
@@ -969,7 +994,7 @@ function getProductOfferProduct() {
 function renderProductOfferProductOptions() {
   const select = getElement("adminProductOfferSlug");
   if (!select || select.options.length) return;
-  select.innerHTML = '<option value="">Select a catalog product</option>' + getAllProducts().map((product) => `<option value="${escapeHtml(product.id)}">${escapeHtml(product.name)} — ${escapeHtml(formatPrice(product.price))}</option>`).join("");
+  select.innerHTML = `<option value="">${escapeHtml(getAdminText("selectCatalogProduct", "Select a catalog product"))}</option>` + getAllProducts().map((product) => `<option value="${escapeHtml(product.id)}">${escapeHtml(product.name)} - ${escapeHtml(formatPrice(product.price))}</option>`).join("");
 }
 
 function updateProductOfferPreview() {
@@ -978,11 +1003,11 @@ function updateProductOfferPreview() {
   const type = getElement("adminProductOfferType")?.value;
   const value = Number(getElement("adminProductOfferValue")?.value);
   if (!preview || !product || !Number.isFinite(value) || value <= 0 || (type === "percentage" && value > 100) || (type === "fixed" && value >= Number(product.price))) {
-    if (preview) preview.innerHTML = '<span>Final price preview</span><strong>Select a product and enter a valid discount to preview the final price.</strong>';
+    if (preview) preview.innerHTML = `<span>${escapeHtml(getAdminText("finalPricePreview", "Final price preview"))}</span><strong>${escapeHtml(getAdminText("finalPricePreviewHint", "Select a product and enter a valid discount to preview the final price."))}</strong>`;
     return;
   }
   const finalPrice = Math.max(0, Number(product.price) - (type === "percentage" ? Number(product.price) * value / 100 : value));
-  preview.innerHTML = `<span>Final price preview</span><strong>${escapeHtml(product.name)}: ${escapeHtml(formatPrice(product.price))} → ${escapeHtml(formatPrice(finalPrice))}</strong>`;
+  preview.innerHTML = `<span>${escapeHtml(getAdminText("finalPricePreview", "Final price preview"))}</span><strong>${escapeHtml(product.name)}: ${escapeHtml(formatPrice(product.price))} -> ${escapeHtml(formatPrice(finalPrice))}</strong>`;
 }
 
 function resetProductOfferForm() {
@@ -996,7 +1021,7 @@ function resetProductOfferForm() {
 }
 
 function getProductOfferStatus(offer) {
-  if (offer.enabled !== true) return { label: "Disabled", className: "is_disabled" };
+  if (offer.enabled !== true) return { label: getAdminText("disabled", "Disabled"), className: "is_disabled" };
   const dayFor = (value) => {
     const source = String(value || "");
     if (/^\d{4}-\d{2}-\d{2}/.test(source)) return source.slice(0, 10);
@@ -1008,21 +1033,23 @@ function getProductOfferStatus(offer) {
   const currentDay = dayFor(new Date());
   const startDay = dayFor(offer.startDate);
   const endDay = dayFor(offer.endDate);
-  if (endDay < currentDay) return { label: "Expired", className: "is_expired" };
-  if (startDay > currentDay) return { label: "Scheduled", className: "is_scheduled" };
-  return { label: "Active", className: "is_active" };
+  if (endDay < currentDay) return { label: getAdminText("expired", "Expired"), className: "is_expired" };
+  if (startDay > currentDay) return { label: getAdminText("scheduled", "Scheduled"), className: "is_scheduled" };
+  return { label: getAdminText("active", "Active"), className: "is_active" };
 }
 
 function renderProductOffers() {
   renderProductOfferProductOptions();
   const list = getElement("adminProductOffersList");
   if (!list) return;
-  if (!productOffers.length) { list.innerHTML = '<div class="admin_product_offers_empty"><strong>No product offers yet.</strong><span>Create your first transactional offer above.</span></div>'; return; }
+  if (!productOffers.length) { list.innerHTML = `<div class="admin_product_offers_empty"><strong>${escapeHtml(getAdminText("noProductOffersYet", "No product offers yet."))}</strong><span>${escapeHtml(getAdminText("createFirstOffer", "Create your first transactional offer above."))}</span></div>`; return; }
   list.innerHTML = productOffers.map((offer) => {
     const product = getAllProducts().find((item) => item.id === offer.slug);
     const status = getProductOfferStatus(offer);
-    const discount = offer.discountType === "percentage" ? `${offer.discountValue}% off` : `${formatPrice(offer.discountValue)} off`;
-    return `<article class="admin_product_offers_item"><div class="admin_product_offers_item_main"><strong class="admin_product_offers_item_name">${escapeHtml(product?.name || offer.slug)}</strong><div class="admin_product_offers_item_details"><b>${escapeHtml(discount)}</b><span>${escapeHtml(productOfferInputDate(offer.startDate))} – ${escapeHtml(productOfferInputDate(offer.endDate))}</span><span>Catalog price ${escapeHtml(formatPrice(product?.price || 0))}</span></div></div><span class="admin_product_offers_status ${status.className}">${status.label}</span><div class="admin_product_offers_item_actions"><button type="button" data-admin-product-offer-edit="${escapeHtml(offer.slug)}">Edit</button><button type="button" data-admin-product-offer-toggle="${escapeHtml(offer.slug)}">${offer.enabled === true ? "Disable" : "Enable"}</button><button type="button" data-admin-product-offer-delete="${escapeHtml(offer.slug)}">Delete</button></div></article>`;
+    const discount = offer.discountType === "percentage"
+      ? getAdminText("percentOff", "{value}% off", { value: offer.discountValue })
+      : getAdminText("amountOff", "{amount} off", { amount: formatPrice(offer.discountValue) });
+    return `<article class="admin_product_offers_item"><div class="admin_product_offers_item_main"><strong class="admin_product_offers_item_name">${escapeHtml(product?.name || offer.slug)}</strong><div class="admin_product_offers_item_details"><b>${escapeHtml(discount)}</b><span>${escapeHtml(productOfferInputDate(offer.startDate))} - ${escapeHtml(productOfferInputDate(offer.endDate))}</span><span>${escapeHtml(getAdminText("catalogPrice", "Catalog price {price}", { price: formatPrice(product?.price || 0) }))}</span></div></div><span class="admin_product_offers_status ${status.className}">${escapeHtml(status.label)}</span><div class="admin_product_offers_item_actions"><button type="button" data-admin-product-offer-edit="${escapeHtml(offer.slug)}">${escapeHtml(getAdminText("edit", "Edit"))}</button><button type="button" data-admin-product-offer-toggle="${escapeHtml(offer.slug)}">${escapeHtml(offer.enabled === true ? getAdminText("disable", "Disable") : getAdminText("enable", "Enable"))}</button><button type="button" data-admin-product-offer-delete="${escapeHtml(offer.slug)}">${escapeHtml(getAdminText("delete", "Delete"))}</button></div></article>`;
   }).join("");
 }
 
@@ -1030,7 +1057,7 @@ async function fetchProductOffers() {
   const token = await currentUser.getIdToken();
   const response = await fetch("/api/admin-actions?action=getProductOffers", { cache: "no-store", headers: { Authorization: `Bearer ${token}` } });
   const body = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(body.error || "Product offers could not be loaded.");
+  if (!response.ok) throw new Error(body.error || getAdminText("productOffersCouldNotLoad", "Product offers could not be loaded."));
   productOffers = body.offers || [];
   renderProductOffers();
 }
@@ -1040,7 +1067,7 @@ async function productOfferRequest(method, payload = {}) {
   const actionMap = { POST: "saveProductOffer", PUT: "saveProductOffer", PATCH: "setProductOfferEnabled", DELETE: "deleteProductOffer" };
   const response = await fetch(`/api/admin-actions?action=${actionMap[method]}`, { method, cache: "no-store", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify(payload) });
   const body = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(body.error || "Product offer could not be saved.");
+  if (!response.ok) throw new Error(body.error || getAdminText("productOfferCouldNotSave", "Product offer could not be saved."));
   return body;
 }
 
@@ -1050,12 +1077,12 @@ async function saveProductOfferFromForm() {
   const endDate = getElement("adminProductOfferEndDate").value;
   const discountType = getElement("adminProductOfferType").value;
   const discountValue = Number(getElement("adminProductOfferValue").value);
-  if (!product || !startDate || !endDate || !Number.isFinite(discountValue) || discountValue <= 0) throw new Error("Select a product, dates, and a positive discount.");
-  if (new Date(endDate) <= new Date(startDate)) throw new Error("End date must be after start date.");
-  if (discountType === "percentage" && discountValue > 100) throw new Error("Percentage discount cannot exceed 100%.");
-  if (discountType === "fixed" && discountValue >= Number(product.price)) throw new Error("Fixed discount must be less than the product price.");
+  if (!product || !startDate || !endDate || !Number.isFinite(discountValue) || discountValue <= 0) throw new Error(getAdminText("selectOfferFields", "Select a product, dates, and a positive discount."));
+  if (new Date(endDate) <= new Date(startDate)) throw new Error(getAdminText("endDateAfterStart", "End date must be after start date."));
+  if (discountType === "percentage" && discountValue > 100) throw new Error(getAdminText("percentageMax", "Percentage discount cannot exceed 100%."));
+  if (discountType === "fixed" && discountValue >= Number(product.price)) throw new Error(getAdminText("fixedLessThanPrice", "Fixed discount must be less than the product price."));
   await productOfferRequest("POST", { offer: { slug: product.id, productPrice: Number(product.price), enabled: getElement("adminProductOfferEnabled").checked, discountType, discountValue, startDate, endDate, priority: Number(getElement("adminProductOfferPriority").value) || 0, title: getElement("adminProductOfferTitle").value, badgeText: getElement("adminProductOfferBadgeText").value } });
-  await fetchProductOffers(); resetProductOfferForm(); emitToast("Product offer saved.", "success");
+  await fetchProductOffers(); resetProductOfferForm(); emitToast(getAdminText("productOfferSaved", "Product offer saved."), "success");
 }
 
 function editProductOffer(slug) {
@@ -1146,37 +1173,37 @@ function renderOrdersLegacyUnused() {
           <span class="admin_order_timestamp">${escapeHtml(formatOrderDate(order.createdAt))}</span>
           <div class="admin_order_identity">
             <span class="admin_order_short_id">${escapeHtml(formatShortOrderId(orderId))}</span>
-            <button class="admin_order_copy_btn" type="button" data-copy-order-id="${escapeHtml(orderId)}" aria-label="Copy Order ID" title="Copy Order ID">
+            <button class="admin_order_copy_btn" type="button" data-copy-order-id="${escapeHtml(orderId)}" aria-label="${escapeHtml(getAdminText("copyOrderId", "Copy Order ID"))}" title="${escapeHtml(getAdminText("copyOrderId", "Copy Order ID"))}">
               <i class="fa fa-clipboard" aria-hidden="true"></i>
             </button>
           </div>
           <strong class="admin_order_total">${escapeHtml(formatOrderPrice(order))}</strong>
         </div>
 
-        <div class="orders_badges" aria-label="Order statuses">
+        <div class="orders_badges" aria-label="${escapeHtml(getAdminText("orderStatus", "Order Status"))}">
           <span class="orders_badge orders_badge_payment orders_badge_payment_${escapeHtml(paymentStatus.className)}">${escapeHtml(paymentStatus.label)}</span>
           <span class="orders_badge orders_badge_order orders_badge_order_${escapeHtml(statusClass)}">${escapeHtml(getStatusLabel(order.orderStatus))}</span>
         </div>
 
         <div class="admin_order_customer_grid">
           <div class="admin_order_field">
-            <span class="admin_order_field_label">Name</span>
+            <span class="admin_order_field_label">${escapeHtml(getAdminText("name", "Name"))}</span>
             <strong class="admin_order_field_value"><i class="fa fa-user-o" aria-hidden="true"></i><span>${escapeHtml(customerName)}</span></strong>
           </div>
           <div class="admin_order_field">
-            <span class="admin_order_field_label">Phone</span>
+            <span class="admin_order_field_label">${escapeHtml(getAdminText("phone", "Phone"))}</span>
             <strong class="admin_order_field_value admin_order_field_value_phone">
               <i class="fa fa-phone" aria-hidden="true"></i>
               <span>${escapeHtml(phone)}</span>
-              ${whatsappUrl ? `<a class="admin_order_whatsapp_btn" href="${escapeHtml(whatsappUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Contact customer on WhatsApp" title="Contact on WhatsApp"><i class="fa fa-whatsapp" aria-hidden="true"></i></a>` : ""}
+              ${whatsappUrl ? `<a class="admin_order_whatsapp_btn" href="${escapeHtml(whatsappUrl)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(getAdminText("contactCustomerWhatsapp", "Contact customer on WhatsApp"))}" title="${escapeHtml(getAdminText("contactOnWhatsapp", "Contact on WhatsApp"))}"><i class="fa fa-whatsapp" aria-hidden="true"></i></a>` : ""}
             </strong>
           </div>
           <div class="admin_order_field">
-            <span class="admin_order_field_label">City</span>
+            <span class="admin_order_field_label">${escapeHtml(getAdminText("city", "City"))}</span>
             <strong class="admin_order_field_value"><i class="fa fa-building-o" aria-hidden="true"></i><span>${escapeHtml(city)}</span></strong>
           </div>
           <div class="admin_order_field">
-            <span class="admin_order_field_label">Payment Status</span>
+            <span class="admin_order_field_label">${escapeHtml(getAdminText("paymentStatus", "Payment Status"))}</span>
             <strong class="admin_order_field_value"><i class="fa fa-credit-card" aria-hidden="true"></i><span>${escapeHtml(formatStatusText(order.paymentStatus || order.status))}</span></strong>
           </div>
         </div>
@@ -1188,7 +1215,7 @@ function renderOrdersLegacyUnused() {
 
         <div class="admin_order_full_id_block">
           <button class="admin_order_id_toggle" type="button" data-toggle-order-id="${escapeHtml(order.id)}" aria-expanded="false" aria-controls="adminOrderFullId-${escapeHtml(order.id)}">
-            Order ID <span aria-hidden="true">▼</span>
+            ${escapeHtml(getAdminText("orderId", "Order ID"))} <span aria-hidden="true">▼</span>
           </button>
           <div class="admin_order_full_id_value" id="adminOrderFullId-${escapeHtml(order.id)}" hidden>
             ${escapeHtml(orderId)}
@@ -1198,11 +1225,11 @@ function renderOrdersLegacyUnused() {
         ${renderOrderItems(order)}
 
         <div class="admin_order_status_form">
-          <select data-admin-order-status="${escapeHtml(order.id)}" ${isUpdating ? "disabled" : ""} aria-label="Update order status">
+          <select data-admin-order-status="${escapeHtml(order.id)}" ${isUpdating ? "disabled" : ""} aria-label="${escapeHtml(getAdminText("updateStatus", "Update order status"))}">
             ${renderStatusOptions(status)}
           </select>
           <button type="button" data-admin-order-update="${escapeHtml(order.id)}" disabled>
-            ${isUpdating ? "Updating..." : "Save"}
+            ${isUpdating ? escapeHtml(getAdminText("updating", "Updating...")) : escapeHtml(getAdminText("save", "Save"))}
           </button>
         </div>
       </article>
@@ -1226,7 +1253,7 @@ function subscribeToAdminOrders() {
   }
 
   setPageState("dashboard");
-  setIntroText(`Signed in as ${currentUser.email}. Showing all Firestore orders.`);
+  setIntroText(getAdminText("signedInAs", "Signed in as {email}. Showing all Firestore orders.", { email: currentUser.email }));
 
   unsubscribeOrders = onSnapshot(
     collection(db, "orders"),
@@ -1236,15 +1263,15 @@ function subscribeToAdminOrders() {
     },
     (error) => {
       console.error("Admin orders listener failed.", error);
-      setPageState("error", "We could not load admin orders. Check that the admin Firestore rules are deployed.");
-      setIntroText("Admin access was confirmed, but Firestore rejected the orders query.");
-      emitToast("Admin orders could not be loaded.", "error");
+      setPageState("error", getAdminText("ordersLoadFailed", "We could not load admin orders. Check that the admin Firestore rules are deployed."));
+      setIntroText(getAdminText("firestoreRejected", "Admin access was confirmed, but Firestore rejected the orders query."));
+      emitToast(getAdminText("ordersCouldNotLoad", "Admin orders could not be loaded."), "error");
     }
   );
 
   fetchAdminCheckoutSettings().catch((error) => {
     console.error("Checkout settings load failed.", error);
-    emitToast(error.message || "Checkout settings could not be loaded.", "error");
+    emitToast(error.message || getAdminText("checkoutSettingsCouldNotLoad", "Checkout settings could not be loaded."), "error");
   });
 }
 
@@ -1281,13 +1308,15 @@ function setOrderUpdating(orderId, isUpdating) {
       : false;
 
     button.disabled = isUpdating || !changed;
-    button.textContent = isUpdating ? "Updating..." : (changed ? "Save" : "Saved");
+    button.textContent = isUpdating
+      ? getAdminText("updating", "Updating...")
+      : (changed ? getAdminText("save", "Save") : getAdminText("saved", "Saved"));
   }
 }
 
 async function syncAdminOrderStatus(orderId, orderStatus) {
   if (!currentUser || typeof currentUser.getIdToken !== "function") {
-    throw new Error("Please sign in again before updating orders.");
+    throw new Error(getAdminText("signInAgainOrders", "Please sign in again before updating orders."));
   }
 
   const idToken = await currentUser.getIdToken();
@@ -1309,7 +1338,7 @@ async function syncAdminOrderStatus(orderId, orderStatus) {
       status: response.status,
       response: responseBody
     });
-    throw new Error(responseBody.error || "Order status could not be synced to customer orders.");
+    throw new Error(responseBody.error || getAdminText("orderStatusSyncFailed", "Order status could not be synced to customer orders."));
   }
 
   return responseBody;
@@ -1317,14 +1346,14 @@ async function syncAdminOrderStatus(orderId, orderStatus) {
 
 async function updateOrderStatus(orderId) {
   if (!currentUser || !isAdminUser(currentUser)) {
-    emitToast("Only admin users can update orders.", "error");
+    emitToast(getAdminText("onlyAdminsUpdateOrders", "Only admin users can update orders."), "error");
     return;
   }
 
   const order = getOrderById(orderId);
   const select = getStatusSelect(orderId);
   if (!order || !select) {
-    emitToast("This order is no longer available.", "error");
+    emitToast(getAdminText("orderUnavailable", "This order is no longer available."), "error");
     return;
   }
 
@@ -1340,10 +1369,10 @@ async function updateOrderStatus(orderId) {
     const result = await syncAdminOrderStatus(orderId, nextStatus);
     order.orderStatus = result.orderStatus || nextStatus;
     order.updatedAt = result.updatedAt || order.updatedAt;
-    emitToast("Order status updated.", "success");
+    emitToast(getAdminText("orderStatusUpdated", "Order status updated."), "success");
   } catch (error) {
     console.error("Order status update failed.", error);
-    emitToast(error.message || "Order status could not be updated.", "error");
+    emitToast(error.message || getAdminText("orderStatusCouldNotUpdate", "Order status could not be updated."), "error");
   } finally {
     updatingOrderIds.delete(orderId);
     renderOrders();
@@ -1393,10 +1422,10 @@ function bindDashboardEvents() {
       const orderId = copyButton.getAttribute("data-copy-order-id") || "";
       if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
         navigator.clipboard.writeText(orderId)
-          .then(() => emitToast("Order ID copied.", "success"))
-          .catch(() => emitToast("Could not copy Order ID.", "error"));
+          .then(() => emitToast(getAdminText("orderIdCopied", "Order ID copied."), "success"))
+          .catch(() => emitToast(getAdminText("orderIdCopyFailed", "Could not copy Order ID."), "error"));
       } else {
-        emitToast("Clipboard is not available on this device.", "info");
+        emitToast(getAdminText("clipboardUnavailable", "Clipboard is not available on this device."), "info");
       }
       return;
     }
@@ -1408,7 +1437,7 @@ function bindDashboardEvents() {
       const shouldExpand = orderIdToggle.getAttribute("aria-expanded") !== "true";
 
       orderIdToggle.setAttribute("aria-expanded", String(shouldExpand));
-      orderIdToggle.innerHTML = `Order ID <span aria-hidden="true">${shouldExpand ? "▲" : "▼"}</span>`;
+      orderIdToggle.innerHTML = `${escapeHtml(getAdminText("orderId", "Order ID"))} <span aria-hidden="true">${shouldExpand ? "&#9650;" : "&#9660;"}</span>`;
       if (panel) {
         panel.hidden = !shouldExpand;
       }
@@ -1418,29 +1447,29 @@ function bindDashboardEvents() {
     if (event.target.closest("#adminOrdersRefreshBtn")) {
       if (currentUser && isAdminUser(currentUser)) {
         subscribeToAdminOrders();
-        emitToast("Orders refreshed.", "success");
+        emitToast(getAdminText("ordersRefreshed", "Orders refreshed."), "success");
       }
       return;
     }
 
     if (event.target.closest("#adminCheckoutSettingsRefreshBtn")) {
       fetchAdminCheckoutSettings()
-        .then(() => emitToast("Checkout settings refreshed.", "success"))
-        .catch((error) => emitToast(error.message || "Checkout settings could not be refreshed.", "error"));
+        .then(() => emitToast(getAdminText("checkoutSettingsRefreshed", "Checkout settings refreshed."), "success"))
+        .catch((error) => emitToast(error.message || getAdminText("checkoutSettingsCouldNotRefresh", "Checkout settings could not be refreshed."), "error"));
       return;
     }
 
     if (event.target.closest("#adminInventoryRefreshBtn")) {
       subscribeToAdminInventory();
-      emitToast("Inventory refreshed.", "success");
+      emitToast(getAdminText("inventoryRefreshed", "Inventory refreshed."), "success");
       return;
     }
 
     if (event.target.closest("#adminInventorySaveAllBtn")) {
       const saveAllButton = getElement("adminInventorySaveAllBtn");
       saveAllVisibleInventory()
-        .catch((error) => { console.error("Save all inventory failed.", error); emitToast(error.message || "Inventory could not be fully saved.", "error"); })
-        .finally(() => { if (saveAllButton) { saveAllButton.disabled = false; window.setTimeout(() => { saveAllButton.textContent = "Save All"; }, 1600); } });
+        .catch((error) => { console.error("Save all inventory failed.", error); emitToast(error.message || getAdminText("inventoryCouldNotFullySave", "Inventory could not be fully saved."), "error"); })
+        .finally(() => { if (saveAllButton) { saveAllButton.disabled = false; window.setTimeout(() => { saveAllButton.textContent = getAdminText("saveAll", "Save All"); }, 1600); } });
       return;
     }
 
@@ -1469,14 +1498,14 @@ function bindDashboardEvents() {
     const toggleCouponButton = event.target.closest("[data-admin-coupon-toggle]");
     if (toggleCouponButton) {
       toggleCoupon(toggleCouponButton.getAttribute("data-admin-coupon-toggle"))
-        .catch((error) => emitToast(error.message || "Promo code could not be updated.", "error"));
+        .catch((error) => emitToast(error.message || getAdminText("promoCodeCouldNotUpdate", "Promo code could not be updated."), "error"));
       return;
     }
 
     const deleteCouponButton = event.target.closest("[data-admin-coupon-delete]");
     if (deleteCouponButton) {
       deleteCouponFromSettings(deleteCouponButton.getAttribute("data-admin-coupon-delete"))
-        .catch((error) => emitToast(error.message || "Promo code could not be deleted.", "error"));
+        .catch((error) => emitToast(error.message || getAdminText("promoCodeCouldNotDelete", "Promo code could not be deleted."), "error"));
       return;
     }
 
@@ -1486,9 +1515,9 @@ function bindDashboardEvents() {
     const productOfferEdit = event.target.closest("[data-admin-product-offer-edit]");
     if (productOfferEdit) { editProductOffer(productOfferEdit.getAttribute("data-admin-product-offer-edit")); return; }
     const productOfferToggle = event.target.closest("[data-admin-product-offer-toggle]");
-    if (productOfferToggle) { const slug = productOfferToggle.getAttribute("data-admin-product-offer-toggle"); const offer = productOffers.find((item) => item.slug === slug); productOfferRequest("PATCH", { slug, enabled: offer?.enabled !== true }).then(fetchProductOffers).then(() => emitToast("Product offer updated.", "success")).catch((error) => emitToast(error.message, "error")); return; }
+    if (productOfferToggle) { const slug = productOfferToggle.getAttribute("data-admin-product-offer-toggle"); const offer = productOffers.find((item) => item.slug === slug); productOfferRequest("PATCH", { slug, enabled: offer?.enabled !== true }).then(fetchProductOffers).then(() => emitToast(getAdminText("productOfferUpdated", "Product offer updated."), "success")).catch((error) => emitToast(error.message || getAdminText("productOfferCouldNotSave", "Product offer could not be saved."), "error")); return; }
     const productOfferDelete = event.target.closest("[data-admin-product-offer-delete]");
-    if (productOfferDelete) { productOfferRequest("DELETE", { slug: productOfferDelete.getAttribute("data-admin-product-offer-delete") }).then(fetchProductOffers).then(() => emitToast("Product offer deleted.", "success")).catch((error) => emitToast(error.message, "error")); return; }
+    if (productOfferDelete) { productOfferRequest("DELETE", { slug: productOfferDelete.getAttribute("data-admin-product-offer-delete") }).then(fetchProductOffers).then(() => emitToast(getAdminText("productOfferDeleted", "Product offer deleted."), "success")).catch((error) => emitToast(error.message || getAdminText("productOfferCouldNotSave", "Product offer could not be saved."), "error")); return; }
     if (event.target.closest("#adminProductOfferResetBtn")) resetProductOfferForm();
   });
 
@@ -1507,7 +1536,7 @@ function bindDashboardEvents() {
 
     const changed = normalizeStatus(statusSelect.value) !== normalizeStatus(order.orderStatus);
     updateButton.disabled = !changed || updatingOrderIds.has(orderId);
-    updateButton.textContent = changed ? "Save" : "Saved";
+    updateButton.textContent = changed ? getAdminText("save", "Save") : getAdminText("saved", "Saved");
   });
 
   const shippingForm = getElement("adminShippingRatesForm");
@@ -1516,7 +1545,7 @@ function bindDashboardEvents() {
       event.preventDefault();
       saveShippingRatesFromForm().catch((error) => {
         console.error("Shipping rates save failed.", error);
-        emitToast(error.message || "Shipping rates could not be saved.", "error");
+        emitToast(error.message || getAdminText("shippingRatesCouldNotSave", "Shipping rates could not be saved."), "error");
       });
     });
   }
@@ -1527,12 +1556,12 @@ function bindDashboardEvents() {
       event.preventDefault();
       saveCouponFromForm().catch((error) => {
         console.error("Coupon save failed.", error);
-        emitToast(error.message || "Promo code could not be saved.", "error");
+        emitToast(error.message || getAdminText("promoCodeCouldNotSave", "Promo code could not be saved."), "error");
       });
     });
   }
   const productOfferForm = getElement("adminProductOfferForm");
-  if (productOfferForm) productOfferForm.addEventListener("submit", (event) => { event.preventDefault(); saveProductOfferFromForm().catch((error) => emitToast(error.message || "Product offer could not be saved.", "error")); });
+  if (productOfferForm) productOfferForm.addEventListener("submit", (event) => { event.preventDefault(); saveProductOfferFromForm().catch((error) => emitToast(error.message || getAdminText("productOfferCouldNotSave", "Product offer could not be saved."), "error")); });
   ["adminProductOfferSlug", "adminProductOfferType", "adminProductOfferValue"].forEach((id) => getElement(id)?.addEventListener("input", updateProductOfferPreview));
 
   const inventorySearch = getElement("adminInventorySearch");
@@ -1572,16 +1601,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!isAdminUser(currentUser)) {
       setPageState("denied");
-      setIntroText(`Signed in as ${currentUser.email || "a non-admin user"}.`);
+      setIntroText(getAdminText("signedInNonAdmin", "Signed in as {email}.", { email: currentUser.email || getAdminText("nonAdminUser", "a non-admin user") }));
       return;
     }
 
     subscribeToAdminOrders();
     subscribeToAdminInventory();
-    fetchProductOffers().catch((error) => { console.error("Product offers load failed.", error); emitToast(error.message || "Product offers could not be loaded.", "error"); });
+    fetchProductOffers().catch((error) => { console.error("Product offers load failed.", error); emitToast(error.message || getAdminText("productOffersCouldNotLoad", "Product offers could not be loaded."), "error"); });
   }, (error) => {
     console.error("Admin auth listener failed.", error);
-    setPageState("error", "We could not verify your account. Please refresh and try again.");
-    setIntroText("Firebase Auth could not confirm your session.");
+    setPageState("error", getAdminText("firebaseAuthVerifyFailed", "We could not verify your account. Please refresh and try again."));
+    setIntroText(getAdminText("firebaseAuthIntroFailed", "Firebase Auth could not confirm your session."));
   });
 });

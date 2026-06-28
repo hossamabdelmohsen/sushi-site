@@ -30,6 +30,7 @@ import { getGuestSessionId } from "./scoped-storage.js";
 import { emitToast, escapeHtml } from "./ui-utils.js?v=20260502b";
 import { getCartOfferSubtotal, getProductOfferPricing, subscribeToProductOffers } from "./offers-data.js?v=20260620a";
 import { t } from "./i18n/i18n.js";
+import { getProductDisplayData } from "./i18n/product-display.js";
 
 const CHECKOUT_CUSTOMER_STORAGE_KEY = "sushi-box-checkout-customer";
 const FALLBACK_IMAGE = "images/optimized/Logo.webp";
@@ -619,13 +620,14 @@ function renderCartItems(cart, detail = {}) {
     const quantity = Number(item.quantity) || 1;
     const image = item.image || FALLBACK_IMAGE;
     const product = getExactProduct(item.id);
+    const displayProduct = getProductDisplayData(product || item);
     const pricing = getProductOfferPricing(product || { id: item.id, price: item.price });
     const price = pricing.finalPrice;
     const lineTotal = price * quantity;
     const inventoryStatus = getInventoryStatus(item.id);
     const quantityLimitNotice = getQuantityLimitNotice(inventoryStatus, quantity);
     const stockStatusText = getCheckoutStockStatusText(inventoryStatus);
-    const viewProductLabel = getCheckoutUiText("viewProduct", "View {name}", { name: item.name });
+    const viewProductLabel = getCheckoutUiText("viewProduct", "View {name}", { name: displayProduct.name || item.name });
 
     return `
       <article class="checkout_cart_item" data-cart-product-id="${escapeHtml(item.id)}">
@@ -633,7 +635,7 @@ function renderCartItems(cart, detail = {}) {
           ${buildResponsiveImageMarkup({
             product,
             imagePath: image,
-            alt: item.name,
+            alt: displayProduct.name || item.name,
             width: 96,
             height: 96,
             loading: "lazy",
@@ -643,7 +645,7 @@ function renderCartItems(cart, detail = {}) {
         <div class="checkout_cart_item_body">
           <div class="checkout_cart_item_head">
             <div>
-              <a href="${escapeHtml(buildProductUrl(item.id))}">${escapeHtml(item.name)}</a>
+              <a href="${escapeHtml(buildProductUrl(item.id))}">${escapeHtml(displayProduct.name || item.name)}</a>
               <span class="product_stock_status${inventoryStatus.isOutOfStock ? " is_out" : ""}${inventoryStatus.isLowStock ? " is_low" : ""}" ${stockStatusText ? "" : "hidden"}>${escapeHtml(stockStatusText)}</span>
             </div>
             <button class="checkout_item_remove" type="button" data-checkout-remove="${escapeHtml(item.id)}">
@@ -656,7 +658,7 @@ function renderCartItems(cart, detail = {}) {
             <strong>${escapeHtml(getCheckoutUiText("itemTotal", "Item total"))}: ${escapeHtml(formatPrice(lineTotal))}</strong>
           </div>
           <div class="checkout_item_qty_stack">
-            <div class="checkout_item_qty" aria-label="${escapeHtml(getCheckoutUiText("quantityControlsFor", "Quantity controls for {name}", { name: item.name }))}">
+            <div class="checkout_item_qty" aria-label="${escapeHtml(getCheckoutUiText("quantityControlsFor", "Quantity controls for {name}", { name: displayProduct.name || item.name }))}">
               <button type="button" data-checkout-decrease="${escapeHtml(item.id)}" aria-label="${escapeHtml(getCheckoutUiText("decreaseQuantity", "Decrease quantity"))}">-</button>
               <span>${quantity}</span>
               <button type="button" data-checkout-increase="${escapeHtml(item.id)}" aria-label="${escapeHtml(getCheckoutUiText("increaseQuantity", "Increase quantity"))}" ${inventoryStatus.tracked && quantity >= inventoryStatus.available ? "disabled" : ""}>+</button>

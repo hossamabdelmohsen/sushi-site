@@ -36,7 +36,7 @@
   <link href="css/font-awesome.min.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap" rel="stylesheet">
   <link href="css/style.css?v=20260615a" rel="stylesheet" />
-  <link href="css/responsive.css?v=20260615a" rel="stylesheet" />
+  <link href="css/responsive.css?v=20260628p10" rel="stylesheet" />
 </head>
 
 <body class="sub_page orders-page admin-orders-page">
@@ -94,10 +94,10 @@
         <div class="orders_page_header admin_orders_header">
           <div class="admin_orders_header_row">
             <div class="admin_orders_header_copy">
-              <h1>Admin Orders</h1>
-              <p id="adminOrdersIntro">Checking admin access before loading customer orders.</p>
+              <h1 data-i18n="adminUi.adminOrders">Admin Orders</h1>
+              <p id="adminOrdersIntro" data-i18n="adminUi.checkingAdminAccess">Checking admin access before loading customer orders.</p>
             </div>
-            <button id="adminOrdersRefreshBtn" class="admin_orders_refresh_btn" type="button" aria-label="Refresh orders" title="Refresh orders">
+            <button id="adminOrdersRefreshBtn" class="admin_orders_refresh_btn" type="button" aria-label="Refresh orders" title="Refresh orders" data-i18n-aria-label="adminUi.refreshOrders" data-i18n-title="adminUi.refreshOrders">
               <i class="fa fa-refresh" aria-hidden="true"></i>
             </button>
           </div>
@@ -106,86 +106,86 @@
         <div class="orders_page_shell admin_orders_shell">
           <div id="adminOrdersLoadingState" class="orders_state">
             <span class="orders_state_icon"><i class="fa fa-spinner" aria-hidden="true"></i></span>
-            <h2>Loading admin dashboard</h2>
-            <p>Please wait while we verify your account.</p>
+            <h2 data-i18n="adminUi.loadingAdminDashboard">Loading admin dashboard</h2>
+            <p data-i18n="adminUi.loadingAdminHint">Please wait while we verify your account.</p>
           </div>
 
           <div id="adminOrdersDeniedState" class="orders_state orders_state_error admin_orders_denied" role="alert" hidden>
             <span class="orders_state_icon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-            <h2>Access denied</h2>
-            <p>This page is available only to Sushi Box admin users.</p>
+            <h2 data-i18n="adminUi.accessDenied">Access denied</h2>
+            <p data-i18n="adminUi.accessDeniedHint">This page is available only to Sushi Box admin users.</p>
           </div>
 
           <div id="adminOrdersErrorState" class="orders_state orders_state_error" role="alert" hidden></div>
 
           <div id="adminOrdersDashboard" class="admin_orders_dashboard" hidden>
             <div class="admin_dashboard_layout">
-              <nav class="admin_dashboard_nav" aria-label="Admin dashboard sections">
-                <a class="is_active" href="#overview" data-admin-nav-section="overview"><i class="fa fa-line-chart" aria-hidden="true"></i><span>Overview</span></a>
-                <a href="#new-orders" data-admin-nav-section="new-orders"><i class="fa fa-bell-o" aria-hidden="true"></i><span>New Orders</span><strong id="adminNeedsActionNavCount">0</strong></a>
-                <a href="#actioned-orders" data-admin-nav-section="actioned-orders"><i class="fa fa-check-circle-o" aria-hidden="true"></i><span>Actioned Orders</span><strong id="adminActionedNavCount">0</strong></a>
-                <a href="#inventory" data-admin-nav-section="inventory"><i class="fa fa-cubes" aria-hidden="true"></i><span>Inventory</span></a>
-                <a href="#shipping" data-admin-nav-section="shipping"><i class="fa fa-truck" aria-hidden="true"></i><span>Shipping Settings</span></a>
-                <a href="#promo-codes" data-admin-nav-section="promo-codes"><i class="fa fa-ticket" aria-hidden="true"></i><span>Promo Codes</span></a>
-                <a href="#product-offers" data-admin-nav-section="product-offers"><i class="fa fa-gift" aria-hidden="true"></i><span>Product Offers</span></a>
+              <nav class="admin_dashboard_nav" aria-label="Admin dashboard sections" data-i18n-aria-label="adminUi.adminDashboardSections">
+                <a class="is_active" href="#overview" data-admin-nav-section="overview"><i class="fa fa-line-chart" aria-hidden="true"></i><span data-i18n="adminUi.overview">Overview</span></a>
+                <a href="#new-orders" data-admin-nav-section="new-orders"><i class="fa fa-bell-o" aria-hidden="true"></i><span data-i18n="adminUi.newOrders">New Orders</span><strong id="adminNeedsActionNavCount">0</strong></a>
+                <a href="#actioned-orders" data-admin-nav-section="actioned-orders"><i class="fa fa-check-circle-o" aria-hidden="true"></i><span data-i18n="adminUi.actionedOrders">Actioned Orders</span><strong id="adminActionedNavCount">0</strong></a>
+                <a href="#inventory" data-admin-nav-section="inventory"><i class="fa fa-cubes" aria-hidden="true"></i><span data-i18n="adminUi.inventory">Inventory</span></a>
+                <a href="#shipping" data-admin-nav-section="shipping"><i class="fa fa-truck" aria-hidden="true"></i><span data-i18n="adminUi.shippingSettings">Shipping Settings</span></a>
+                <a href="#promo-codes" data-admin-nav-section="promo-codes"><i class="fa fa-ticket" aria-hidden="true"></i><span data-i18n="adminUi.promoCodes">Promo Codes</span></a>
+                <a href="#product-offers" data-admin-nav-section="product-offers"><i class="fa fa-gift" aria-hidden="true"></i><span data-i18n="adminUi.productOffers">Product Offers</span></a>
               </nav>
 
               <div class="admin_dashboard_content">
                 <section id="overview" class="admin_dashboard_panel" data-admin-panel="overview">
                   <div class="admin_section_head">
                     <div>
-                      <span class="admin_orders_group_kicker">Control panel</span>
-                      <h2>Dashboard / Overview</h2>
+                      <span class="admin_orders_group_kicker" data-i18n="adminUi.controlPanel">Control panel</span>
+                      <h2 data-i18n="adminUi.dashboardOverview">Dashboard / Overview</h2>
                     </div>
                   </div>
                   <div class="admin_orders_toolbar">
-                    <div class="admin_orders_stats" aria-label="Order summary">
+                    <div class="admin_orders_stats" aria-label="Order summary" data-i18n-aria-label="adminUi.orderSummary">
                       <div>
-                        <span>Total orders</span>
+                        <span data-i18n="adminUi.totalOrders">Total orders</span>
                         <strong id="adminOrdersCount">0</strong>
                       </div>
                       <div>
-                        <span>Shown orders</span>
+                        <span data-i18n="adminUi.shownOrders">Shown orders</span>
                         <strong id="adminOrdersFilteredCount">0</strong>
                       </div>
                       <div>
-                        <span>Total value</span>
+                        <span data-i18n="adminUi.totalValue">Total value</span>
                         <strong id="adminOrdersRevenue">&#1580;.&#1605; 0.00</strong>
                       </div>
                     </div>
                   </div>
                 </section>
 
-                <div class="admin_orders_queue_tabs" role="tablist" aria-label="Admin order workflow">
+                <div class="admin_orders_queue_tabs" role="tablist" aria-label="Admin order workflow" data-i18n-aria-label="adminUi.adminOrderWorkflow">
                   <button id="adminNeedsActionTab" class="is_active" type="button" role="tab" aria-selected="true" aria-controls="adminNeedsActionPanel" data-admin-orders-section="needs_action">
-                    New / Needs Action <span id="adminNeedsActionTabCount">0</span>
+                    <span data-i18n="adminUi.newNeedsAction">New / Needs Action</span> <span id="adminNeedsActionTabCount">0</span>
                   </button>
                   <button id="adminActionedTab" type="button" role="tab" aria-selected="false" aria-controls="adminActionedPanel" data-admin-orders-section="actioned">
-                    Actioned <span id="adminActionedTabCount">0</span>
+                    <span data-i18n="adminUi.actioned">Actioned</span> <span id="adminActionedTabCount">0</span>
                   </button>
                 </div>
 
-                <div class="admin_orders_filters" aria-label="Filter orders by status">
-                  <button class="is_active" type="button" data-admin-order-filter="all">All <span class="admin_filter_badge">0</span></button>
-                  <button type="button" data-admin-order-filter="pending">Pending <span class="admin_filter_badge">0</span></button>
-                  <button type="button" data-admin-order-filter="preparing">Preparing <span class="admin_filter_badge">0</span></button>
-                  <button type="button" data-admin-order-filter="out_for_delivery">Out for delivery <span class="admin_filter_badge">0</span></button>
-                  <button type="button" data-admin-order-filter="delivered">Delivered <span class="admin_filter_badge">0</span></button>
-                  <button type="button" data-admin-order-filter="cancelled">Cancelled <span class="admin_filter_badge">0</span></button>
+                <div class="admin_orders_filters" aria-label="Filter orders by status" data-i18n-aria-label="adminUi.filterOrdersByStatus">
+                  <button class="is_active" type="button" data-admin-order-filter="all"><span data-i18n="adminUi.all">All</span> <span class="admin_filter_badge">0</span></button>
+                  <button type="button" data-admin-order-filter="pending"><span data-i18n="adminUi.pending">Pending</span> <span class="admin_filter_badge">0</span></button>
+                  <button type="button" data-admin-order-filter="preparing"><span data-i18n="adminUi.preparing">Preparing</span> <span class="admin_filter_badge">0</span></button>
+                  <button type="button" data-admin-order-filter="out_for_delivery"><span data-i18n="adminUi.outForDelivery">Out for delivery</span> <span class="admin_filter_badge">0</span></button>
+                  <button type="button" data-admin-order-filter="delivered"><span data-i18n="adminUi.delivered">Delivered</span> <span class="admin_filter_badge">0</span></button>
+                  <button type="button" data-admin-order-filter="cancelled"><span data-i18n="adminUi.cancelled">Cancelled</span> <span class="admin_filter_badge">0</span></button>
                 </div>
 
                 <div id="adminOrdersEmptyState" class="orders_state" hidden>
                   <span class="orders_state_icon"><i class="fa fa-list-alt" aria-hidden="true"></i></span>
-                  <h2>No orders found</h2>
-                  <p>There are no orders matching this filter yet.</p>
+                  <h2 data-i18n="adminUi.noOrdersFound">No orders found</h2>
+                  <p data-i18n="adminUi.noOrdersFilterHint">There are no orders matching this filter yet.</p>
                 </div>
 
                 <div class="admin_orders_groups" id="adminOrdersGroups" hidden>
                   <section id="new-orders" class="admin_dashboard_panel admin_orders_group admin_orders_group_new" role="tabpanel" aria-labelledby="adminNeedsActionTab" data-admin-panel="new-orders">
                     <div class="admin_orders_group_head">
                       <div>
-                        <span class="admin_orders_group_kicker">Needs action</span>
-                        <h2 id="adminNewOrdersTitle">New / Needs Action Orders</h2>
+                        <span class="admin_orders_group_kicker" data-i18n="adminUi.needsAction">Needs action</span>
+                        <h2 id="adminNewOrdersTitle" data-i18n="adminUi.newNeedsActionOrders">New / Needs Action Orders</h2>
                       </div>
                       <strong id="adminNewOrdersCount">0</strong>
                     </div>
@@ -195,8 +195,8 @@
                   <section id="actioned-orders" class="admin_dashboard_panel admin_orders_group admin_orders_group_actioned" role="tabpanel" aria-labelledby="adminActionedTab" data-admin-panel="actioned-orders">
                     <div class="admin_orders_group_head">
                       <div>
-                        <span class="admin_orders_group_kicker">Completed queue</span>
-                        <h2 id="adminActionedOrdersTitle">Actioned Orders</h2>
+                        <span class="admin_orders_group_kicker" data-i18n="adminUi.completedQueue">Completed queue</span>
+                        <h2 id="adminActionedOrdersTitle" data-i18n="adminUi.actionedOrders">Actioned Orders</h2>
                       </div>
                       <strong id="adminActionedOrdersCount">0</strong>
                     </div>
@@ -204,98 +204,98 @@
                   </section>
                 </div>
 
-                <section id="inventory" class="admin_dashboard_panel admin_inventory_panel" aria-label="Inventory" data-admin-panel="inventory" hidden>
+                <section id="inventory" class="admin_dashboard_panel admin_inventory_panel" aria-label="Inventory" data-i18n-aria-label="adminUi.inventory" data-admin-panel="inventory" hidden>
                   <div class="admin_checkout_settings_head">
                     <div>
-                      <span class="admin_orders_group_kicker">Stock control</span>
-                      <h2>Inventory</h2>
+                      <span class="admin_orders_group_kicker" data-i18n="adminUi.stockControl">Stock control</span>
+                      <h2 data-i18n="adminUi.inventory">Inventory</h2>
                     </div>
-                    <button id="adminInventoryRefreshBtn" class="admin_orders_refresh_btn" type="button" aria-label="Refresh inventory" title="Refresh inventory">
+                    <button id="adminInventoryRefreshBtn" class="admin_orders_refresh_btn" type="button" aria-label="Refresh inventory" title="Refresh inventory" data-i18n-aria-label="adminUi.refreshInventory" data-i18n-title="adminUi.refreshInventory">
                       <i class="fa fa-refresh" aria-hidden="true"></i>
                     </button>
                   </div>
 
                   <div class="admin_inventory_toolbar">
                     <div class="admin_inventory_search_group">
-                      <span>Search product</span>
-                      <input id="adminInventorySearch" type="search" autocomplete="off" placeholder="Search by name, slug, or category">
+                      <span data-i18n="adminUi.searchProduct">Search product</span>
+                      <input id="adminInventorySearch" type="search" autocomplete="off" placeholder="Search by name, slug, or category" data-i18n-placeholder="adminUi.searchProductPlaceholder">
                     </div>
                     <strong id="adminInventoryCount" class="admin_inventory_count">0 products</strong>
-                    <label class="admin_inventory_track_all"><span>Track Stock All</span><input id="adminInventoryTrackAll" type="checkbox"></label>
-                    <button id="adminInventorySaveAllBtn" class="admin_inventory_save_all" type="button">Save All Inventory</button>
+                    <label class="admin_inventory_track_all"><span data-i18n="adminUi.trackStockAll">Track Stock All</span><input id="adminInventoryTrackAll" type="checkbox"></label>
+                    <button id="adminInventorySaveAllBtn" class="admin_inventory_save_all" type="button" data-i18n="adminUi.saveAllInventory">Save All Inventory</button>
                   </div>
 
-                  <p id="adminInventoryEmpty" class="orders_item_empty" hidden>No matching products found.</p>
+                  <p id="adminInventoryEmpty" class="orders_item_empty" hidden data-i18n="adminUi.noMatchingProductsFound">No matching products found.</p>
                   <div id="adminInventoryList" class="admin_inventory_list"></div>
                 </section>
 
-                <section id="shipping" class="admin_dashboard_panel admin_checkout_settings" aria-label="Shipping settings" data-admin-panel="shipping" hidden>
+                <section id="shipping" class="admin_dashboard_panel admin_checkout_settings" aria-label="Shipping settings" data-i18n-aria-label="adminUi.shippingSettings" data-admin-panel="shipping" hidden>
                   <div class="admin_checkout_settings_head">
                     <div>
-                      <span class="admin_orders_group_kicker">Checkout settings</span>
-                      <h2>Shipping Settings</h2>
+                      <span class="admin_orders_group_kicker" data-i18n="adminUi.checkoutSettings">Checkout settings</span>
+                      <h2 data-i18n="adminUi.shippingSettings">Shipping Settings</h2>
                     </div>
-                    <button id="adminCheckoutSettingsRefreshBtn" class="admin_orders_refresh_btn" type="button" aria-label="Refresh checkout settings" title="Refresh checkout settings">
+                    <button id="adminCheckoutSettingsRefreshBtn" class="admin_orders_refresh_btn" type="button" aria-label="Refresh checkout settings" title="Refresh checkout settings" data-i18n-aria-label="adminUi.refreshCheckoutSettings" data-i18n-title="adminUi.refreshCheckoutSettings">
                       <i class="fa fa-refresh" aria-hidden="true"></i>
                     </button>
                   </div>
 
                   <form id="adminShippingRatesForm" class="admin_shipping_rates_form">
-                    <h3>Shipping Rates</h3>
+                    <h3 data-i18n="adminUi.shippingRates">Shipping Rates</h3>
                     <div id="adminShippingRatesList" class="admin_shipping_rates_grid"></div>
-                    <button type="submit">Save shipping rates</button>
+                    <button type="submit" data-i18n="adminUi.saveShippingRates">Save shipping rates</button>
                   </form>
                 </section>
 
-                <section id="promo-codes" class="admin_dashboard_panel admin_checkout_settings" aria-label="Promo code settings" data-admin-panel="promo-codes" hidden>
+                <section id="promo-codes" class="admin_dashboard_panel admin_checkout_settings" aria-label="Promo code settings" data-i18n-aria-label="adminUi.promoCodes" data-admin-panel="promo-codes" hidden>
                   <div class="admin_checkout_settings_head">
                     <div>
-                      <span class="admin_orders_group_kicker">Checkout settings</span>
-                      <h2>Promo Codes</h2>
+                      <span class="admin_orders_group_kicker" data-i18n="adminUi.checkoutSettings">Checkout settings</span>
+                      <h2 data-i18n="adminUi.promoCodes">Promo Codes</h2>
                     </div>
                   </div>
 
                   <form id="adminCouponForm" class="admin_coupon_form">
-                    <h3 id="adminCouponFormTitle">Create Promo Code</h3>
+                    <h3 id="adminCouponFormTitle" data-i18n="adminUi.createPromoCode">Create Promo Code</h3>
                     <input id="adminCouponOriginalCode" type="hidden">
                     <div class="admin_coupon_grid">
                       <label>
-                        <span>Code</span>
+                        <span data-i18n="adminUi.code">Code</span>
                         <input id="adminCouponCode" type="text" autocomplete="off" required>
                       </label>
                       <label>
-                        <span>Type</span>
+                        <span data-i18n="adminUi.type">Type</span>
                         <select id="adminCouponType" required>
-                          <option value="free_shipping">Free Shipping</option>
-                          <option value="fixed_discount">Fixed Discount</option>
-                          <option value="percentage_discount">Percentage Discount</option>
+                          <option value="free_shipping" data-i18n="adminUi.freeShipping">Free Shipping</option>
+                          <option value="fixed_discount" data-i18n="adminUi.fixedDiscount">Fixed Discount</option>
+                          <option value="percentage_discount" data-i18n="adminUi.percentageDiscount">Percentage Discount</option>
                         </select>
                       </label>
                       <label>
-                        <span>Value</span>
+                        <span data-i18n="adminUi.value">Value</span>
                         <input id="adminCouponValue" type="number" min="0" step="0.01" value="0">
                       </label>
                       <label>
-                        <span>Expiration date</span>
+                        <span data-i18n="adminUi.expirationDate">Expiration date</span>
                         <input id="adminCouponExpiresAt" type="date">
                       </label>
                       <label>
-                        <span>Usage limit</span>
+                        <span data-i18n="adminUi.usageLimit">Usage limit</span>
                         <input id="adminCouponUsageLimit" type="number" min="0" step="1" value="0">
                       </label>
                       <label class="admin_coupon_enabled">
                         <input id="adminCouponEnabled" type="checkbox" checked>
-                        <span>Enabled</span>
+                        <span data-i18n="adminUi.enabled">Enabled</span>
                       </label>
                     </div>
                     <div class="admin_coupon_actions">
-                      <button type="submit">Save promo code</button>
-                      <button id="adminCouponResetBtn" type="button">New code</button>
+                      <button type="submit" data-i18n="adminUi.savePromoCode">Save promo code</button>
+                      <button id="adminCouponResetBtn" type="button" data-i18n="adminUi.newCode">New code</button>
                     </div>
                   </form>
 
                   <div class="admin_coupons_panel">
-                    <h3>Promo Codes</h3>
+                    <h3 data-i18n="adminUi.promoCodes">Promo Codes</h3>
                     <div id="adminCouponsList" class="admin_coupons_list"></div>
                   </div>
                 </section>
@@ -303,32 +303,32 @@
                 <section id="product-offers" class="admin_dashboard_panel admin_product_offers_panel" data-admin-panel="product-offers" hidden>
                   <div class="admin_section_head admin_product_offers_head">
                     <div>
-                      <span class="admin_orders_group_kicker">Transactional offers</span>
-                      <h2>Product Offers</h2>
+                      <span class="admin_orders_group_kicker" data-i18n="adminUi.transactionalOffers">Transactional offers</span>
+                      <h2 data-i18n="adminUi.productOffers">Product Offers</h2>
                     </div>
                   </div>
-                  <p class="admin_product_offers_note">Active offers apply automatically across product pages, cart, checkout, and payment.</p>
+                  <p class="admin_product_offers_note" data-i18n="adminUi.offersNote">Active offers apply automatically across product pages, cart, checkout, and payment.</p>
                   <div class="admin_product_offers_card">
-                    <div class="admin_product_offers_card_head"><div><span>Create or edit</span><h3>Offer details</h3></div><p>Choose a catalog item, set its active period, then preview its display price.</p></div>
+                    <div class="admin_product_offers_card_head"><div><span data-i18n="adminUi.createOrEdit">Create or edit</span><h3 data-i18n="adminUi.offerDetails">Offer details</h3></div><p data-i18n="adminUi.offerDetailsHint">Choose a catalog item, set its active period, then preview its display price.</p></div>
                     <form id="adminProductOfferForm" class="admin_product_offers_form">
                     <input id="adminProductOfferOriginalSlug" type="hidden">
                     <div class="admin_product_offers_grid">
-                      <label class="admin_product_offers_field"><span>Product</span><select id="adminProductOfferSlug" required></select></label>
-                      <label class="admin_product_offers_field"><span>Discount type</span><select id="adminProductOfferType" required><option value="percentage">Percentage</option><option value="fixed">Fixed amount</option></select></label>
-                      <label class="admin_product_offers_field"><span>Discount value</span><input id="adminProductOfferValue" type="number" min="0.01" step="0.01" required></label>
-                      <label class="admin_product_offers_field"><span>Priority</span><input id="adminProductOfferPriority" type="number" min="0" step="1" value="0"></label>
-                      <label class="admin_product_offers_field"><span>Start date</span><input id="adminProductOfferStartDate" type="date" required></label>
-                      <label class="admin_product_offers_field"><span>End date</span><input id="adminProductOfferEndDate" type="date" required></label>
-                      <label class="admin_product_offers_field"><span>Title <em>optional</em></span><input id="adminProductOfferTitle" type="text" maxlength="120"></label>
-                      <label class="admin_product_offers_field"><span>Badge text <em>optional</em></span><input id="adminProductOfferBadgeText" type="text" maxlength="48"></label>
+                      <label class="admin_product_offers_field"><span data-i18n="adminUi.productLabel">Product</span><select id="adminProductOfferSlug" required></select></label>
+                      <label class="admin_product_offers_field"><span data-i18n="adminUi.discountType">Discount type</span><select id="adminProductOfferType" required><option value="percentage" data-i18n="adminUi.percentage">Percentage</option><option value="fixed" data-i18n="adminUi.fixedAmount">Fixed amount</option></select></label>
+                      <label class="admin_product_offers_field"><span data-i18n="adminUi.discountValue">Discount value</span><input id="adminProductOfferValue" type="number" min="0.01" step="0.01" required></label>
+                      <label class="admin_product_offers_field"><span data-i18n="adminUi.priority">Priority</span><input id="adminProductOfferPriority" type="number" min="0" step="1" value="0"></label>
+                      <label class="admin_product_offers_field"><span data-i18n="adminUi.startDate">Start date</span><input id="adminProductOfferStartDate" type="date" required></label>
+                      <label class="admin_product_offers_field"><span data-i18n="adminUi.endDate">End date</span><input id="adminProductOfferEndDate" type="date" required></label>
+                      <label class="admin_product_offers_field"><span data-i18n="adminUi.titleOptional">Title optional</span><input id="adminProductOfferTitle" type="text" maxlength="120"></label>
+                      <label class="admin_product_offers_field"><span data-i18n="adminUi.badgeTextOptional">Badge text optional</span><input id="adminProductOfferBadgeText" type="text" maxlength="48"></label>
                     </div>
-                    <label class="admin_product_offers_toggle"><input id="adminProductOfferEnabled" type="checkbox" checked><span class="admin_product_offers_toggle_track" aria-hidden="true"></span><span><strong>Enable this offer</strong><small>Show it when the selected date range is active.</small></span></label>
-                    <div class="admin_product_offers_preview" id="adminProductOfferPreview"><span>Final price preview</span><strong>Select a product and enter a valid discount to preview the final price.</strong></div>
-                    <div class="admin_product_offers_actions"><button type="submit" class="admin_product_offers_primary">Save Offer</button><button id="adminProductOfferResetBtn" type="button" class="admin_product_offers_secondary">New Offer</button></div>
+                    <label class="admin_product_offers_toggle"><input id="adminProductOfferEnabled" type="checkbox" checked><span class="admin_product_offers_toggle_track" aria-hidden="true"></span><span><strong data-i18n="adminUi.enableThisOffer">Enable this offer</strong><small data-i18n="adminUi.enableOfferHint">Show it when the selected date range is active.</small></span></label>
+                    <div class="admin_product_offers_preview" id="adminProductOfferPreview"><span data-i18n="adminUi.finalPricePreview">Final price preview</span><strong data-i18n="adminUi.finalPricePreviewHint">Select a product and enter a valid discount to preview the final price.</strong></div>
+                    <div class="admin_product_offers_actions"><button type="submit" class="admin_product_offers_primary" data-i18n="adminUi.saveOffer">Save Offer</button><button id="adminProductOfferResetBtn" type="button" class="admin_product_offers_secondary" data-i18n="adminUi.newOffer">New Offer</button></div>
                     </form>
                   </div>
                   <div class="admin_product_offers_card admin_product_offers_current">
-                    <div class="admin_product_offers_card_head"><div><span>Current offers</span><h3>Offer library</h3></div><p>Manage what customers see on the Offers page.</p></div>
+                    <div class="admin_product_offers_card_head"><div><span data-i18n="adminUi.currentOffers">Current offers</span><h3 data-i18n="adminUi.offerLibrary">Offer library</h3></div><p data-i18n="adminUi.offerLibraryHint">Manage what customers see on the Offers page.</p></div>
                     <div id="adminProductOffersList" class="admin_product_offers_list"></div>
                   </div>
                 </section>
@@ -431,8 +431,8 @@
   <script defer src="js/bootstrap.js"></script>
   <script defer src="js/custom.js?v=20260603a"></script>
   <script type="module" src="js/navbar-offers.js?v=20260518c" defer></script>
-  <script type="module" src="js/app-shell.js?v=20260619a" defer></script>
-  <script type="module" src="js/admin-orders.js?v=20260619a" defer></script>
+  <script type="module" src="js/app-shell.js?v=20260628p10" defer></script>
+  <script type="module" src="js/admin-orders.js?v=20260628p10" defer></script>
 </body>
 
 </html>

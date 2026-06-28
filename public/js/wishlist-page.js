@@ -18,6 +18,7 @@ import { subscribeToReviewSummaries } from "./firebase-reviews.js?v=20260602d";
 import { buildRatingSummaryMarkup, emitToast, escapeHtml, primeRatingsCache } from "./ui-utils.js?v=20260523a";
 import { getActiveOfferForProduct, getOfferDisplayData, getProductOfferPricing, subscribeToProductOffers } from "./offers-data.js?v=20260620a";
 import { t } from "./i18n/i18n.js";
+import { getProductDisplayData } from "./i18n/product-display.js";
 
 let latestReviewSummaries = {};
 let latestWishlistItems = [];
@@ -130,6 +131,7 @@ function renderWishlist(items, detail = latestWishlistDetail) {
   }
 
   grid.innerHTML = products.map((product) => {
+    const displayProduct = getProductDisplayData(product);
     const image = (product.images && product.images[0]) || "";
     const productUrl = buildProductUrl(product.id);
     const inventoryStatus = getInventoryStatus(product.id);
@@ -143,7 +145,7 @@ function renderWishlist(items, detail = latestWishlistDetail) {
           ${buildResponsiveImageMarkup({
             product,
             imagePath: image,
-            alt: product.name,
+            alt: displayProduct.name,
             width: 600,
             height: 600,
             loading: "lazy",
@@ -154,10 +156,10 @@ function renderWishlist(items, detail = latestWishlistDetail) {
         </a>
         <div class="wishlist_card_body">
           <div>
-            <span class="wishlist_card_category">${escapeHtml(product.category || getProductUiText("product", "Product"))}</span>
-            <h3><a href="${productUrl}">${escapeHtml(product.name)}</a></h3>
+            <span class="wishlist_card_category">${escapeHtml(displayProduct.category || getProductUiText("product", "Product"))}</span>
+            <h3><a href="${productUrl}">${escapeHtml(displayProduct.name)}</a></h3>
             ${buildRatingSummaryMarkup(latestReviewSummaries[product.id], "wishlist_card_rating", { productId: product.id })}
-            <p>${escapeHtml(product.description || "")}</p>
+            <p>${escapeHtml(displayProduct.description || "")}</p>
           </div>
           <div class="wishlist_card_footer">
             ${getWishlistPriceMarkup(product)}

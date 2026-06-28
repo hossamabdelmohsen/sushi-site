@@ -22982,3 +22982,329 @@ html[dir="rtl"] .product_offer_badge {
 html[dir="rtl"] .site_search_result_link {
   text-align: start !important;
 }
+
+/* Phase 9 i18n: product translation text wrapping only. */
+html[dir="rtl"] .food_section .box.product-card .detail-box h5,
+html[dir="rtl"] .food_section .box.product-card .detail-box h5 a,
+html[dir="rtl"] .food_section .box.product-card .detail-box p,
+html[dir="rtl"] .offers_page_card h3,
+html[dir="rtl"] .wishlist_card h3,
+html[dir="rtl"] .wishlist_card h3 a,
+html[dir="rtl"] .wishlist_card p,
+html[dir="rtl"] .recommendation_card .product-title,
+html[dir="rtl"] .recommendation_card .product-title a,
+html[dir="rtl"] .recommendation_card .product-description,
+html[dir="rtl"] .site_search_result_body,
+html[dir="rtl"] body.cart-page .cart_page_item_head a,
+html[dir="rtl"] body.checkout-page .checkout_cart_item_head a,
+html[dir="rtl"] body.product-page #productName,
+html[dir="rtl"] body.product-page #productDescription,
+html[dir="rtl"] body.product-page .product_story_title,
+html[dir="rtl"] body.product-page .product_story_lead,
+html[dir="rtl"] body.product-page .product_story_body,
+html[dir="rtl"] body.product-page .product_story_body p,
+html[dir="rtl"] body.product-page .product_story_list li,
+html[dir="rtl"] body.product-page .product_spec_row dt,
+html[dir="rtl"] body.product-page .product_spec_row dd {
+  text-align: start !important;
+  overflow-wrap: anywhere;
+}
+
+html[dir="rtl"] .product_feature_list li,
+html[dir="rtl"] .product_story_list li {
+  padding-left: 0 !important;
+  padding-right: 18px !important;
+}
+
+html[dir="rtl"] .product_feature_list li::before,
+html[dir="rtl"] .product_story_list li::before {
+  left: auto !important;
+  right: 0 !important;
+}
+
+/* Phase 10 i18n: admin dashboard RTL text flow only. */
+html[dir="rtl"] body.admin-orders-page .admin_orders_header,
+html[dir="rtl"] body.admin-orders-page .admin_dashboard_nav,
+html[dir="rtl"] body.admin-orders-page .admin_dashboard_content,
+html[dir="rtl"] body.admin-orders-page .admin_dashboard_panel,
+html[dir="rtl"] body.admin-orders-page .admin_order_card,
+html[dir="rtl"] body.admin-orders-page .admin_inventory_item,
+html[dir="rtl"] body.admin-orders-page .admin_coupon_card,
+html[dir="rtl"] body.admin-orders-page .admin_product_offers_card,
+html[dir="rtl"] body.admin-orders-page .admin_product_offers_item {
+  text-align: start !important;
+}
+
+html[dir="rtl"] body.admin-orders-page .admin_orders_stats,
+html[dir="rtl"] body.admin-orders-page .admin_order_quick_facts,
+html[dir="rtl"] body.admin-orders-page .admin_order_customer_grid,
+html[dir="rtl"] body.admin-orders-page .admin_inventory_controls,
+html[dir="rtl"] body.admin-orders-page .admin_coupon_grid,
+html[dir="rtl"] body.admin-orders-page .admin_product_offers_grid,
+html[dir="rtl"] body.admin-orders-page .admin_product_offers_actions,
+html[dir="rtl"] body.admin-orders-page .admin_coupon_actions {
+  direction: rtl !important;
+}
+
+html[dir="rtl"] body.admin-orders-page input,
+html[dir="rtl"] body.admin-orders-page select,
+html[dir="rtl"] body.admin-orders-page textarea,
+html[dir="rtl"] body.admin-orders-page button {
+  text-align: start;
+}
+
+html[dir="rtl"] body.admin-orders-page .admin_order_short_id,
+html[dir="rtl"] body.admin-orders-page .admin_order_full_id_value,
+html[dir="rtl"] body.admin-orders-page .admin_coupon_code,
+html[dir="rtl"] body.admin-orders-page input[type="number"],
+html[dir="rtl"] body.admin-orders-page input[type="date"] {
+  direction: ltr !important;
+}
+
+html[dir="rtl"] body.admin-orders-page .admin_order_customer_name,
+html[dir="rtl"] body.admin-orders-page .admin_order_address_row,
+html[dir="rtl"] body.admin-orders-page .admin_inventory_product strong,
+html[dir="rtl"] body.admin-orders-page .admin_product_offers_item_name,
+html[dir="rtl"] body.admin-orders-page .admin_product_offers_note {
+  overflow-wrap: anywhere;
+}
+
+/* Phase 11 i18n: final RTL/LTR UI polish without behavior changes. */
+html[dir="rtl"] body {
+  line-height: 1.65;
+}
+
+html[dir="rtl"] .custom_nav-container .navbar-nav .nav-item .nav-link,
+html[dir="rtl"] .auth_button,
+html[dir="rtl"] .auth_dropdown_link,
+html[dir="rtl"] .auth_dropdown_btn,
+html[dir="rtl"] .side_drawer_link,
+html[dir="rtl"] .side_drawer_account_row,
+html[dir="rtl"] .side_drawer_logout_btn,
+html[dir="rtl"] .mobile_auth_google_btn {
+  text-align: start !important;
+}
+
+html[dir="rtl"] .custom_nav-container .navbar-nav .nav-item .nav-link,
+html[dir="rtl"] .orders_nav_link,
+html[dir="rtl"] .wishlist_nav_link,
+html[dir="rtl"] .auth_button,
+html[dir="rtl"] .auth_dropdown_user,
+html[dir="rtl"] .auth_dropdown_icon_button,
+html[dir="rtl"] .auth_dropdown_link,
+html[dir="rtl"] .mobile_auth_google_btn {
+  direction: rtl !important;
+}
+
+html[dir="rtl"] .wishlist_nav_link {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+}
+
+html[dir="rtl"] .wishlist_count_badge {
+  margin-inline-start: 0 !important;
+  margin-inline-end: 2px !important;
+}
+
+html[dir="rtl"] .auth_dropdown {
+  right: auto !important;
+  left: 0 !important;
+  text-align: start !important;
+}
+
+html[dir="rtl"] .auth_chevron,
+html[dir="rtl"] .side_drawer_account_chevron {
+  margin-inline-start: 0 !important;
+  margin-inline-end: auto !important;
+}
+
+html[dir="rtl"] .side_drawer_account_actions,
+html[dir="rtl"] .side_drawer_account_text,
+html[dir="rtl"] .auth_dropdown_user_meta {
+  text-align: start !important;
+}
+
+html[dir="rtl"] .food_section .filters_menu,
+html[dir="rtl"] .food_section .box.product-card .options,
+html[dir="rtl"] .product_offer_price_stack,
+html[dir="rtl"] .product_display_offer,
+html[dir="rtl"] body.product-page .product_actions,
+html[dir="rtl"] body.product-page .product_quantity_row,
+html[dir="rtl"] body.product-page .product_meta_row,
+html[dir="rtl"] body.product-page .product_delivery_note,
+html[dir="rtl"] body.cart-page .cart_page_item_actions,
+html[dir="rtl"] body.cart-page .cart_page_item_prices,
+html[dir="rtl"] body.cart-page .cart_page_item_bottom,
+html[dir="rtl"] body.checkout-page .checkout_cart_item_meta,
+html[dir="rtl"] body.orders-page .orders_badges,
+html[dir="rtl"] .wishlist_card_footer,
+html[dir="rtl"] .wishlist_card_actions,
+html[dir="rtl"] .offers_page_price_row,
+html[dir="rtl"] .offers_page_actions {
+  direction: rtl !important;
+}
+
+html[dir="rtl"] .product_action_group {
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}
+
+html[dir="rtl"] .product_stock_status,
+html[dir="rtl"] .product_offer_badge,
+html[dir="rtl"] .offers_page_offer_title,
+html[dir="rtl"] .product_display_offer_badge,
+html[dir="rtl"] .cart_quantity_limit_notice,
+html[dir="rtl"] body.admin-orders-page .orders_badge,
+html[dir="rtl"] body.admin-orders-page .admin_inventory_status,
+html[dir="rtl"] body.admin-orders-page .admin_product_offers_status {
+  text-align: center !important;
+  line-height: 1.35 !important;
+  white-space: normal !important;
+}
+
+html[dir="rtl"] .food_section .box.product-card .img-box .product_stock_status,
+html[dir="rtl"] .product-card-media .product_stock_status,
+html[dir="rtl"] body.product-page .recommendation_card_media .product_stock_status {
+  max-width: calc(100% - 58px) !important;
+  overflow-wrap: anywhere;
+}
+
+html[dir="rtl"] .product-card-media .product_offer_badge,
+html[dir="rtl"] .food_section .box.product-card .img-box .product_offer_badge,
+html[dir="rtl"] body.product-page .recommendation_card_media .product_offer_badge {
+  max-width: min(52%, 128px) !important;
+  overflow-wrap: normal;
+}
+
+html[dir="rtl"] .food_section .box.product-card .detail-box,
+html[dir="rtl"] .offers_page_body,
+html[dir="rtl"] .wishlist_card_body,
+html[dir="rtl"] .recommendation_card_body,
+html[dir="rtl"] body.cart-page .cart_page_item_body,
+html[dir="rtl"] body.checkout-page .checkout_cart_item_body,
+html[dir="rtl"] body.orders-page .orders_card,
+html[dir="rtl"] body.admin-orders-page .admin_inventory_product,
+html[dir="rtl"] body.admin-orders-page .admin_product_offers_item_main {
+  min-width: 0 !important;
+}
+
+html[dir="rtl"] .wishlist_clear_btn,
+html[dir="rtl"] .wishlist_empty_btn,
+html[dir="rtl"] .wishlist_view_btn,
+html[dir="rtl"] .wishlist_add_btn,
+html[dir="rtl"] .wishlist_remove_btn,
+html[dir="rtl"] .offers_page_view_btn,
+html[dir="rtl"] .offers_page_add_btn,
+html[dir="rtl"] body.cart-page .cart_page_save_btn,
+html[dir="rtl"] body.cart-page .cart_page_remove_btn,
+html[dir="rtl"] body.checkout-page .checkout_back_btn,
+html[dir="rtl"] body.checkout-page .checkout_next_btn,
+html[dir="rtl"] body.checkout-page .checkout_confirm_btn,
+html[dir="rtl"] body.checkout-page .checkout_menu_btn,
+html[dir="rtl"] body.admin-orders-page .admin_inventory_save_all,
+html[dir="rtl"] body.admin-orders-page .admin_product_offers_actions button,
+html[dir="rtl"] body.admin-orders-page .admin_product_offers_item_actions button {
+  min-width: 0 !important;
+  white-space: normal !important;
+  text-align: center !important;
+}
+
+html[dir="rtl"] body.cart-page .cart_page_item,
+html[dir="rtl"] body.checkout-page .checkout_cart_item,
+html[dir="rtl"] body.orders-page .orders_card,
+html[dir="rtl"] body.admin-orders-page .admin_order_card,
+html[dir="rtl"] body.admin-orders-page .admin_inventory_item,
+html[dir="rtl"] body.admin-orders-page .admin_product_offers_item {
+  overflow: hidden;
+}
+
+html[dir="rtl"] body.cart-page .cart_page_item_image,
+html[dir="rtl"] body.checkout-page .checkout_cart_item_image,
+html[dir="rtl"] .wishlist_card_image,
+html[dir="rtl"] .offers_page_image,
+html[dir="rtl"] .recommendation_card_image,
+html[dir="rtl"] .product-card-image-link,
+html[dir="rtl"] .brand_logo_picture,
+html[dir="rtl"] .footer-logo,
+html[dir="rtl"] .payment_icon,
+html[dir="rtl"] .product_card_rating {
+  direction: ltr !important;
+}
+
+html[dir="rtl"] body.checkout-page .checkout_steps {
+  direction: rtl !important;
+}
+
+html[dir="rtl"] body.checkout-page .checkout_step {
+  min-width: 0 !important;
+  text-align: center !important;
+}
+
+html[dir="rtl"] body.checkout-page .checkout_step > span:last-child,
+html[dir="rtl"] body.checkout-page .checkout_step_label {
+  max-width: 100% !important;
+  overflow-wrap: anywhere;
+  text-align: center !important;
+}
+
+html[dir="rtl"] body.admin-orders-page .admin_dashboard_nav a,
+html[dir="rtl"] body.admin-orders-page .admin_orders_filters button,
+html[dir="rtl"] body.admin-orders-page .admin_orders_queue_tabs button,
+html[dir="rtl"] body.admin-orders-page .admin_inventory_track_all,
+html[dir="rtl"] body.admin-orders-page .admin_inventory_toggle,
+html[dir="rtl"] body.admin-orders-page .admin_product_offers_toggle {
+  gap: 9px !important;
+}
+
+html[dir="rtl"] body.admin-orders-page .admin_product_offers_card_head p {
+  text-align: start !important;
+}
+
+html[dir="rtl"] body.admin-orders-page .admin_product_offers_item_name {
+  white-space: normal !important;
+}
+
+html[dir="rtl"] body.admin-orders-page .admin_product_offers_item_actions {
+  justify-content: flex-start !important;
+}
+
+@media (max-width: 767px) {
+  html[dir="rtl"] .custom_nav-container .navbar-collapse,
+  html[dir="rtl"] .custom_nav-container .navbar-nav,
+  html[dir="rtl"] .user_option,
+  html[dir="rtl"] .wishlist_header,
+  html[dir="rtl"] .offers_page_header,
+  html[dir="rtl"] body.cart-page .cart_page_item,
+  html[dir="rtl"] body.checkout-page .checkout_cart_item,
+  html[dir="rtl"] body.admin-orders-page .admin_orders_header_row,
+  html[dir="rtl"] body.admin-orders-page .admin_inventory_toolbar {
+    text-align: start !important;
+  }
+
+  html[dir="rtl"] .wishlist_header,
+  html[dir="rtl"] .offers_page_header,
+  html[dir="rtl"] body.cart-page .cart_page_item_bottom,
+  html[dir="rtl"] body.checkout-page .checkout_panel_actions,
+  html[dir="rtl"] body.admin-orders-page .admin_orders_header_row,
+  html[dir="rtl"] body.admin-orders-page .admin_inventory_toolbar,
+  html[dir="rtl"] body.admin-orders-page .admin_product_offers_card_head,
+  html[dir="rtl"] body.admin-orders-page .admin_product_offers_item {
+    direction: rtl !important;
+  }
+
+  html[dir="rtl"] body.checkout-page .checkout_steps {
+    gap: 8px !important;
+  }
+
+  html[dir="rtl"] body.checkout-page .checkout_step {
+    flex: 1 1 calc(50% - 8px) !important;
+  }
+
+  html[dir="rtl"] body.admin-orders-page .admin_inventory_track_all,
+  html[dir="rtl"] body.admin-orders-page .admin_inventory_save_all,
+  html[dir="rtl"] body.admin-orders-page .admin_product_offers_actions button,
+  html[dir="rtl"] body.admin-orders-page .admin_product_offers_item_actions button {
+    width: 100% !important;
+  }
+}
