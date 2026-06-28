@@ -126,24 +126,13 @@ html[dir="rtl"] .slider_section .btn-box {
   visibility: visible !important;
 }
 
-.client_section .client_owl-carousel .owl-stage {
-  display: flex !important;
-  align-items: stretch !important;
-}
-
-.client_section .client_owl-carousel .owl-item {
-  display: flex !important;
-  min-height: 100% !important;
-}
-
-.client_section .client_owl-carousel .item,
-.client_section .client_owl-carousel .box {
-  width: 100% !important;
-  height: 100% !important;
-}
-
 html[dir="rtl"] .client_section .client_owl-carousel .box {
   direction: rtl !important;
+  text-align: start !important;
+}
+
+html[dir="rtl"] .client_section .owl-carousel .owl-nav {
+  direction: ltr;
 }
 
 html[dir="rtl"] .site_side_drawer .side_drawer_link {

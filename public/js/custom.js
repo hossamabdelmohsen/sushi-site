@@ -394,17 +394,32 @@ function initClientCarousel() {
     $(".client_owl-carousel").each(function () {
         var $carousel = $(this);
         var isRtl = document.documentElement.getAttribute("dir") === "rtl";
+        var originalHtml = $carousel.data("sushiBoxOriginalHtml");
+
+        if (!originalHtml) {
+            originalHtml = $carousel.html();
+            $carousel.data("sushiBoxOriginalHtml", originalHtml);
+        }
 
         if ($carousel.data("owl.carousel")) {
+            $carousel.trigger("stop.owl.autoplay");
             $carousel.trigger("destroy.owl.carousel");
+        }
+
+        $carousel.html(originalHtml);
+
+        if (window.SushiBoxI18n && typeof window.SushiBoxI18n.applyTranslations === "function") {
+            window.SushiBoxI18n.applyTranslations($carousel[0]);
         }
 
         $carousel
             .removeClass("owl-loaded owl-hidden")
+            .attr("data-carousel-dir", isRtl ? "rtl" : "ltr")
             .css({
                 display: "block",
                 opacity: 1,
-                visibility: "visible"
+                visibility: "visible",
+                direction: isRtl ? "rtl" : "ltr"
             });
 
         $carousel.find(".item").css({
@@ -415,7 +430,7 @@ function initClientCarousel() {
 
         $carousel.owlCarousel({
             loop: true,
-            margin: 0,
+            margin: 20,
             dots: false,
             nav: true,
             rtl: isRtl,
@@ -437,10 +452,19 @@ function initClientCarousel() {
                 }
             }
         });
+
+        window.requestAnimationFrame(function () {
+            $carousel.trigger("refresh.owl.carousel");
+        });
     });
 }
 
-$(document).ready(initClientCarousel);
+$(document).ready(function () {
+    initClientCarousel();
+    window.setTimeout(initClientCarousel, 250);
+});
+
+$(window).on("load", initClientCarousel);
 
 window.addEventListener("sushi-box:language-change", function () {
     window.requestAnimationFrame(function () {
