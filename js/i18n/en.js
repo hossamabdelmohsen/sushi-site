@@ -44,6 +44,38 @@ export const en = {
     switchToDark: "Switch to dark mode",
     switchToLight: "Switch to light mode"
   },
+  home: {
+    hero: {
+      slide1Title: "Premium Asian Ingredients for Egypt",
+      slide1Description: "Sushi Box supplies sushi raw materials, sauces, noodles, frozen items, baozi, dumplings, and Asian cooking essentials at strong value for restaurants and home kitchens.",
+      slide2Title: "Sushi Raw Materials and Cooking Essentials",
+      slide2Description: "Find nori sheets, rice paper, condiments, ramen, and pantry staples selected for quality, authenticity, and reliable availability across Delta cities.",
+      slide3Title: "Reliable Distribution Across the Delta",
+      slide3Description: "We support homes, restaurants, and businesses with premium imported and local Asian products, competitive prices, and scheduled distribution across Mansoura, Kafr El Sheikh, Tanta, and El Mahalla.",
+      viewProducts: "View Products",
+      readAboutUs: "Read About Us",
+      previousSlide: "Previous slide",
+      nextSlide: "Next slide"
+    },
+    howToOrder: {
+      viewDeliverySchedule: "View delivery schedule"
+    },
+    testimonials: {
+      title: "Why Businesses Trust Sushi Box",
+      restaurantText: "The nori, sauces, and frozen items arrive with consistent quality. Sushi Box helps us keep our sushi menu stable without chasing multiple suppliers.",
+      restaurantRole: "Restaurant Owner",
+      homeChefText: "I prepare home catering orders, so I need good ingredients in practical quantities. The pricing is clear, and the checkout flow makes confirmation simple.",
+      homeChefRole: "Home Chef",
+      businessText: "For our grocery and cafe, competitive wholesale pricing matters. Sushi Box gives us clear stock updates and reliable delivery days we can plan around.",
+      businessRole: "Business Client",
+      bulkText: "Their Delta distribution is dependable. Having scheduled coverage for Mansoura, Tanta, Kafr El Sheikh, and El Mahalla helps us avoid last-minute supply gaps.",
+      bulkRole: "Bulk Buyer",
+      mansoura: "Mansoura",
+      tanta: "Tanta",
+      kafrElSheikh: "Kafr El Sheikh",
+      deltaRegion: "Delta region"
+    }
+  },
   auth: {
     login: "Login",
     signIn: "Sign in",
@@ -501,6 +533,8 @@ export const en = {
     quantity: "Quantity",
     addToCart: "Add to Cart",
     addToCartLower: "Add to cart",
+    checkout: "Checkout",
+    total: "Total",
     viewCart: "View Cart",
     continueShopping: "Continue Shopping",
     viewDetails: "View Details",

@@ -99,6 +99,134 @@ padding-left: 0;
   }
 }
 
+/* Phase 11B: remaining homepage i18n and RTL drawer polish. */
+.navbar_theme_lock i,
+.side_drawer_lock i {
+  display: block !important;
+  color: currentColor !important;
+  font-size: 10px !important;
+  line-height: 1 !important;
+}
+
+html[dir="rtl"] .slider_section .detail-box,
+html[dir="rtl"] .client_section,
+html[dir="rtl"] .client_section .detail-box {
+  direction: rtl !important;
+  text-align: start !important;
+}
+
+html[dir="rtl"] .slider_section .btn-box {
+  justify-content: flex-start !important;
+}
+
+.client_section .client_owl-carousel {
+  display: block !important;
+  min-height: 1px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.client_section .client_owl-carousel .owl-stage {
+  display: flex !important;
+  align-items: stretch !important;
+}
+
+.client_section .client_owl-carousel .owl-item {
+  display: flex !important;
+  min-height: 100% !important;
+}
+
+.client_section .client_owl-carousel .item,
+.client_section .client_owl-carousel .box {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+html[dir="rtl"] .client_section .client_owl-carousel .box {
+  direction: rtl !important;
+}
+
+html[dir="rtl"] .site_side_drawer .side_drawer_link {
+  display: flex !important;
+  grid-template-columns: none !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-height: 40px !important;
+  padding-inline: 10px !important;
+  direction: rtl !important;
+  text-align: start !important;
+}
+
+html[dir="rtl"] .site_side_drawer .side_drawer_icon {
+  flex: 0 0 28px !important;
+  width: 28px !important;
+  min-width: 28px !important;
+  margin: 0 !important;
+  grid-column: auto !important;
+}
+
+html[dir="rtl"] .site_side_drawer .side_drawer_link > span:not(.side_drawer_badge) {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  grid-column: auto !important;
+  text-align: start !important;
+}
+
+html[dir="rtl"] .site_side_drawer .side_drawer_badge {
+  flex: 0 0 auto !important;
+  grid-column: auto !important;
+  justify-self: auto !important;
+  margin-inline-start: 8px !important;
+  margin-inline-end: 0 !important;
+}
+
+html[dir="rtl"] .site_side_drawer .drawer-language-row,
+html[dir="rtl"] .site_side_drawer .side_drawer_theme_row,
+html[dir="rtl"] .site_side_drawer .side_drawer_account_row {
+  display: flex !important;
+  grid-template-columns: none !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 10px !important;
+  direction: rtl !important;
+  text-align: start !important;
+  padding-inline: 10px !important;
+}
+
+html[dir="rtl"] .site_side_drawer .drawer-language-icon,
+html[dir="rtl"] .site_side_drawer .side_drawer_theme_icon,
+html[dir="rtl"] .site_side_drawer .side_drawer_account_avatar {
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+}
+
+html[dir="rtl"] .site_side_drawer .drawer-language-label,
+html[dir="rtl"] .site_side_drawer .side_drawer_theme_text,
+html[dir="rtl"] .site_side_drawer .side_drawer_account_text {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  text-align: start !important;
+}
+
+html[dir="rtl"] .site_side_drawer .drawer-language-pills,
+html[dir="rtl"] .site_side_drawer .side_drawer_theme_switch,
+html[dir="rtl"] .site_side_drawer .side_drawer_account_chevron {
+  flex: 0 0 auto !important;
+  margin-inline-start: auto !important;
+  margin-inline-end: 0 !important;
+}
+
+html[dir="rtl"] .site_side_drawer .side_drawer_theme_switch {
+  justify-content: flex-end !important;
+}
+
+html[dir="rtl"] .site_side_drawer .side_drawer_account_actions,
+html[dir="rtl"] .site_side_drawer .side_drawer_logout_btn {
+  direction: rtl !important;
+  text-align: start !important;
+}
+
 /* Premium compact product detail redesign */
 body.product-page {
   --pdp-bg: #fff9ec;

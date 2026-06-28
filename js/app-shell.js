@@ -901,7 +901,7 @@ function wrapNavbarThemeToggle(themeToggle) {
   themeToggle.setAttribute("tabindex", "-1");
 
   if (!wrapper.querySelector(".navbar_theme_lock")) {
-    wrapper.insertAdjacentHTML("beforeend", '<span class="navbar_theme_lock" aria-hidden="true">🔒</span>');
+    wrapper.insertAdjacentHTML("beforeend", '<span class="navbar_theme_lock" aria-hidden="true"><i class="fa fa-lock" aria-hidden="true"></i></span>');
   }
 
   return themeToggle;
@@ -928,7 +928,7 @@ function ensureThemeToggle(userOption) {
 
   const wrapper = createElementFromHTML('<span class="navbar_theme_coming_soon" data-tooltip-en="Coming soon" data-tooltip-ar="قريباً"></span>');
   wrapper.appendChild(themeToggle);
-  wrapper.insertAdjacentHTML("beforeend", '<span class="navbar_theme_lock" aria-hidden="true">🔒</span>');
+  wrapper.insertAdjacentHTML("beforeend", '<span class="navbar_theme_lock" aria-hidden="true"><i class="fa fa-lock" aria-hidden="true"></i></span>');
   userOption.appendChild(wrapper);
   return wrapNavbarThemeToggle(themeToggle);
 }
@@ -1179,7 +1179,7 @@ function renderSideDrawerThemeSection() {
           <span class="side_drawer_theme_switch_knob"></span>
         </span>
       </button>
-      <span class="side_drawer_lock" aria-hidden="true">🔒</span>
+      <span class="side_drawer_lock" aria-hidden="true"><i class="fa fa-lock" aria-hidden="true"></i></span>
     </div>
   `;
 }

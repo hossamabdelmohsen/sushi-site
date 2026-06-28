@@ -386,32 +386,67 @@ $(document).ready(function() {
   });
 
 // client section owl carousel
-if ($.fn.owlCarousel) {
-    $(".client_owl-carousel").owlCarousel({
-        loop: true,
-        margin: 0,
-        dots: false,
-        nav: true,
-        navText: [],
-        autoplay: true,
-        autoplayHoverPause: true,
-        navText: [
-            '<i class="fa fa-angle-left" aria-hidden="true"></i>',
-            '<i class="fa fa-angle-right" aria-hidden="true"></i>'
-        ],
-        responsive: {
-            0: {
-                items: 1
-            },
-            768: {
-                items: 2
-            },
-            1000: {
-                items: 2
-            }
+function initClientCarousel() {
+    if (!$.fn.owlCarousel) {
+        return;
+    }
+
+    $(".client_owl-carousel").each(function () {
+        var $carousel = $(this);
+        var isRtl = document.documentElement.getAttribute("dir") === "rtl";
+
+        if ($carousel.data("owl.carousel")) {
+            $carousel.trigger("destroy.owl.carousel");
         }
+
+        $carousel
+            .removeClass("owl-loaded owl-hidden")
+            .css({
+                display: "block",
+                opacity: 1,
+                visibility: "visible"
+            });
+
+        $carousel.find(".item").css({
+            display: "block",
+            opacity: 1,
+            visibility: "visible"
+        });
+
+        $carousel.owlCarousel({
+            loop: true,
+            margin: 0,
+            dots: false,
+            nav: true,
+            rtl: isRtl,
+            autoplay: true,
+            autoplayHoverPause: true,
+            navText: [
+                '<i class="fa fa-angle-left" aria-hidden="true"></i>',
+                '<i class="fa fa-angle-right" aria-hidden="true"></i>'
+            ],
+            responsive: {
+                0: {
+                    items: 1
+                },
+                768: {
+                    items: 2
+                },
+                1000: {
+                    items: 2
+                }
+            }
+        });
     });
 }
+
+$(document).ready(initClientCarousel);
+
+window.addEventListener("sushi-box:language-change", function () {
+    window.requestAnimationFrame(function () {
+        initClientCarousel();
+    });
+});
 
 // product card click behavior
 document.addEventListener("DOMContentLoaded", function () {

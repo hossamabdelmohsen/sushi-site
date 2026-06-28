@@ -41,8 +41,8 @@ import {
   getProductOfferPricing,
   subscribeToProductOffers
 } from "./offers-data.js?v=20260624a"
-import { t } from "./i18n/i18n.js"
-import { getProductDisplayData } from "./i18n/product-display.js"
+import { initI18n, t } from "./i18n/i18n.js"
+import { getProductDisplayData } from "./i18n/product-display.js?v=20260628p9c"
 
 const FALLBACK_IMAGE = "images/optimized/Logo.webp"
 let offerPricingWarningShown = false
@@ -544,6 +544,8 @@ function renderRecommendations(container, currentProduct, products, reviewSummar
 }
 
 function initProductPage() {
+  initI18n()
+
   const productId = getProductIdFromPageUrl()
   const product = getProductById(productId)
   const allProducts = getAllProducts()

@@ -164,7 +164,7 @@ function ProductDetails() {
                   </div>
                 </div>
 
-                <p className="product_total_price">Total: <span id="totalPrice">EGP 0.00</span></p>
+                <p className="product_total_price"><span data-i18n="productUi.total">Total</span>: <span id="totalPrice">EGP 0.00</span></p>
 
                 <div className="product_action_row">
                   <button id="addToCartBtn" type="button" className="product_cart_primary_btn">
@@ -173,7 +173,7 @@ function ProductDetails() {
                   </button>
                   <button id="productCheckoutBtn" type="button" className="product_checkout_btn">
                     <i className="fa fa-credit-card" aria-hidden="true" />
-                    Checkout
+                    <span data-i18n="productUi.checkout">Checkout</span>
                   </button>
                 </div>
               </div>
@@ -378,7 +378,7 @@ function ProductScripts() {
       <Script src="/js/custom.js?v=20260603a" strategy="afterInteractive" />
       <Script type="module" src="/js/navbar-offers.js?v=20260518c" strategy="afterInteractive" />
       <Script type="module" src="/js/app-shell.js?v=20260627p9" strategy="afterInteractive" />
-      <Script type="module" src="/js/product-page.js?v=20260627p9" strategy="afterInteractive" />
+      <Script type="module" src="/js/product-page.js?v=20260628p9c" strategy="afterInteractive" />
     </>
   );
 }
