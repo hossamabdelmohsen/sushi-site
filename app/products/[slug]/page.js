@@ -383,7 +383,7 @@ function ProductScripts() {
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/js/jquery.nice-select.min.js" strategy="afterInteractive" />
       <Script src="/js/custom.js?v=20260603a" strategy="afterInteractive" />
       <Script type="module" src="/js/navbar-offers.js?v=20260518c" strategy="afterInteractive" />
-      <Script type="module" src="/js/app-shell.js?v=20260629titlebidi" strategy="afterInteractive" />
+      <Script type="module" src="/js/app-shell.js?v=20260629checkoutmodal" strategy="afterInteractive" />
       <Script type="module" src="/js/product-page.js?v=20260629productdetailsi18n" strategy="afterInteractive" />
     </>
   );

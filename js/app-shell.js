@@ -52,7 +52,7 @@ import {
   getLanguage,
   initI18n,
   t
-} from "./i18n/i18n.js?v=20260629headerlock";
+} from "./i18n/i18n.js?v=20260629checkoutmodal";
 import { getProductDisplayData } from "./i18n/product-display.js?v=20260629titlebidi";
 
 const THEME_STORAGE_KEY = "theme";
@@ -118,6 +118,10 @@ function getProductUiText(key, fallback = "", values = {}) {
 
 function getCartUiText(key, fallback = "", values = {}) {
   return getLocalizedText(`cartUi.${key}`, fallback, values);
+}
+
+function getCheckoutUiText(key, fallback = "", values = {}) {
+  return getLocalizedText(`checkoutUi.${key}`, fallback, values);
 }
 
 function getCartUiCountText(key, count, fallbackSingular, fallbackPlural) {
@@ -1654,10 +1658,10 @@ const deliveryCities = [
 ];
 
 const checkoutSteps = [
-  "Review cart",
-  "Choose city",
-  "Address",
-  "Review & pay"
+  { labelKey: "reviewCart", fallback: "Review cart" },
+  { labelKey: "chooseCity", fallback: "Choose city" },
+  { labelKey: "addressDetails", fallback: "Address details" },
+  { labelKey: "reviewAndPay", fallback: "Review & pay" }
 ];
 
 function getDeliveryCityById(cityId) {
@@ -1780,11 +1784,13 @@ function syncCheckoutCityCards(modal) {
   });
 
   if (selectedCityName) {
-    selectedCityName.textContent = selectedCity ? selectedCity.name : "Choose a city first";
+    selectedCityName.textContent = selectedCity ? selectedCity.name : getCheckoutUiText("chooseCityFirst", "Choose a city first");
   }
 
   if (selectedCitySchedule) {
-    selectedCitySchedule.textContent = selectedCity ? `Delivery: ${selectedCity.schedule}` : "Address fields unlock after city selection.";
+    selectedCitySchedule.textContent = selectedCity
+      ? getCheckoutUiText("selectedDeliverySchedule", "Delivery: {schedule}", { schedule: selectedCity.schedule })
+      : getCheckoutUiText("addressFieldsUnlock", "Address fields unlock after city selection.");
   }
 
   if (addressPanel) {
@@ -1858,13 +1864,13 @@ function renderCheckoutReview(modal) {
   const customerEl = modal.querySelector("#checkoutReviewCustomer");
 
   if (cityEl) {
-    cityEl.textContent = values.cityName ? `${values.cityName} - ${values.deliverySchedule}` : "City not selected";
+    cityEl.textContent = values.cityName ? `${values.cityName} - ${values.deliverySchedule}` : getCheckoutUiText("cityNotSelected", "City not selected");
   }
 
   if (customerEl) {
     customerEl.textContent = values.name || values.phone
       ? [values.name, values.phone].filter(Boolean).join(" - ")
-      : "Customer details not entered";
+      : getCheckoutUiText("customerDetailsNotEntered", "Customer details not entered");
   }
 
   if (addressEl) {
@@ -1875,7 +1881,7 @@ function renderCheckoutReview(modal) {
       values.floorApartment ? `Floor / Apt ${values.floorApartment}` : "",
       values.notes
     ].filter(Boolean);
-    addressEl.textContent = addressParts.length ? addressParts.join(", ") : "Address details not entered";
+    addressEl.textContent = addressParts.length ? addressParts.join(", ") : getCheckoutUiText("addressDetailsNotEntered", "Address details not entered");
   }
 }
 
@@ -1973,27 +1979,32 @@ function bindCheckoutModalControls(modal) {
 function ensureCheckoutModal() {
   let modal = document.querySelector(".checkout_modal");
   if (modal) {
+    if (modal.dataset.checkoutLanguage !== getLanguage() && modal.hidden) {
+      modal.remove();
+      modal = null;
+    } else {
     bindCheckoutModalControls(modal);
     return modal;
+    }
   }
 
   modal = createElementFromHTML(`
     <div class="checkout_modal" hidden>
       <div class="checkout_backdrop" data-close-checkout="true"></div>
       <section class="checkout_dialog" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
-        <button class="checkout_close" type="button" data-close-checkout="true" aria-label="Close checkout">
+        <button class="checkout_close" type="button" data-close-checkout="true" aria-label="${escapeHtml(getCheckoutUiText("closeCheckout", "Close checkout"))}">
           <i class="fa fa-times" aria-hidden="true"></i>
         </button>
         <div class="checkout_header">
-          <span class="checkout_kicker">Secure checkout</span>
-          <h3 id="checkoutTitle">Checkout</h3>
-          <p>Four quick steps, then secure Paymob payment.</p>
+          <span class="checkout_kicker">${escapeHtml(getCheckoutUiText("secureCheckout", "Secure checkout"))}</span>
+          <h3 id="checkoutTitle">${escapeHtml(getCheckoutUiText("checkout", "Checkout"))}</h3>
+          <p>${escapeHtml(getCheckoutUiText("checkoutModalIntro", "Four quick steps, then secure Paymob payment."))}</p>
         </div>
-        <ol class="checkout_steps" aria-label="Checkout progress">
+        <ol class="checkout_steps" aria-label="${escapeHtml(getCheckoutUiText("checkoutProgress", "Checkout progress"))}">
           ${checkoutSteps.map((step, index) => `
             <li class="checkout_step" data-checkout-step="${index}">
               <span class="checkout_step_number">${index + 1}</span>
-              <span>${escapeHtml(step)}</span>
+              <span>${escapeHtml(getCheckoutUiText(step.labelKey, step.fallback))}</span>
             </li>
           `).join("")}
         </ol>
@@ -2003,8 +2014,8 @@ function ensureCheckoutModal() {
             <div class="checkout_panel checkout_cart_panel">
               <div class="checkout_panel_head">
                 <div>
-                  <span class="checkout_step_label">Step 1</span>
-                  <h4>Review cart</h4>
+                  <span class="checkout_step_label">${escapeHtml(getCheckoutUiText("step1", "Step 1"))}</span>
+                  <h4>${escapeHtml(getCheckoutUiText("reviewCart", "Review cart"))}</h4>
                 </div>
                 <strong id="checkoutTotalPrice">\u062c.\u0645 0.00</strong>
               </div>
@@ -2012,7 +2023,7 @@ function ensureCheckoutModal() {
             </div>
             <div class="checkout_nav_row">
               <span></span>
-              <button class="checkout_next_btn" type="button" data-checkout-next>Choose city</button>
+              <button class="checkout_next_btn" type="button" data-checkout-next>${escapeHtml(getCheckoutUiText("chooseCity", "Choose city"))}</button>
             </div>
           </div>
 
@@ -2020,12 +2031,12 @@ function ensureCheckoutModal() {
             <div class="checkout_panel checkout_delivery_panel">
               <div class="checkout_panel_head">
                 <div>
-                  <span class="checkout_step_label">Step 2</span>
-                  <h4>Choose delivery city</h4>
+                  <span class="checkout_step_label">${escapeHtml(getCheckoutUiText("step2", "Step 2"))}</span>
+                  <h4>${escapeHtml(getCheckoutUiText("chooseDeliveryCity", "Choose delivery city"))}</h4>
                 </div>
               </div>
               <fieldset class="checkout_city_selector">
-                <legend>Available cities</legend>
+                <legend>${escapeHtml(getCheckoutUiText("availableCities", "Available cities"))}</legend>
                 <div class="checkout_city_options">
                   ${deliveryCities.map((city) => `
                     <label class="checkout_city_card" data-checkout-city="${city.id}">
@@ -2041,8 +2052,8 @@ function ensureCheckoutModal() {
               </fieldset>
             </div>
             <div class="checkout_nav_row">
-              <button class="checkout_back_btn" type="button" data-checkout-prev>Back</button>
-              <button class="checkout_next_btn" type="button" data-checkout-next>Address details</button>
+              <button class="checkout_back_btn" type="button" data-checkout-prev>${escapeHtml(getCheckoutUiText("back", "Back"))}</button>
+              <button class="checkout_next_btn" type="button" data-checkout-next>${escapeHtml(getCheckoutUiText("addressDetails", "Address details"))}</button>
             </div>
           </div>
 
@@ -2050,52 +2061,52 @@ function ensureCheckoutModal() {
             <div class="checkout_panel">
               <div class="checkout_panel_head">
                 <div>
-                  <span class="checkout_step_label">Step 3</span>
-                  <h4>Address details</h4>
+                  <span class="checkout_step_label">${escapeHtml(getCheckoutUiText("step3", "Step 3"))}</span>
+                  <h4>${escapeHtml(getCheckoutUiText("addressDetails", "Address details"))}</h4>
                 </div>
               </div>
               <div class="checkout_selected_city">
-                <strong id="checkoutSelectedCityName">Choose a city first</strong>
-                <span id="checkoutSelectedCitySchedule">Address fields unlock after city selection.</span>
+                <strong id="checkoutSelectedCityName">${escapeHtml(getCheckoutUiText("chooseCityFirst", "Choose a city first"))}</strong>
+                <span id="checkoutSelectedCitySchedule">${escapeHtml(getCheckoutUiText("addressFieldsUnlock", "Address fields unlock after city selection."))}</span>
               </div>
               <div class="checkout_fields checkout_address_fields">
                 <label>
-                  <span>Customer name</span>
+                  <span>${escapeHtml(getCheckoutUiText("customerName", "Customer name"))}</span>
                   <input id="checkoutCustomerName" name="customerName" type="text" autocomplete="name" required>
                 </label>
                 <label>
-                  <span>Phone number</span>
+                  <span>${escapeHtml(getCheckoutUiText("phoneNumber", "Phone number"))}</span>
                   <input id="checkoutCustomerPhone" name="customerPhone" type="tel" autocomplete="tel" required>
                 </label>
                 <label>
-                  <span>Email <em>optional</em></span>
+                  <span>${escapeHtml(getCheckoutUiText("email", "Email"))} <em>${escapeHtml(getCheckoutUiText("optional", "optional"))}</em></span>
                   <input id="checkoutCustomerEmail" name="customerEmail" type="email" autocomplete="email">
                 </label>
                 <label>
-                  <span>Area</span>
+                  <span>${escapeHtml(getCheckoutUiText("area", "Area"))}</span>
                   <input id="checkoutCustomerArea" name="customerArea" type="text" autocomplete="address-level3" required>
                 </label>
                 <label class="checkout_full_width">
-                  <span>Full address</span>
+                  <span>${escapeHtml(getCheckoutUiText("fullAddress", "Full address"))}</span>
                   <textarea id="checkoutCustomerAddress" name="customerAddress" rows="3" autocomplete="street-address" required></textarea>
                 </label>
                 <label>
-                  <span>Building number</span>
+                  <span>${escapeHtml(getCheckoutUiText("buildingNumber", "Building number"))}</span>
                   <input id="checkoutCustomerBuilding" name="customerBuilding" type="text" required>
                 </label>
                 <label>
-                  <span>Floor / apartment</span>
+                  <span>${escapeHtml(getCheckoutUiText("floorApartment", "Floor / apartment"))}</span>
                   <input id="checkoutCustomerFloorApartment" name="customerFloorApartment" type="text" required>
                 </label>
                 <label class="checkout_full_width">
-                  <span>Landmark / notes <em>optional</em></span>
+                  <span>${escapeHtml(getCheckoutUiText("landmarkNotes", "Landmark / notes"))} <em>${escapeHtml(getCheckoutUiText("optional", "optional"))}</em></span>
                   <textarea id="checkoutCustomerNotes" name="customerNotes" rows="2"></textarea>
                 </label>
               </div>
             </div>
             <div class="checkout_nav_row">
-              <button class="checkout_back_btn" type="button" data-checkout-prev>Back</button>
-              <button class="checkout_next_btn" type="button" data-checkout-next>Review & pay</button>
+              <button class="checkout_back_btn" type="button" data-checkout-prev>${escapeHtml(getCheckoutUiText("back", "Back"))}</button>
+              <button class="checkout_next_btn" type="button" data-checkout-next>${escapeHtml(getCheckoutUiText("reviewAndPay", "Review & pay"))}</button>
             </div>
           </div>
 
@@ -2103,41 +2114,41 @@ function ensureCheckoutModal() {
             <div class="checkout_panel checkout_payment_panel">
               <div class="checkout_panel_head">
                 <div>
-                  <span class="checkout_step_label">Step 4</span>
-                  <h4>Review & pay</h4>
+                  <span class="checkout_step_label">${escapeHtml(getCheckoutUiText("step4", "Step 4"))}</span>
+                  <h4>${escapeHtml(getCheckoutUiText("reviewAndPay", "Review & pay"))}</h4>
                 </div>
                 <strong id="checkoutReviewTotalPrice">\u062c.\u0645 0.00</strong>
               </div>
               <div class="checkout_review_cards">
                 <div class="checkout_review_card">
-                  <span>Delivery city</span>
-                  <strong id="checkoutReviewCity">City not selected</strong>
+                  <span>${escapeHtml(getCheckoutUiText("deliveryCity", "Delivery city"))}</span>
+                  <strong id="checkoutReviewCity">${escapeHtml(getCheckoutUiText("cityNotSelected", "City not selected"))}</strong>
                 </div>
                 <div class="checkout_review_card">
-                  <span>Customer</span>
-                  <strong id="checkoutReviewCustomer">Customer details not entered</strong>
+                  <span>${escapeHtml(getCheckoutUiText("customer", "Customer"))}</span>
+                  <strong id="checkoutReviewCustomer">${escapeHtml(getCheckoutUiText("customerDetailsNotEntered", "Customer details not entered"))}</strong>
                 </div>
                 <div class="checkout_review_card checkout_full_width">
-                  <span>Address</span>
-                  <strong id="checkoutReviewAddress">Address details not entered</strong>
+                  <span>${escapeHtml(getCheckoutUiText("address", "Address"))}</span>
+                  <strong id="checkoutReviewAddress">${escapeHtml(getCheckoutUiText("addressDetailsNotEntered", "Address details not entered"))}</strong>
                 </div>
               </div>
               <label class="checkout_payment_option">
                 <input type="radio" name="checkoutPaymentMethod" value="paymob-checkout" checked>
                 <span class="checkout_payment_icon"><i class="fa fa-credit-card" aria-hidden="true"></i></span>
                 <span>
-                  <strong>Secure online payment</strong>
-                  <small>Visa / Mastercard, mobile wallets, and kiosk / Fawry are handled by Paymob.</small>
+                  <strong>${escapeHtml(getCheckoutUiText("secureOnlinePayment", "Secure online payment"))}</strong>
+                  <small>${escapeHtml(getCheckoutUiText("paymobPaymentMethods", "Visa / Mastercard, mobile wallets, and kiosk / Fawry are handled by Paymob."))}</small>
                 </span>
               </label>
               <div class="checkout_total_row">
-                <span>Total price</span>
+                <span>${escapeHtml(getCheckoutUiText("totalPrice", "Total price"))}</span>
                 <strong id="checkoutFinalTotalPrice">\u062c.\u0645 0.00</strong>
               </div>
             </div>
             <div class="checkout_nav_row">
-              <button class="checkout_back_btn" type="button" data-checkout-prev>Back</button>
-              <button class="checkout_confirm_btn" type="submit">Confirm Order</button>
+              <button class="checkout_back_btn" type="button" data-checkout-prev>${escapeHtml(getCheckoutUiText("back", "Back"))}</button>
+              <button class="checkout_confirm_btn" type="submit">${escapeHtml(getCheckoutUiText("confirmOrder", "Confirm Order"))}</button>
             </div>
           </div>
         </form>
@@ -2147,6 +2158,7 @@ function ensureCheckoutModal() {
 
   document.body.appendChild(modal);
   modal.setAttribute("aria-hidden", "true");
+  modal.dataset.checkoutLanguage = getLanguage();
   bindCheckoutModalControls(modal);
   return modal;
 }

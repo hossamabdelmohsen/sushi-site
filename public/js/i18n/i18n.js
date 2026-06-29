@@ -1,5 +1,5 @@
-import { en } from "./en.js?v=20260629productdetailsi18n";
-import { ar } from "./ar.js?v=20260629productdetailsi18n";
+import { en } from "./en.js?v=20260629checkoutmodal";
+import { ar } from "./ar.js?v=20260629checkoutmodal";
 
 const STORAGE_KEY = "sushiBoxLanguage";
 const LEGACY_STORAGE_KEY = "sushiBoxLang";
