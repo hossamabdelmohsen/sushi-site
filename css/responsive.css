@@ -23627,6 +23627,26 @@ html[dir="rtl"] body.checkout-page .checkout_step_label {
   text-align: center !important;
 }
 
+html[dir="rtl"] body.checkout-page .checkout_step > span:last-child::before {
+  content: "خطوة " attr(data-checkout-step) !important;
+}
+
+html[dir="rtl"] body.checkout-page .checkout_step[data-checkout-step="1"] > span:last-child::before {
+  content: "خطوة 01" !important;
+}
+
+html[dir="rtl"] body.checkout-page .checkout_step[data-checkout-step="2"] > span:last-child::before {
+  content: "خطوة 02" !important;
+}
+
+html[dir="rtl"] body.checkout-page .checkout_step[data-checkout-step="3"] > span:last-child::before {
+  content: "خطوة 03" !important;
+}
+
+html[dir="rtl"] body.checkout-page .checkout_step[data-checkout-step="4"] > span:last-child::before {
+  content: "خطوة 04" !important;
+}
+
 html[dir="rtl"] body.admin-orders-page .admin_dashboard_nav a,
 html[dir="rtl"] body.admin-orders-page .admin_orders_filters button,
 html[dir="rtl"] body.admin-orders-page .admin_orders_queue_tabs button,
