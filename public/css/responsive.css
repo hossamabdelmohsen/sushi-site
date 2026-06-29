@@ -23552,8 +23552,19 @@ html[dir="rtl"] body.product-page .recommendation_card_media .product_stock_stat
 html[dir="rtl"] .product-card-media .product_offer_badge,
 html[dir="rtl"] .food_section .box.product-card .img-box .product_offer_badge,
 html[dir="rtl"] body.product-page .recommendation_card_media .product_offer_badge {
+  right: 0 !important;
+  left: auto !important;
   max-width: min(52%, 128px) !important;
+  padding: 7px 13px 7px 14px !important;
+  border-radius: 0 0 0 12px !important;
   overflow-wrap: normal;
+}
+
+html[dir="rtl"] .product_offer_badge::after {
+  right: auto !important;
+  left: -9px !important;
+  transform: skewX(18deg) !important;
+  transform-origin: bottom right !important;
 }
 
 html[dir="rtl"] .food_section .box.product-card .detail-box,
