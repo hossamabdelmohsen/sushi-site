@@ -184,23 +184,23 @@ function ProductDetails() {
 
       <div id="productImageLightbox" className="product_lightbox" hidden aria-hidden="true">
         <div className="product_lightbox_backdrop" data-lightbox-close="true" />
-        <div className="product_lightbox_dialog" role="dialog" aria-modal="true" aria-label="Product image preview">
+        <div className="product_lightbox_dialog" role="dialog" aria-modal="true" aria-label="Product image preview" data-i18n-aria-label="productUi.productImagePreview">
           <div className="product_lightbox_toolbar">
-            <div className="product_lightbox_zoom_group" aria-label="Image zoom controls">
-              <button id="productImageZoomOut" type="button" className="product_lightbox_control" aria-label="Zoom out">
+            <div className="product_lightbox_zoom_group" aria-label="Image zoom controls" data-i18n-aria-label="productUi.imageZoomControls">
+              <button id="productImageZoomOut" type="button" className="product_lightbox_control" aria-label="Zoom out" data-i18n-aria-label="productUi.zoomOut">
                 <i className="fa fa-search-minus" aria-hidden="true" />
               </button>
               <span id="productImageZoomValue" className="product_lightbox_zoom_value">100%</span>
-              <button id="productImageZoomIn" type="button" className="product_lightbox_control" aria-label="Zoom in">
+              <button id="productImageZoomIn" type="button" className="product_lightbox_control" aria-label="Zoom in" data-i18n-aria-label="productUi.zoomIn">
                 <i className="fa fa-search-plus" aria-hidden="true" />
               </button>
             </div>
-            <button id="productImageLightboxClose" type="button" className="product_lightbox_close" aria-label="Close image preview">
+            <button id="productImageLightboxClose" type="button" className="product_lightbox_close" aria-label="Close image preview" data-i18n-aria-label="productUi.closeImagePreview">
               <i className="fa fa-times" aria-hidden="true" />
             </button>
           </div>
           <div id="productImageLightboxStage" className="product_lightbox_stage">
-            <img id="productImageLightboxImage" alt="Expanded product image" width="1200" height="1200" loading="lazy" decoding="async" />
+            <img id="productImageLightboxImage" alt="Expanded product image" data-i18n-alt="productUi.expandedProductImage" width="1200" height="1200" loading="lazy" decoding="async" />
           </div>
         </div>
       </div>
@@ -213,7 +213,7 @@ function ProductStory() {
     <section id="productStorySection" className="product_story_section layout_padding-bottom">
       <div className="container product_page_container">
         <div className="product_story_card">
-          <div className="product_detail_tabs" aria-label="Product detail sections">
+          <div className="product_detail_tabs" aria-label="Product detail sections" data-i18n-aria-label="productUi.productDetailSections">
             <a className="product_detail_tab active" href="#productStorySection" data-i18n="productUi.description">Description</a>
             <a className="product_detail_tab" href="#productComponentsSection" data-i18n="productUi.components">Components</a>
             <a className="product_detail_tab" href="#productReviewsSection" data-i18n="productUi.reviews">Reviews</a>
@@ -262,8 +262,14 @@ function ProductReviews() {
               <div className="review_field">
                 <label data-i18n="productUi.ratings">Ratings</label>
                 <div className="review_star_picker" aria-label="Choose a star rating from one to five" data-i18n-aria-label="productUi.chooseRating">
-                  {[1, 2, 3, 4, 5].map((rating) => (
-                    <button key={rating} type="button" className="review_star_btn" data-rating={rating} aria-label={`Rate ${rating} star${rating === 1 ? "" : "s"}`}>
+                  {[
+                    { rating: 1, label: "Rate 1 star", labelKey: "productUi.rate1Star" },
+                    { rating: 2, label: "Rate 2 stars", labelKey: "productUi.rate2Stars" },
+                    { rating: 3, label: "Rate 3 stars", labelKey: "productUi.rate3Stars" },
+                    { rating: 4, label: "Rate 4 stars", labelKey: "productUi.rate4Stars" },
+                    { rating: 5, label: "Rate 5 stars", labelKey: "productUi.rate5Stars" }
+                  ].map(({ rating, label, labelKey }) => (
+                    <button key={rating} type="button" className="review_star_btn" data-rating={rating} aria-label={label} data-i18n-aria-label={labelKey}>
                       <i className="fa fa-star" aria-hidden="true" />
                     </button>
                   ))}
@@ -378,7 +384,7 @@ function ProductScripts() {
       <Script src="/js/custom.js?v=20260603a" strategy="afterInteractive" />
       <Script type="module" src="/js/navbar-offers.js?v=20260518c" strategy="afterInteractive" />
       <Script type="module" src="/js/app-shell.js?v=20260629titlebidi" strategy="afterInteractive" />
-      <Script type="module" src="/js/product-page.js?v=20260629titlebidi" strategy="afterInteractive" />
+      <Script type="module" src="/js/product-page.js?v=20260629productdetailsi18n" strategy="afterInteractive" />
     </>
   );
 }

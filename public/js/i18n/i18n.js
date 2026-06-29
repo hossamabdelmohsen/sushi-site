@@ -1,5 +1,5 @@
-import { en } from "./en.js?v=20260629paymentresult";
-import { ar } from "./ar.js?v=20260629paymentresult";
+import { en } from "./en.js?v=20260629productdetailsi18n";
+import { ar } from "./ar.js?v=20260629productdetailsi18n";
 
 const STORAGE_KEY = "sushiBoxLanguage";
 const LEGACY_STORAGE_KEY = "sushiBoxLang";
@@ -95,6 +95,7 @@ function applyTextTranslations(root = document) {
 function applyAttributeTranslations(root = document) {
   [
     ["data-i18n-placeholder", "placeholder"],
+    ["data-i18n-alt", "alt"],
     ["data-i18n-title", "title"],
     ["data-i18n-aria-label", "aria-label"]
   ].forEach(([dataAttribute, targetAttribute]) => {

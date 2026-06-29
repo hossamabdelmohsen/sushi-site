@@ -41,7 +41,7 @@ import {
   getProductOfferPricing,
   subscribeToProductOffers
 } from "./offers-data.js?v=20260624a"
-import { initI18n, t } from "./i18n/i18n.js"
+import { applyTranslations, initI18n, t } from "./i18n/i18n.js?v=20260629productdetailsi18n"
 import { getProductDisplayData } from "./i18n/product-display.js?v=20260629titlebidi"
 
 const FALLBACK_IMAGE = "images/optimized/Logo.webp"
@@ -209,14 +209,17 @@ function renderComponents(sectionEl, listEl, components) {
   paintComponents()
 
   if (shouldCollapse) {
+    const hiddenCount = safeComponents.length - 5
     const toggleButton = document.createElement("button")
     toggleButton.type = "button"
     toggleButton.className = "product_components_toggle"
-    toggleButton.textContent = `Show ${safeComponents.length - 5} more`
+    toggleButton.textContent = getProductUiText("showMoreComponents", `Show ${hiddenCount} more`, { count: hiddenCount })
     toggleButton.addEventListener("click", () => {
       isExpanded = !isExpanded
       paintComponents()
-      toggleButton.textContent = isExpanded ? "Show less" : `Show ${safeComponents.length - 5} more`
+      toggleButton.textContent = isExpanded
+        ? getProductUiText("showLessComponents", "Show less")
+        : getProductUiText("showMoreComponents", `Show ${hiddenCount} more`, { count: hiddenCount })
     })
     sectionEl.appendChild(toggleButton)
   }
@@ -891,8 +894,8 @@ function initProductPage() {
       ${display.marketingTitle ? `<strong class="product_display_offer_title">${escapeHtml(display.marketingTitle)}</strong>` : ""}
       <span class="product_display_offer_badge">${escapeHtml(display.discountLabel)}</span>
       <span class="product_display_offer_prices"><del>${escapeHtml(display.originalPriceText)}</del><strong>${escapeHtml(display.discountedPriceText)}</strong></span>
-      <span class="product_display_offer_savings">Save ${escapeHtml(formatPrice(savings))}</span>
-      <small>Offer applied automatically in cart and checkout.</small>
+      <span class="product_display_offer_savings">${escapeHtml(getProductUiText("saveAmount", "Save {amount}", { amount: formatPrice(savings) }))}</span>
+      <small>${escapeHtml(getProductUiText("offerAppliedAutomatically", "Offer applied automatically in cart and checkout."))}</small>
     `
   }
 
@@ -1405,6 +1408,7 @@ function renderReviewSummary() {
   })
 
   window.addEventListener("sushi-box:language-change", () => {
+    applyTranslations(document)
     renderProductContent()
     syncProductInventoryUi()
     renderReviewSummary()

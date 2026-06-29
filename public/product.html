@@ -172,23 +172,23 @@
 
   <div id="productImageLightbox" class="product_lightbox" hidden aria-hidden="true">
     <div class="product_lightbox_backdrop" data-lightbox-close="true"></div>
-    <div class="product_lightbox_dialog" role="dialog" aria-modal="true" aria-label="Product image preview">
+    <div class="product_lightbox_dialog" role="dialog" aria-modal="true" aria-label="Product image preview" data-i18n-aria-label="productUi.productImagePreview">
       <div class="product_lightbox_toolbar">
-        <div class="product_lightbox_zoom_group" aria-label="Image zoom controls">
-          <button id="productImageZoomOut" type="button" class="product_lightbox_control" aria-label="Zoom out">
+        <div class="product_lightbox_zoom_group" aria-label="Image zoom controls" data-i18n-aria-label="productUi.imageZoomControls">
+          <button id="productImageZoomOut" type="button" class="product_lightbox_control" aria-label="Zoom out" data-i18n-aria-label="productUi.zoomOut">
             <i class="fa fa-search-minus" aria-hidden="true"></i>
           </button>
           <span id="productImageZoomValue" class="product_lightbox_zoom_value">100%</span>
-          <button id="productImageZoomIn" type="button" class="product_lightbox_control" aria-label="Zoom in">
+          <button id="productImageZoomIn" type="button" class="product_lightbox_control" aria-label="Zoom in" data-i18n-aria-label="productUi.zoomIn">
             <i class="fa fa-search-plus" aria-hidden="true"></i>
           </button>
         </div>
-        <button id="productImageLightboxClose" type="button" class="product_lightbox_close" aria-label="Close image preview">
+        <button id="productImageLightboxClose" type="button" class="product_lightbox_close" aria-label="Close image preview" data-i18n-aria-label="productUi.closeImagePreview">
           <i class="fa fa-times" aria-hidden="true"></i>
         </button>
       </div>
       <div id="productImageLightboxStage" class="product_lightbox_stage">
-        <img id="productImageLightboxImage" alt="Expanded product image" width="1200" height="1200" loading="lazy" decoding="async">
+        <img id="productImageLightboxImage" alt="Expanded product image" data-i18n-alt="productUi.expandedProductImage" width="1200" height="1200" loading="lazy" decoding="async">
       </div>
     </div>
   </div>
@@ -196,7 +196,7 @@
   <section id="productStorySection" class="product_story_section layout_padding-bottom">
     <div class="container product_page_container">
       <div class="product_story_card">
-        <div class="product_detail_tabs" aria-label="Product detail sections">
+        <div class="product_detail_tabs" aria-label="Product detail sections" data-i18n-aria-label="productUi.productDetailSections">
           <a class="product_detail_tab active" href="#productStorySection" data-i18n="productUi.description">Description</a>
           <a class="product_detail_tab" href="#productComponentsSection" data-i18n="productUi.components">Components</a>
           <a class="product_detail_tab" href="#productReviewsSection" data-i18n="productUi.reviews">Reviews</a>
@@ -241,11 +241,11 @@
             <div class="review_field">
               <label data-i18n="productUi.ratings">Ratings</label>
               <div class="review_star_picker" aria-label="Choose a star rating from one to five" data-i18n-aria-label="productUi.chooseRating">
-                <button type="button" class="review_star_btn" data-rating="1" aria-label="Rate 1 star"><i class="fa fa-star" aria-hidden="true"></i></button>
-                <button type="button" class="review_star_btn" data-rating="2" aria-label="Rate 2 stars"><i class="fa fa-star" aria-hidden="true"></i></button>
-                <button type="button" class="review_star_btn" data-rating="3" aria-label="Rate 3 stars"><i class="fa fa-star" aria-hidden="true"></i></button>
-                <button type="button" class="review_star_btn" data-rating="4" aria-label="Rate 4 stars"><i class="fa fa-star" aria-hidden="true"></i></button>
-                <button type="button" class="review_star_btn" data-rating="5" aria-label="Rate 5 stars"><i class="fa fa-star" aria-hidden="true"></i></button>
+                <button type="button" class="review_star_btn" data-rating="1" aria-label="Rate 1 star" data-i18n-aria-label="productUi.rate1Star"><i class="fa fa-star" aria-hidden="true"></i></button>
+                <button type="button" class="review_star_btn" data-rating="2" aria-label="Rate 2 stars" data-i18n-aria-label="productUi.rate2Stars"><i class="fa fa-star" aria-hidden="true"></i></button>
+                <button type="button" class="review_star_btn" data-rating="3" aria-label="Rate 3 stars" data-i18n-aria-label="productUi.rate3Stars"><i class="fa fa-star" aria-hidden="true"></i></button>
+                <button type="button" class="review_star_btn" data-rating="4" aria-label="Rate 4 stars" data-i18n-aria-label="productUi.rate4Stars"><i class="fa fa-star" aria-hidden="true"></i></button>
+                <button type="button" class="review_star_btn" data-rating="5" aria-label="Rate 5 stars" data-i18n-aria-label="productUi.rate5Stars"><i class="fa fa-star" aria-hidden="true"></i></button>
               </div>
             </div>
 
@@ -372,7 +372,7 @@
   <script defer src="js/custom.js?v=20260603a"></script>
   <script type="module" src="js/navbar-offers.js?v=20260518c" defer></script>
   <script type="module" src="js/app-shell.js?v=20260629titlebidi" defer></script>
-  <script type="module" src="js/product-page.js?v=20260629titlebidi" defer></script>
+  <script type="module" src="js/product-page.js?v=20260629productdetailsi18n" defer></script>
 </body>
 
 </html>
