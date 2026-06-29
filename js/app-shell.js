@@ -52,7 +52,7 @@ import {
   getLanguage,
   initI18n,
   t
-} from "./i18n/i18n.js?v=20260629checkoutmodal";
+} from "./i18n/i18n.js?v=20260629commonaccessibility";
 import { getProductDisplayData } from "./i18n/product-display.js?v=20260629titlebidi";
 
 const THEME_STORAGE_KEY = "theme";
@@ -122,6 +122,10 @@ function getCartUiText(key, fallback = "", values = {}) {
 
 function getCheckoutUiText(key, fallback = "", values = {}) {
   return getLocalizedText(`checkoutUi.${key}`, fallback, values);
+}
+
+function getCommonUiText(key, fallback = "", values = {}) {
+  return getLocalizedText(`commonUi.${key}`, fallback, values);
 }
 
 function getCartUiCountText(key, count, fallbackSingular, fallbackPlural) {
@@ -2167,11 +2171,14 @@ function ensureBackToTopButton() {
   let button = document.querySelector(".back_to_top_btn:not(.scroll-down)");
   if (button) {
     button.classList.add("scroll-to-top", "scroll-top-btn");
+    button.setAttribute("aria-label", getCommonUiText("backToTop", "Back to top"));
+    button.setAttribute("title", getCommonUiText("backToTop", "Back to top"));
+    button.setAttribute("data-i18n-attr", "aria-label:commonUi.backToTop,title:commonUi.backToTop");
     return button;
   }
 
   button = createElementFromHTML(`
-    <button class="back_to_top_btn scroll-to-top scroll-top-btn" type="button" aria-label="Back to top" title="Back to top" hidden>
+    <button class="back_to_top_btn scroll-to-top scroll-top-btn" type="button" aria-label="${escapeHtml(getCommonUiText("backToTop", "Back to top"))}" title="${escapeHtml(getCommonUiText("backToTop", "Back to top"))}" data-i18n-attr="aria-label:commonUi.backToTop,title:commonUi.backToTop" hidden>
       <i class="fa fa-arrow-up" aria-hidden="true"></i>
     </button>
   `);
@@ -2184,11 +2191,14 @@ function ensureScrollDownButton() {
   let button = document.querySelector(".scroll-down");
   if (button) {
     button.classList.add("back_to_top_btn", "scroll-down-btn");
+    button.setAttribute("aria-label", getCommonUiText("scrollToProducts", "Scroll to products"));
+    button.setAttribute("title", getCommonUiText("scrollToProducts", "Scroll to products"));
+    button.setAttribute("data-i18n-attr", "aria-label:commonUi.scrollToProducts,title:commonUi.scrollToProducts");
     return button;
   }
 
   button = createElementFromHTML(`
-    <button class="back_to_top_btn scroll-down scroll-down-btn" type="button" aria-label="Scroll to products" title="Scroll to products" hidden>
+    <button class="back_to_top_btn scroll-down scroll-down-btn" type="button" aria-label="${escapeHtml(getCommonUiText("scrollToProducts", "Scroll to products"))}" title="${escapeHtml(getCommonUiText("scrollToProducts", "Scroll to products"))}" data-i18n-attr="aria-label:commonUi.scrollToProducts,title:commonUi.scrollToProducts" hidden>
       <i class="fa fa-arrow-down" aria-hidden="true"></i>
     </button>
   `);

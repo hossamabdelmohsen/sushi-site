@@ -25,6 +25,11 @@ export const ar = {
     viewFavorites: "عرض المفضلة",
     favoritesTitle: "المفضلة"
   },
+  commonUi: {
+    toggleNavigation: "فتح أو إغلاق القائمة",
+    backToTop: "العودة إلى الأعلى",
+    scrollToProducts: "التمرير إلى المنتجات"
+  },
   language: {
     label: "اللغة",
     choose: "اختيار اللغة",

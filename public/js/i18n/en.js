@@ -25,6 +25,11 @@ export const en = {
     viewFavorites: "View favorites",
     favoritesTitle: "Favorites"
   },
+  commonUi: {
+    toggleNavigation: "Toggle navigation",
+    backToTop: "Back to top",
+    scrollToProducts: "Scroll to products"
+  },
   language: {
     label: "Language",
     choose: "Choose language",
