@@ -42,7 +42,7 @@ import {
   subscribeToProductOffers
 } from "./offers-data.js?v=20260624a"
 import { initI18n, t } from "./i18n/i18n.js"
-import { getProductDisplayData } from "./i18n/product-display.js?v=20260628p9c"
+import { getProductDisplayData } from "./i18n/product-display.js?v=20260629titlebidi"
 
 const FALLBACK_IMAGE = "images/optimized/Logo.webp"
 let offerPricingWarningShown = false

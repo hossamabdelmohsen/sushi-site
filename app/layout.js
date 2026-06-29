@@ -24,7 +24,7 @@ export default function RootLayout({ children }) {
         <link rel="stylesheet" href="/css/font-awesome.min.css" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap" />
         <link rel="stylesheet" href="/css/style.css?v=20260603d" />
-        <link rel="stylesheet" href="/css/responsive.css?v=20260603e" />
+        <link rel="stylesheet" href="/css/responsive.css?v=20260629footerrows" />
       </head>
       <body className="sub_page product-page">{children}</body>
     </html>

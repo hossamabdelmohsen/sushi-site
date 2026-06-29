@@ -52,8 +52,8 @@ import {
   getLanguage,
   initI18n,
   t
-} from "./i18n/i18n.js";
-import { getProductDisplayData } from "./i18n/product-display.js";
+} from "./i18n/i18n.js?v=20260629headerlock";
+import { getProductDisplayData } from "./i18n/product-display.js?v=20260629titlebidi";
 
 const THEME_STORAGE_KEY = "theme";
 const LEGACY_THEME_STORAGE_KEY = "sushiBoxTheme";
@@ -891,11 +891,13 @@ function wrapNavbarThemeToggle(themeToggle) {
 
   let wrapper = themeToggle.closest(".navbar_theme_coming_soon");
   if (!wrapper) {
-    wrapper = createElementFromHTML('<span class="navbar_theme_coming_soon" data-tooltip-en="Coming soon" data-tooltip-ar="قريباً"></span>');
+    wrapper = createElementFromHTML('<span class="navbar_theme_coming_soon" data-tooltip-en="Dark mode locked" data-tooltip-ar="الوضع الداكن غير مفعل حاليًا"></span>');
     themeToggle.parentNode.insertBefore(wrapper, themeToggle);
     wrapper.appendChild(themeToggle);
   }
 
+  wrapper.setAttribute("data-tooltip-en", getLocalizedText("theme.locked", "Dark mode locked"));
+  wrapper.setAttribute("data-tooltip-ar", "الوضع الداكن غير مفعل حاليًا");
   themeToggle.classList.add("navbar_theme_coming_soon_control");
   themeToggle.setAttribute("aria-disabled", "true");
   themeToggle.setAttribute("tabindex", "-1");
@@ -926,10 +928,7 @@ function ensureThemeToggle(userOption) {
     </button>
   `);
 
-  const wrapper = createElementFromHTML('<span class="navbar_theme_coming_soon" data-tooltip-en="Coming soon" data-tooltip-ar="قريباً"></span>');
-  wrapper.appendChild(themeToggle);
-  wrapper.insertAdjacentHTML("beforeend", '<span class="navbar_theme_lock" aria-hidden="true"><i class="fa fa-lock" aria-hidden="true"></i></span>');
-  userOption.appendChild(wrapper);
+  userOption.appendChild(themeToggle);
   return wrapNavbarThemeToggle(themeToggle);
 }
 
@@ -978,6 +977,11 @@ function setThemeToggleElementState(themeToggle, isDarkMode) {
   themeToggle.setAttribute("aria-label", getLocalizedText(labelKey, isDarkMode ? "Switch to light mode" : "Switch to dark mode"));
   themeToggle.setAttribute("title", getLocalizedText(titleKey, isDarkMode ? "Light mode" : "Dark mode"));
   themeToggle.setAttribute("data-i18n-attr", `aria-label:${labelKey},title:${titleKey}`);
+  if (themeToggle.classList.contains("navbar_theme_coming_soon_control")) {
+    themeToggle.setAttribute("aria-label", getLocalizedText("theme.locked", "Dark mode locked"));
+    themeToggle.setAttribute("title", getLocalizedText("theme.locked", "Dark mode locked"));
+    themeToggle.setAttribute("data-i18n-attr", "aria-label:theme.locked,title:theme.locked");
+  }
 
   const icon = themeToggle.querySelector(".theme_toggle_icon");
   if (icon) {
@@ -1039,7 +1043,7 @@ function toggleTheme() {
 }
 
 function initThemeToggle(themeToggle) {
-  const currentTheme = getSavedTheme() || "light";
+  const currentTheme = "light";
   const isDarkMode = currentTheme === "dark";
 
   saveTheme(currentTheme);
@@ -1057,6 +1061,9 @@ function initThemeToggle(themeToggle) {
     }
 
     event.preventDefault();
+    if (themeToggleAction.getAttribute("aria-disabled") === "true" || themeToggleAction.closest(".navbar_theme_coming_soon")) {
+      return;
+    }
     toggleTheme();
   });
 }
@@ -1442,7 +1449,6 @@ function placeNavbarControls() {
   const cartLink = document.querySelector(".cart_link");
   const searchForm = document.querySelector(".site_search_toggle_form") || document.querySelector(".form-inline");
   const authShell = document.querySelector(".auth_shell");
-  const languageSwitcher = document.querySelector(".custom-language-switcher");
   const collapse = nav && nav.querySelector(".navbar-collapse");
 
   if (!nav || !userOption) {
@@ -1457,14 +1463,15 @@ function placeNavbarControls() {
     || actions.querySelector(".navbar_theme_coming_soon .theme_toggle")
     || userOption.querySelector(".theme_toggle")
     || actions.querySelector(":scope > .theme_toggle");
-  const themeToggleWrapper = themeToggle && themeToggle.closest(".navbar_theme_coming_soon");
+  const lockedThemeToggle = wrapNavbarThemeToggle(themeToggle);
+  const lockedThemeWrapper = lockedThemeToggle && lockedThemeToggle.closest(".navbar_theme_coming_soon");
   const isPhoneNav = window.matchMedia && window.matchMedia("(max-width: 575px)").matches;
 
-  if (isPhoneNav && themeToggleWrapper && themeToggleWrapper.parentElement !== userOption) {
-    userOption.appendChild(themeToggleWrapper);
+  if (isPhoneNav && lockedThemeWrapper && lockedThemeWrapper.parentElement !== userOption) {
+    userOption.appendChild(lockedThemeWrapper);
   }
 
-  [authShell, cartLink, searchForm, languageSwitcher, isPhoneNav ? null : (themeToggleWrapper || themeToggle), toggler].forEach((control) => {
+  [lockedThemeWrapper, cartLink, authShell, searchForm, toggler].forEach((control) => {
     if (control) {
       actions.appendChild(control);
     }

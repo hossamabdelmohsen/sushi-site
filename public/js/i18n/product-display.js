@@ -1,8 +1,14 @@
-import { getLanguage } from "./i18n.js";
-import { SUSHI_PRODUCT_TRANSLATIONS_AR } from "./product-translations-ar.js";
+import { getLanguage } from "./i18n.js?v=20260629productfix";
+import { SUSHI_PRODUCT_TRANSLATIONS_AR } from "./product-translations-ar.js?v=20260629titlebidi";
 
 const FALLBACK_PRODUCT_NAME = "Product";
 const FALLBACK_PRODUCT_IMAGE = "images/optimized/Logo.webp";
+const RTL_ISOLATE = "\u2067";
+const LTR_ISOLATE = "\u2066";
+const POP_ISOLATE = "\u2069";
+const BIDI_CONTROL_PATTERN = /[\u2066-\u2069]/g;
+const MIXED_TITLE_BRAND_PATTERN = /\b(?:Tai Hua|Bosphorus|Kikkoman|Samyang|Buldak|Yopokki|Zumra|ZUMRA|Soly|AMR)\b/g;
+const MIXED_TITLE_QUANTITY_PATTERN = /\d+(?:[.,]\d+)?(?:\s*[-+]\s*\d+(?:[.,]\d+)?%?)?(?:\s*[x×]\s*\d+(?:[.,]\d+)?)?(?:\s*%?\s*(?:جم|مل|كجم|سم|قطعة|قطع|أوراق|ورقة|كيس|أكياس|زوج|دهون|pcs?|sheets?|gm|g|kg|ml|cm))?/gi;
 
 const CATEGORY_TRANSLATIONS_AR = {
   "Noodles / Ramen": "نودلز / رامن",
@@ -446,6 +452,27 @@ function isArabic(language) {
   return language === "ar";
 }
 
+function hasArabicText(value) {
+  return /[\u0600-\u06FF]/.test(String(value || ""));
+}
+
+function wrapLtrIsolate(value) {
+  return `${LTR_ISOLATE}${value}${POP_ISOLATE}`;
+}
+
+function isolateMixedDirectionTitle(value, language) {
+  const source = String(value || "").replace(BIDI_CONTROL_PATTERN, "");
+  if (!isArabic(language) || !hasArabicText(source)) {
+    return source;
+  }
+
+  const isolated = source
+    .replace(MIXED_TITLE_BRAND_PATTERN, (match) => wrapLtrIsolate(match))
+    .replace(MIXED_TITLE_QUANTITY_PATTERN, (match) => wrapLtrIsolate(match));
+
+  return `${RTL_ISOLATE}${isolated}${POP_ISOLATE}`;
+}
+
 function getTranslation(productId, language) {
   if (!isArabic(language) || !productId) {
     return null;
@@ -805,7 +832,10 @@ export function getProductDisplayData(product, language = getLanguage()) {
     displayProduct.descriptionBlocks = buildFallbackArabicDescriptionBlocks(displayProduct);
   }
 
-  displayProduct.name = displayProduct.name || getFallbackName(source);
+  displayProduct.name = isolateMixedDirectionTitle(displayProduct.name || getFallbackName(source), language);
+  if (displayProduct.longDescriptionTitle) {
+    displayProduct.longDescriptionTitle = isolateMixedDirectionTitle(displayProduct.longDescriptionTitle, language);
+  }
   displayProduct.description = displayProduct.description || source.description || "";
   displayProduct.images = getSafeImages(displayProduct);
   displayProduct.slug = displayProduct.slug || productId || displayProduct.id;

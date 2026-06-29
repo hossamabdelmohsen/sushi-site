@@ -71,7 +71,7 @@
   <link href="css/font-awesome.min.css" rel="stylesheet" />
 
   <link href="css/style.css?v=20260603d" rel="stylesheet" />
-  <link href="css/responsive.css?v=20260628trust" rel="stylesheet" />
+  <link href="css/responsive.css?v=20260629footerrows" rel="stylesheet" />
 
   <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
@@ -292,23 +292,23 @@
   <section id="products" class="food_section layout_padding-bottom">
     <div class="container">
       <div class="heading_container heading_center">
-        <h2>
+        <h2 data-i18n="home.featured.title">
           Featured Products
         </h2>
-        <p class="products_heading_subtitle">
+        <p class="products_heading_subtitle" data-i18n="home.featured.subtitle">
           A curated preview of Sushi Box favorites. Visit the Products page for the full catalog.
         </p>
       </div>
 
       <ul class="filters_menu">
-        <li class="active" data-filter="*">All</li>
-        <li data-filter=".noodles">Noodles / Ramen</li>
-        <li data-filter=".sauces">Sauces</li>
-        <li data-filter=".frozen">Frozen / Dumplings</li>
-        <li data-filter=".essentials">Sushi Essentials / Asian Ingredients</li>
-        <li data-filter=".seafood">Seafood</li>
-        <li data-filter=".pantry">Canned Food / Pantry</li>
-        <li data-filter=".beverages">Beverages</li>
+        <li class="active" data-filter="*" data-i18n="home.featured.filters.all">All</li>
+        <li data-filter=".noodles" data-i18n="home.featured.filters.noodles">Noodles / Ramen</li>
+        <li data-filter=".sauces" data-i18n="home.featured.filters.sauces">Sauces</li>
+        <li data-filter=".frozen" data-i18n="home.featured.filters.frozen">Frozen / Dumplings</li>
+        <li data-filter=".essentials" data-i18n="home.featured.filters.essentials">Sushi Essentials / Asian Ingredients</li>
+        <li data-filter=".seafood" data-i18n="home.featured.filters.seafood">Seafood</li>
+        <li data-filter=".pantry" data-i18n="home.featured.filters.pantry">Canned Food / Pantry</li>
+        <li data-filter=".beverages" data-i18n="home.featured.filters.beverages">Beverages</li>
       </ul>
 
       <div class="filters-content">
@@ -317,7 +317,7 @@
 
       <div class="products_view_more">
         <a class="products_view_more_btn" href="menu.html">
-          View More
+          <span data-i18n="home.featured.viewMore">View More</span>
           <i class="fa fa-angle-right" aria-hidden="true"></i>
         </a>
       </div>
@@ -343,16 +343,16 @@
         <div class="col-md-6">
           <div class="detail-box">
             <div class="heading_container">
-              <h2>
+              <h2 data-i18n="home.about.title">
                 We Are Sushi Box
               </h2>
             </div>
-            <p>
+            <p data-i18n="home.about.description">
               Sushi Box brings premium Asian ingredients and sushi essentials to the Egyptian market with a focus on
               quality, value, and reliable supply. From nori sheets and sauces to noodles, dumplings, baozi, and pantry
               staples, we help restaurants and home cooks prepare authentic Asian cuisine with confidence.
             </p>
-            <a href="about.html">
+            <a href="about.html" data-i18n="home.about.readMore">
               Read More
             </a>
           </div>
@@ -543,25 +543,25 @@
     <div class="container">
       <div class="mobile_app_card">
         <div class="mobile_app_content">
-          <span class="mobile_app_badge">COMING SOON</span>
-          <h2 id="mobileAppHeading">Get Our Apps</h2>
-          <p>
+          <span class="mobile_app_badge" data-i18n="home.mobileApp.comingSoonUpper">COMING SOON</span>
+          <h2 id="mobileAppHeading" data-i18n="home.mobileApp.title">Get Our Apps</h2>
+          <p data-i18n="home.mobileApp.description">
             Order faster, save favorites, and track your Sushi Box orders soon.
           </p>
         </div>
-        <div class="mobile_app_store_badges" aria-label="Mobile app downloads">
+        <div class="mobile_app_store_badges" aria-label="Mobile app downloads" data-i18n-attr="aria-label:home.mobileApp.downloadsLabel">
           <button class="mobile_app_store_badge" type="button" disabled>
             <i class="fa fa-apple" aria-hidden="true"></i>
             <span>
-              <small>Coming Soon</small>
-              App Store
+              <small data-i18n="home.mobileApp.comingSoon">Coming Soon</small>
+              <b dir="ltr" data-i18n="home.mobileApp.appStore">App Store</b>
             </span>
           </button>
           <button class="mobile_app_store_badge" type="button" disabled>
             <i class="fa fa-play" aria-hidden="true"></i>
             <span>
-              <small>Coming Soon</small>
-              Google Play
+              <small data-i18n="home.mobileApp.comingSoon">Coming Soon</small>
+              <b dir="ltr" data-i18n="home.mobileApp.googlePlay">Google Play</b>
             </span>
           </button>
         </div>
@@ -575,35 +575,35 @@
     <div class="row">
       <div class="col-md-4 footer-col">
         <div class="footer_contact">
-          <h4>Contact Us</h4>
+          <h4 data-i18n="footer.contactUs">Contact Us</h4>
           <div class="contact_link_box">
             <a href="https://maps.google.com/?q=Egypt%20El%20Gharbia%20El%20Mahalla%20El%20Kubra" target="_blank" rel="noopener noreferrer">
               <i class="fa fa-map-marker" aria-hidden="true"></i>
-              <span>Egypt - El Gharbia - El Mahalla El Kubra</span>
+              <span data-i18n="footer.location">Egypt - El Gharbia - El Mahalla El Kubra</span>
             </a>
             <a href="tel:+201503460361">
               <i class="fa fa-phone" aria-hidden="true"></i>
-              <span>Call +201503460361</span>
+              <span dir="ltr" data-i18n="footer.call">Call +201503460361</span>
             </a>
             <a href="https://wa.me/201503460361" target="_blank" rel="noopener noreferrer">
               <i class="fa fa-whatsapp" aria-hidden="true"></i>
-              <span>WhatsApp</span>
+              <span data-i18n="footer.whatsapp">WhatsApp</span>
             </a>
             <a href="mailto:info@sushiboxshop.com">
               <i class="fa fa-envelope" aria-hidden="true"></i>
-              <span>info@sushiboxshop.com</span>
+              <span dir="ltr">info@sushiboxshop.com</span>
             </a>
           </div>
         </div>
-          <nav class="footer_policy_links footer_policy_links_contact" aria-label="Company links">
-            <a href="about.html">About Us</a>
-            <a href="privacy-policy.html">Privacy Policy</a>
+          <nav class="footer_policy_links footer_policy_links_contact" aria-label="Company links" data-i18n-attr="aria-label:footer.companyLinks">
+            <a href="about.html" data-i18n="footer.aboutUs">About Us</a>
+            <a href="privacy-policy.html" data-i18n="footer.privacyPolicy">Privacy Policy</a>
           </nav>
       </div>
       <div class="col-md-4 footer-col">
         <div class="footer_detail">
           <a href="index.html" class="footer-logo">Sushi Box</a>
-          <p>Sushi Box is your trusted source for premium Asian ingredients, sushi essentials, frozen products, sauces, noodles, baozi, dumplings, and reliable supply across the Delta region.</p>
+          <p data-i18n="footer.description">Sushi Box is your trusted source for premium Asian ingredients, sushi essentials, frozen products, sauces, noodles, baozi, dumplings, and reliable supply across the Delta region.</p>
           <div class="footer_social">
             <a href="https://www.facebook.com/profile.php?id=61589534703634" target="_blank" rel="noopener noreferrer"><i class="fa fa-facebook" aria-hidden="true"></i></a>
             <a href="https://x.com/SushiBo0oX" target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter" aria-hidden="true"></i></a>
@@ -613,45 +613,45 @@
         </div>
       </div>
       <div class="col-md-4 footer-col">
-        <h4>Delivery Schedule</h4>
+        <h4 data-i18n="footer.deliverySchedule">Delivery Schedule</h4>
         <div class="delivery-list simple-footer-list">
           <div class="footer-info-item delivery-item">
             <span class="footer-icon delivery-icon"><i class="fa fa-map-marker" aria-hidden="true"></i></span>
             <div class="delivery-text">
-              <strong>Kafr El Sheikh</strong>
-              <span>Wednesday, Thursday, Friday</span>
+              <strong data-i18n="common.cities.kafrElSheikh">Kafr El Sheikh</strong>
+              <span data-i18n="common.wednesdayFriday">Wednesday, Thursday, Friday</span>
             </div>
           </div>
           <div class="footer-info-item delivery-item">
             <span class="footer-icon delivery-icon"><i class="fa fa-truck" aria-hidden="true"></i></span>
             <div class="delivery-text">
-              <strong>Mansoura</strong>
-              <span>Wednesday, Thursday, Friday</span>
+              <strong data-i18n="common.cities.mansoura">Mansoura</strong>
+              <span data-i18n="common.wednesdayFriday">Wednesday, Thursday, Friday</span>
             </div>
           </div>
           <div class="footer-info-item delivery-item">
             <span class="footer-icon delivery-icon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
             <div class="delivery-text">
-              <strong>Tanta</strong>
-              <span>Wednesday, Thursday, Friday</span>
+              <strong data-i18n="common.cities.tanta">Tanta</strong>
+              <span data-i18n="common.wednesdayFriday">Wednesday, Thursday, Friday</span>
             </div>
           </div>
           <div class="footer-info-item delivery-item">
             <span class="footer-icon delivery-icon"><i class="fa fa-map-marker" aria-hidden="true"></i></span>
             <div class="delivery-text">
-              <strong>El Mahalla</strong>
-              <span>Wednesday, Thursday, Friday</span>
+              <strong data-i18n="common.cities.elMahalla">El Mahalla</strong>
+              <span data-i18n="common.wednesdayFriday">Wednesday, Thursday, Friday</span>
             </div>
           </div>
         </div>
-        <nav class="footer_policy_links footer_policy_links_delivery" aria-label="Policy links">
-          <a href="delivery-shipping-policy.html">Delivery &amp; Shipping Policy</a>
-          <a href="refund-cancellation-policy.html">Refund &amp; Cancellation Policy</a>
+        <nav class="footer_policy_links footer_policy_links_delivery" aria-label="Policy links" data-i18n-attr="aria-label:footer.policyLinks">
+          <a href="delivery-shipping-policy.html" data-i18n="footer.deliveryPolicy">Delivery &amp; Shipping Policy</a>
+          <a href="refund-cancellation-policy.html" data-i18n="footer.refundPolicy">Return, Refund &amp; Cancellation Policy</a>
         </nav>
       </div>
     </div>
     <div class="footer-info">
-      <p>&copy; <span id="displayYear"></span> Sushi Box. All rights reserved.</p>
+      <p>&copy; <span id="displayYear"></span> <span data-i18n="footer.copyrightSuffix">Sushi Box. All rights reserved.</span></p>
     </div>
   </div>
 </footer>
@@ -674,8 +674,8 @@
   <!-- custom js -->
   <script defer src="js/custom.js?v=20260628trust"></script>
   <script type="module" src="js/navbar-offers.js?v=20260518c" defer></script>
-  <script type="module" src="js/app-shell.js?v=20260628p11b" defer></script>
-  <script type="module" src="js/product-grid.js?v=20260627p9" defer></script>
+  <script type="module" src="js/app-shell.js?v=20260629titlebidi" defer></script>
+  <script type="module" src="js/product-grid.js?v=20260629titlebidi" defer></script>
 </body>
 
 </html>

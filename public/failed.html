@@ -100,22 +100,22 @@
       <div class="container">
         <div class="payment_result_card">
           <span class="payment_result_icon"><i class="fa fa-times" aria-hidden="true"></i></span>
-          <span class="payment_result_kicker">Payment not completed</span>
-          <h1>Please try again</h1>
-          <p>Your cart is still saved. You can return to checkout and choose another Paymob payment method or try the payment again.</p>
+          <span class="payment_result_kicker" data-i18n="paymentResultUi.failedKicker">Payment not completed</span>
+          <h1 data-i18n="paymentResultUi.failedTitle">Please try again</h1>
+          <p data-i18n="paymentResultUi.failedIntro">Your cart is still saved. You can return to checkout and choose another Paymob payment method or try the payment again.</p>
           <dl class="payment_result_meta">
             <div>
-              <dt>Order reference</dt>
-              <dd id="paymentResultReference">Pending Paymob reference</dd>
+              <dt data-i18n="paymentResultUi.orderReference">Order reference</dt>
+              <dd id="paymentResultReference" dir="auto" data-i18n="paymentResultUi.pendingPaymobReference">Pending Paymob reference</dd>
             </div>
             <div>
-              <dt>Transaction ID</dt>
-              <dd id="paymentResultTransaction">Not available yet</dd>
+              <dt data-i18n="paymentResultUi.transactionId">Transaction ID</dt>
+              <dd id="paymentResultTransaction" dir="auto" data-i18n="paymentResultUi.notAvailableYet">Not available yet</dd>
             </div>
           </dl>
           <div class="payment_result_actions">
-            <a class="payment_result_primary" href="checkout.html">Try Checkout Again</a>
-            <a class="payment_result_secondary" href="cart.html">Review Cart</a>
+            <a class="payment_result_primary" href="checkout.html" data-i18n="paymentResultUi.tryCheckoutAgain">Try Checkout Again</a>
+            <a class="payment_result_secondary" href="cart.html" data-i18n="paymentResultUi.reviewCart">Review Cart</a>
           </div>
         </div>
       </div>
@@ -214,7 +214,7 @@
   <script defer src="js/custom.js?v=20260603a"></script>
   <script type="module" src="js/navbar-offers.js?v=20260518c" defer></script>
   <script type="module" src="js/app-shell.js?v=20260619a" defer></script>
-  <script type="module" src="js/payment-result.js?v=20260615a" defer></script>
+  <script type="module" src="js/payment-result.js?v=20260629paymentresult" defer></script>
 </body>
 
 </html>

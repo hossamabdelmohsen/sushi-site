@@ -41,6 +41,7 @@ export const en = {
     off: "Off",
     dark: "Dark mode",
     light: "Light mode",
+    locked: "Dark mode locked",
     switchToDark: "Switch to dark mode",
     switchToLight: "Switch to light mode"
   },
@@ -56,6 +57,35 @@ export const en = {
       readAboutUs: "Read About Us",
       previousSlide: "Previous slide",
       nextSlide: "Next slide"
+    },
+    featured: {
+      title: "Featured Products",
+      subtitle: "A curated preview of Sushi Box favorites. Visit the Products page for the full catalog.",
+      viewMore: "View More",
+      filters: {
+        all: "All",
+        noodles: "Noodles / Ramen",
+        sauces: "Sauces",
+        frozen: "Frozen / Dumplings",
+        essentials: "Sushi Essentials / Asian Ingredients",
+        seafood: "Seafood",
+        pantry: "Canned Food / Pantry",
+        beverages: "Beverages"
+      }
+    },
+    about: {
+      title: "We Are Sushi Box",
+      description: "Sushi Box brings premium Asian ingredients and sushi essentials to the Egyptian market with a focus on quality, value, and reliable supply. From nori sheets and sauces to noodles, dumplings, baozi, and pantry staples, we help restaurants and home cooks prepare authentic Asian cuisine with confidence.",
+      readMore: "Read More"
+    },
+    mobileApp: {
+      comingSoonUpper: "COMING SOON",
+      comingSoon: "Coming Soon",
+      title: "Get Our Apps",
+      description: "Order faster, save favorites, and track your Sushi Box orders soon.",
+      downloadsLabel: "Mobile app downloads",
+      googlePlay: "Google Play",
+      appStore: "App Store"
     },
     howToOrder: {
       viewDeliverySchedule: "View delivery schedule"
@@ -74,6 +104,23 @@ export const en = {
       tanta: "Tanta",
       kafrElSheikh: "Kafr El Sheikh",
       deltaRegion: "Delta region"
+    }
+  },
+  productsPage: {
+    title: "Our Products",
+    subtitle: "Explore our complete catalog of Asian ingredients, sushi essentials, sauces, noodles, and frozen favorites.",
+    loadedAria: "All products loaded",
+    loadedTitle: "All products loaded successfully",
+    loadedText: "You've reached the end of our catalog.",
+    filters: {
+      all: "All",
+      noodles: "Noodles / Ramen",
+      sauces: "Sauces",
+      frozen: "Frozen / Dumplings",
+      essentials: "Sushi Essentials / Asian Ingredients",
+      seafood: "Seafood",
+      pantry: "Canned Food / Pantry",
+      beverages: "Beverages"
     }
   },
   auth: {
@@ -453,7 +500,7 @@ export const en = {
     kicker: "Customer Experience",
     titlePrefix: "Your Opinion Helps",
     titleTail: "Us Improve",
-    intro: "At Sushi Box, every suggestion, review, and idea matters. Help us create a better experience for sushi lovers across Egypt.",
+    intro: "At Sushi Box, we believe the best stores grow through customer feedback. Every suggestion helps us improve our products, delivery experience, and service quality.",
     supportAria: "Sushi Box customer support",
     readTitle: "We read every message.",
     readText: "Share what worked, what needs attention, and what you would love to see next in our product selection or delivery experience.",
@@ -482,7 +529,7 @@ export const en = {
     send: "Send Feedback",
     sending: "Sending...",
     appreciationTitle: "Built together with our customers.",
-    appreciationText: "At Sushi Box, we believe the best stores evolve through customer feedback. Every suggestion helps us improve our products, delivery experience, and overall service quality.",
+    appreciationText: "Thank you for being part of the Sushi Box journey.",
     validationName: "Please enter your full name.",
     validationEmail: "Please enter a valid email address.",
     validationType: "Please choose a feedback type.",
@@ -560,7 +607,7 @@ export const en = {
     deliverySchedule: "Delivery Schedule",
     policyLinks: "Policy links",
     deliveryPolicy: "Delivery & Shipping Policy",
-    refundPolicy: "Refund & Cancellation Policy",
+    refundPolicy: "Return, Refund & Cancellation Policy",
     copyrightSuffix: "Sushi Box. All rights reserved.",
     messenger: "Messenger"
   },
@@ -748,6 +795,22 @@ export const en = {
     viewDetails: "View Details",
     outOfStock: "Out of Stock",
     onlyLeft: "Only {count} left"
+  },
+  paymentResultUi: {
+    successKicker: "Payment confirmed",
+    successTitle: "Thank you for your order",
+    successIntro: "Your payment was verified by Paymob. We will prepare your Sushi Box order and contact you if any delivery detail needs confirmation.",
+    failedKicker: "Payment not completed",
+    failedTitle: "Please try again",
+    failedIntro: "Your cart is still saved. You can return to checkout and choose another Paymob payment method or try the payment again.",
+    orderReference: "Order reference",
+    pendingPaymobReference: "Pending Paymob reference",
+    transactionId: "Transaction ID",
+    notAvailableYet: "Not available yet",
+    continueShopping: "Continue Shopping",
+    backHome: "Back Home",
+    tryCheckoutAgain: "Try Checkout Again",
+    reviewCart: "Review Cart"
   },
   cartUi: {
     shoppingCart: "Shopping Cart",

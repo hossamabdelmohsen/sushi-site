@@ -18,7 +18,7 @@ import { subscribeToReviewSummaries } from "./firebase-reviews.js?v=20260602d";
 import { buildRatingSummaryMarkup, emitToast, escapeHtml, primeRatingsCache } from "./ui-utils.js?v=20260523a";
 import { getActiveOfferForProduct, getOfferDisplayData, getProductOfferPricing, subscribeToProductOffers } from "./offers-data.js?v=20260620a";
 import { t } from "./i18n/i18n.js";
-import { getProductDisplayData } from "./i18n/product-display.js";
+import { getProductDisplayData } from "./i18n/product-display.js?v=20260629titlebidi";
 
 let latestReviewSummaries = {};
 let latestWishlistItems = [];

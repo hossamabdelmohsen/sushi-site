@@ -1,5 +1,5 @@
-import { en } from "./en.js";
-import { ar } from "./ar.js";
+import { en } from "./en.js?v=20260629paymentresult";
+import { ar } from "./ar.js?v=20260629paymentresult";
 
 const STORAGE_KEY = "sushiBoxLanguage";
 const LEGACY_STORAGE_KEY = "sushiBoxLang";
@@ -20,6 +20,20 @@ function getStoredLanguage() {
   } catch (error) {
     return DEFAULT_LANGUAGE;
   }
+}
+
+function getDocumentLanguage() {
+  const documentLanguage = document.documentElement.getAttribute("lang");
+  return isSupportedLanguage(documentLanguage) ? documentLanguage : null;
+}
+
+function syncCurrentLanguage() {
+  const documentLanguage = getDocumentLanguage();
+  if (documentLanguage && documentLanguage !== currentLanguage) {
+    currentLanguage = documentLanguage;
+  }
+
+  return currentLanguage;
 }
 
 function storeLanguage(language) {
@@ -44,6 +58,7 @@ function formatTranslation(value, values = {}) {
 }
 
 export function t(key, fallback = "", values = {}) {
+  syncCurrentLanguage();
   const dictionary = DICTIONARIES[currentLanguage] || DICTIONARIES[DEFAULT_LANGUAGE];
   const translated = getTranslationValue(dictionary, key);
   if (typeof translated === "string") {
@@ -55,7 +70,7 @@ export function t(key, fallback = "", values = {}) {
 }
 
 export function getLanguage() {
-  return currentLanguage;
+  return syncCurrentLanguage();
 }
 
 export function isRtlLanguage(language = currentLanguage) {
@@ -110,6 +125,7 @@ function applyAttributeTranslations(root = document) {
 }
 
 function updateLanguageControls(root = document) {
+  syncCurrentLanguage();
   root.querySelectorAll("[data-language-option]").forEach((control) => {
     const language = control.getAttribute("data-language-option");
     const isCurrent = language === currentLanguage;
@@ -168,7 +184,6 @@ function bindLanguageEvents() {
 
 export function initI18n() {
   currentLanguage = getStoredLanguage();
-  storeLanguage(currentLanguage);
   applyTranslations();
   bindLanguageEvents();
   window.SushiBoxI18n = {

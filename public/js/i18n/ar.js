@@ -41,6 +41,7 @@ export const ar = {
     off: "غير مفعل",
     dark: "الوضع الداكن",
     light: "الوضع الفاتح",
+    locked: "الوضع الداكن غير مفعل حاليًا",
     switchToDark: "التبديل إلى الوضع الداكن",
     switchToLight: "التبديل إلى الوضع الفاتح"
   },
@@ -56,6 +57,35 @@ export const ar = {
       readAboutUs: "اعرف المزيد عنا",
       previousSlide: "الشريحة السابقة",
       nextSlide: "الشريحة التالية"
+    },
+    featured: {
+      title: "منتجات مميزة",
+      subtitle: "مجموعة مختارة من منتجات Sushi Box المفضلة. يمكنك زيارة صفحة المنتجات لمشاهدة الكتالوج بالكامل.",
+      viewMore: "عرض المزيد",
+      filters: {
+        all: "الكل",
+        noodles: "نودلز / رامن",
+        sauces: "صوصات",
+        frozen: "مجمدات / دامبلينج",
+        essentials: "مستلزمات السوشي / مكونات آسيوية",
+        seafood: "مأكولات بحرية",
+        pantry: "أغذية معلبة / مستلزمات المطبخ",
+        beverages: "مشروبات"
+      }
+    },
+    about: {
+      title: "نحن Sushi Box",
+      description: "تقدم Sushi Box مكونات آسيوية ومستلزمات سوشي عالية الجودة للسوق المصري، مع التركيز على الجودة والقيمة والتوفر الموثوق. من أوراق النوري والصوصات إلى النودلز والدامبلينج والباوزي ومستلزمات المطبخ الآسيوي، نساعد المطاعم ومحبي الطبخ المنزلي على تحضير أكلات آسيوية أصلية بثقة.",
+      readMore: "اقرأ المزيد"
+    },
+    mobileApp: {
+      comingSoonUpper: "قريبًا",
+      comingSoon: "قريبًا",
+      title: "حمّل تطبيقاتنا قريبًا",
+      description: "اطلب أسرع، احفظ مفضلتك، وتابع طلباتك من Sushi Box قريبًا.",
+      downloadsLabel: "تحميل تطبيقات الهاتف",
+      googlePlay: "Google Play",
+      appStore: "App Store"
     },
     howToOrder: {
       viewDeliverySchedule: "عرض مواعيد التوصيل"
@@ -74,6 +104,23 @@ export const ar = {
       tanta: "طنطا",
       kafrElSheikh: "كفر الشيخ",
       deltaRegion: "منطقة الدلتا"
+    }
+  },
+  productsPage: {
+    title: "منتجاتنا",
+    subtitle: "استكشف كتالوجنا الكامل من المكونات الآسيوية، مستلزمات السوشي، الصوصات، النودلز، والمنتجات المجمدة المفضلة.",
+    loadedAria: "تم تحميل جميع المنتجات",
+    loadedTitle: "تم تحميل جميع المنتجات بنجاح",
+    loadedText: "لقد وصلت إلى نهاية الكتالوج.",
+    filters: {
+      all: "الكل",
+      noodles: "نودلز / رامن",
+      sauces: "صوصات",
+      frozen: "مجمدات / دامبلنج",
+      essentials: "مستلزمات السوشي / مكونات آسيوية",
+      seafood: "مأكولات بحرية",
+      pantry: "أغذية معلبة / مستلزمات المطبخ",
+      beverages: "مشروبات"
     }
   },
   auth: {
@@ -453,7 +500,7 @@ export const ar = {
     kicker: "تجربة العملاء",
     titlePrefix: "رأيك يساعدنا",
     titleTail: "على التطوير",
-    intro: "في سوشي بوكس، كل اقتراح ومراجعة وفكرة لها قيمة. ساعدنا على تقديم تجربة أفضل لمحبي السوشي في مصر.",
+    intro: "في سوشي بوكس، نؤمن أن أفضل المتاجر تتطور من خلال آراء العملاء. كل اقتراح يساعدنا على تحسين منتجاتنا وتجربة التوصيل وجودة الخدمة.",
     supportAria: "دعم عملاء سوشي بوكس",
     readTitle: "نقرأ كل رسالة.",
     readText: "شاركنا ما أعجبك، وما يحتاج إلى تحسين، وما تتمنى إضافته في منتجاتنا أو تجربة التوصيل.",
@@ -482,7 +529,7 @@ export const ar = {
     send: "إرسال الملاحظات",
     sending: "جارٍ الإرسال...",
     appreciationTitle: "نتطور مع عملائنا.",
-    appreciationText: "في سوشي بوكس، نؤمن أن أفضل المتاجر تتطور من خلال آراء العملاء. كل اقتراح يساعدنا على تحسين منتجاتنا وتجربة التوصيل وجودة الخدمة.",
+    appreciationText: "شكرًا لكونك جزءًا من رحلة Sushi Box.",
     validationName: "يرجى إدخال الاسم الكامل.",
     validationEmail: "يرجى إدخال بريد إلكتروني صحيح.",
     validationType: "يرجى اختيار نوع الملاحظة.",
@@ -560,7 +607,7 @@ export const ar = {
     deliverySchedule: "جدول التوصيل",
     policyLinks: "روابط السياسات",
     deliveryPolicy: "سياسة التوصيل والشحن",
-    refundPolicy: "سياسة الاسترجاع والإلغاء",
+    refundPolicy: "سياسة الاسترجاع والاسترداد والإلغاء",
     copyrightSuffix: "سوشي بوكس. جميع الحقوق محفوظة.",
     messenger: "ماسنجر"
   },
@@ -748,6 +795,22 @@ export const ar = {
     viewDetails: "عرض التفاصيل",
     outOfStock: "غير متوفر حاليًا",
     onlyLeft: "متبقي {count} فقط"
+  },
+  paymentResultUi: {
+    successKicker: "تم تأكيد الدفع",
+    successTitle: "شكرًا لطلبك",
+    successIntro: "تم التحقق من عملية الدفع من خلال Paymob. سنقوم بتجهيز طلبك من Sushi Box وسنتواصل معك إذا احتجنا إلى تأكيد أي تفاصيل خاصة بالتوصيل.",
+    failedKicker: "لم يكتمل الدفع",
+    failedTitle: "يرجى المحاولة مرة أخرى",
+    failedIntro: "ما زالت سلتك محفوظة. يمكنك الرجوع إلى صفحة الدفع واختيار طريقة دفع أخرى من Paymob أو المحاولة مرة أخرى.",
+    orderReference: "رقم الطلب",
+    pendingPaymobReference: "مرجع Paymob قيد الانتظار",
+    transactionId: "رقم عملية الدفع",
+    notAvailableYet: "غير متاح حاليًا",
+    continueShopping: "متابعة التسوق",
+    backHome: "الرجوع للرئيسية",
+    tryCheckoutAgain: "المحاولة من جديد",
+    reviewCart: "مراجعة السلة"
   },
   cartUi: {
     shoppingCart: "سلة التسوق",

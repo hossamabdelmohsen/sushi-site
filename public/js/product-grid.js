@@ -26,8 +26,8 @@ import {
   shareProduct
 } from "./ui-utils.js?v=20260523a";
 import { getActiveOfferForProduct, getOfferDisplayData, subscribeToProductOffers } from "./offers-data.js?v=20260620a";
-import { t } from "./i18n/i18n.js";
-import { getProductDisplayData } from "./i18n/product-display.js";
+import { t } from "./i18n/i18n.js?v=20260629productsui";
+import { getProductDisplayData } from "./i18n/product-display.js?v=20260629titlebidi";
 
 let productTitleTooltip = null;
 let productTitleTooltipHideTimer = null;
@@ -38,6 +38,23 @@ const PRODUCT_TITLE_TOOLTIP_DELAY = 1000;
 
 function getProductUiText(key, fallback = "", values = {}) {
   return t(`productUi.${key}`, fallback, values);
+}
+
+function getProductsPageText(key, fallback = "", values = {}) {
+  return t(`productsPage.${key}`, fallback, values);
+}
+
+function syncProductsPageText() {
+  const endState = document.querySelector(".products_end_state");
+  if (endState) {
+    endState.setAttribute("aria-label", getProductsPageText("loadedAria", "All products loaded"));
+  }
+
+  document.querySelectorAll(".filters_menu [data-i18n]").forEach((filter) => {
+    const key = filter.getAttribute("data-i18n");
+    const fallback = filter.textContent.trim();
+    filter.textContent = t(key, fallback);
+  });
 }
 
 function getProductStockStatusText(status) {
@@ -627,10 +644,12 @@ function updateCardSummary(card, summary) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  syncProductsPageText();
   renderProductGrids();
 
   const cards = Array.from(document.querySelectorAll(".product-card"));
   window.addEventListener("sushi-box:language-change", () => {
+    syncProductsPageText();
     document.querySelectorAll(".product_grid_empty").forEach((message) => {
       message.textContent = getProductUiText("noProductsAvailable", "No products are available right now.");
     });

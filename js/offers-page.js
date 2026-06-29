@@ -4,7 +4,7 @@ import { subscribeToReviewSummaries } from "./firebase-reviews.js?v=20260618b";
 import { addCartItemWithInventory, getInventoryStatus, subscribeToInventory } from "./inventory-store.js?v=20260619a";
 import { bindCardNavigation, buildRatingSummaryMarkup, escapeHtml, primeRatingsCache, shareProduct } from "./ui-utils.js?v=20260523a";
 import { t } from "./i18n/i18n.js";
-import { getProductDisplayData } from "./i18n/product-display.js";
+import { getProductDisplayData } from "./i18n/product-display.js?v=20260629titlebidi";
 
 let latestReviewSummaries = {};
 

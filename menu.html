@@ -45,7 +45,7 @@
   <!-- Custom styles for this template -->
   <link href="css/style.css?v=20260603b" rel="stylesheet" />
   <!-- responsive style -->
-  <link href="css/responsive.css?v=20260603e" rel="stylesheet" />
+  <link href="css/responsive.css?v=20260629footerrows" rel="stylesheet" />
 
 <!-- Microsoft Clarity Analytics -->
 <script type="text/javascript">
@@ -179,35 +179,35 @@
   <section class="food_section layout_padding">
     <div class="container">
       <div class="heading_container heading_center">
-        <h2>
+        <h2 data-i18n="productsPage.title">
           Our Products
         </h2>
-        <p class="products_heading_subtitle">
+        <p class="products_heading_subtitle" data-i18n="productsPage.subtitle">
           Explore our complete catalog of Asian ingredients, sushi essentials, sauces, noodles, and frozen favorites.
         </p>
       </div>
 
       <ul class="filters_menu">
-        <li class="active" data-filter="*">All</li>
-        <li data-filter=".noodles">Noodles / Ramen</li>
-        <li data-filter=".sauces">Sauces</li>
-        <li data-filter=".frozen">Frozen / Dumplings</li>
-        <li data-filter=".essentials">Sushi Essentials / Asian Ingredients</li>
-        <li data-filter=".seafood">Seafood</li>
-        <li data-filter=".pantry">Canned Food / Pantry</li>
-        <li data-filter=".beverages">Beverages</li>
+        <li class="active" data-filter="*" data-i18n="productsPage.filters.all">All</li>
+        <li data-filter=".noodles" data-i18n="productsPage.filters.noodles">Noodles / Ramen</li>
+        <li data-filter=".sauces" data-i18n="productsPage.filters.sauces">Sauces</li>
+        <li data-filter=".frozen" data-i18n="productsPage.filters.frozen">Frozen / Dumplings</li>
+        <li data-filter=".essentials" data-i18n="productsPage.filters.essentials">Sushi Essentials / Asian Ingredients</li>
+        <li data-filter=".seafood" data-i18n="productsPage.filters.seafood">Seafood</li>
+        <li data-filter=".pantry" data-i18n="productsPage.filters.pantry">Canned Food / Pantry</li>
+        <li data-filter=".beverages" data-i18n="productsPage.filters.beverages">Beverages</li>
       </ul>
 
       <div class="filters-content">
         <div class="row grid" data-product-grid data-product-scope="all"></div>
       </div>
 
-      <div class="products_end_state" aria-label="All products loaded">
+      <div class="products_end_state" aria-label="All products loaded" data-i18n-aria-label="productsPage.loadedAria">
         <span class="products_end_icon" aria-hidden="true">
           <i class="fa fa-check"></i>
         </span>
-        <strong>All products loaded successfully</strong>
-        <p>You've reached the end of our catalog.</p>
+        <strong data-i18n="productsPage.loadedTitle">All products loaded successfully</strong>
+        <p data-i18n="productsPage.loadedText">You've reached the end of our catalog.</p>
       </div>
     </div>
   </section>
@@ -319,8 +319,8 @@
   <!-- custom js -->
   <script defer src="js/custom.js?v=20260603a"></script>
   <script type="module" src="js/navbar-offers.js?v=20260518c" defer></script>
-  <script type="module" src="js/app-shell.js?v=20260627p9" defer></script>
-  <script type="module" src="js/product-grid.js?v=20260627p9" defer></script>
+  <script type="module" src="js/app-shell.js?v=20260629productsui" defer></script>
+  <script type="module" src="js/product-grid.js?v=20260629productsui" defer></script>
 </body>
 
 </html>

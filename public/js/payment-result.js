@@ -1,6 +1,16 @@
 import { clearCart, whenCartReady } from "./cart-store.js?v=20260615a";
 import { trackPurchase } from "./analytics-events.js?v=20260602c";
 import { getCurrentCustomerOrder } from "./orders-store.js?v=20260520a";
+import { applyTranslations, t } from "./i18n/i18n.js?v=20260629paymentresult";
+
+const PAYMENT_RESULT_FALLBACKS = {
+  pendingPaymobReference: "Pending Paymob reference",
+  notAvailableYet: "Not available yet"
+};
+
+function getPaymentResultText(key) {
+  return t(`paymentResultUi.${key}`, PAYMENT_RESULT_FALLBACKS[key] || "");
+}
 
 function getQueryValue(name) {
   try {
@@ -17,16 +27,23 @@ function renderPaymentReference() {
   const transactionId = getQueryValue("transaction");
 
   if (referenceEl) {
-    referenceEl.textContent = orderReference || "Pending Paymob reference";
+    referenceEl.textContent = orderReference || getPaymentResultText("pendingPaymobReference");
+    referenceEl.setAttribute("dir", orderReference ? "ltr" : "auto");
   }
 
   if (transactionEl) {
-    transactionEl.textContent = transactionId || "Not available yet";
+    transactionEl.textContent = transactionId || getPaymentResultText("notAvailableYet");
+    transactionEl.setAttribute("dir", transactionId ? "ltr" : "auto");
   }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  applyTranslations(document);
   renderPaymentReference();
+  window.addEventListener("sushi-box:language-change", () => {
+    applyTranslations(document);
+    renderPaymentReference();
+  });
 
   if (document.body.classList.contains("payment-success-page")) {
     let cleared = false;
