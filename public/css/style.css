@@ -3233,9 +3233,11 @@ body.admin-orders-page .admin_product_offers_grid { display: grid; grid-template
 body.admin-orders-page .admin_product_offers_field { display: grid; min-width: 0; gap: 7px; }
 body.admin-orders-page .admin_product_offers_field > span { color: #554738; font-size: 12px; font-weight: 800; letter-spacing: .015em; }
 body.admin-orders-page .admin_product_offers_field em { color: #a18f7b; font-size: 10px; font-style: normal; font-weight: 700; text-transform: uppercase; }
-body.admin-orders-page .admin_product_offers_field input, body.admin-orders-page .admin_product_offers_field select { width: 100%; min-width: 0; height: 46px; border: 1px solid #e4d8c5; border-radius: 10px; padding: 0 13px; outline: none; background: #fffefb; color: #2c241b; font: inherit; font-size: 14px; transition: border-color .18s ease, box-shadow .18s ease, background .18s ease; }
+body.admin-orders-page .admin_product_offers_field input,
+body.admin-orders-page .admin_product_offers_field select { width: 100%; min-width: 0; height: 46px; border: 1px solid #e4d8c5; border-radius: 10px; padding: 0 13px; outline: none; background: #fffefb; color: #2c241b; font: inherit; font-size: 14px; transition: border-color .18s ease, box-shadow .18s ease, background .18s ease; }
 body.admin-orders-page .admin_product_offers_field select { appearance: auto; cursor: pointer; }
-body.admin-orders-page .admin_product_offers_field input:focus, body.admin-orders-page .admin_product_offers_field select:focus { border-color: #d89a24; background: #fff; box-shadow: 0 0 0 3px rgba(255, 190, 51, .18); }
+body.admin-orders-page .admin_product_offers_field input:focus,
+body.admin-orders-page .admin_product_offers_field select:focus { border-color: #d89a24; background: #fff; box-shadow: 0 0 0 3px rgba(255, 190, 51, .18); }
 body.admin-orders-page .admin_product_offers_field select:disabled { cursor: not-allowed; opacity: .7; background: #f4ecdf; }
 body.admin-orders-page .admin_product_offers_toggle { display: flex; align-items: center; gap: 11px; width: fit-content; cursor: pointer; color: #3f3327; }
 body.admin-orders-page .admin_product_offers_toggle input { position: absolute; width: 1px; height: 1px; opacity: 0; }
@@ -3244,15 +3246,18 @@ body.admin-orders-page .admin_product_offers_toggle_track::after { position: abs
 body.admin-orders-page .admin_product_offers_toggle input:checked + .admin_product_offers_toggle_track { background: #d9961d; }
 body.admin-orders-page .admin_product_offers_toggle input:checked + .admin_product_offers_toggle_track::after { transform: translateX(18px); }
 body.admin-orders-page .admin_product_offers_toggle input:focus-visible + .admin_product_offers_toggle_track { outline: 3px solid rgba(255, 190, 51, .35); outline-offset: 2px; }
-body.admin-orders-page .admin_product_offers_toggle strong, body.admin-orders-page .admin_product_offers_toggle small { display: block; }
+body.admin-orders-page .admin_product_offers_toggle strong,
+body.admin-orders-page .admin_product_offers_toggle small { display: block; }
 body.admin-orders-page .admin_product_offers_toggle strong { font-size: 13px; font-weight: 900; }
 body.admin-orders-page .admin_product_offers_toggle small { margin-top: 2px; color: #8c7e6d; font-size: 12px; }
 body.admin-orders-page .admin_product_offers_preview { display: grid; gap: 4px; padding: 16px 18px; border: 1px solid rgba(216, 154, 36, .32); border-radius: 12px; background: linear-gradient(135deg, #fff4cf, #fffbf0); box-shadow: inset 0 1px rgba(255, 255, 255, .9); }
 body.admin-orders-page .admin_product_offers_preview span { color: #9a6812; font-size: 11px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
 body.admin-orders-page .admin_product_offers_preview strong { color: #4b3513; font-size: 15px; line-height: 1.45; }
 body.admin-orders-page .admin_product_offers_actions { display: flex; flex-wrap: wrap; gap: 10px; }
-body.admin-orders-page .admin_product_offers_actions button, body.admin-orders-page .admin_product_offers_item_actions button { min-height: 42px; border: 1px solid transparent; border-radius: 9px; padding: 0 15px; font: inherit; font-size: 13px; font-weight: 900; cursor: pointer; transition: transform .18s ease, box-shadow .18s ease, background .18s ease; }
-body.admin-orders-page .admin_product_offers_actions button:hover, body.admin-orders-page .admin_product_offers_item_actions button:hover { transform: translateY(-1px); }
+body.admin-orders-page .admin_product_offers_actions button,
+body.admin-orders-page .admin_product_offers_item_actions button { min-height: 42px; border: 1px solid transparent; border-radius: 9px; padding: 0 15px; font: inherit; font-size: 13px; font-weight: 900; cursor: pointer; transition: transform .18s ease, box-shadow .18s ease, background .18s ease; }
+body.admin-orders-page .admin_product_offers_actions button:hover,
+body.admin-orders-page .admin_product_offers_item_actions button:hover { transform: translateY(-1px); }
 body.admin-orders-page .admin_product_offers_primary { background: linear-gradient(135deg, #ffcb58, #e7a51a); box-shadow: 0 8px 18px rgba(202, 136, 16, .22); color: #2e200d; }
 body.admin-orders-page .admin_product_offers_secondary { border-color: #e2d2ba !important; background: #fffdf8; color: #654919; }
 body.admin-orders-page .admin_product_offers_current { background: #fff; }
@@ -3263,13 +3268,26 @@ body.admin-orders-page .admin_product_offers_item_name { display: block; overflo
 body.admin-orders-page .admin_product_offers_item_details { display: flex; flex-wrap: wrap; gap: 5px 12px; margin-top: 6px; color: #837565; font-size: 12px; }
 body.admin-orders-page .admin_product_offers_item_details b { color: #a66d14; }
 body.admin-orders-page .admin_product_offers_status { display: inline-flex; align-items: center; justify-content: center; min-width: 76px; padding: 6px 9px; border-radius: 999px; font-size: 11px; font-weight: 900; }
-body.admin-orders-page .admin_product_offers_status.is_active { background: #e7f6e9; color: #277441; } body.admin-orders-page .admin_product_offers_status.is_disabled { background: #f2eee8; color: #75695c; } body.admin-orders-page .admin_product_offers_status.is_expired { background: #fff0e8; color: #ad572f; } body.admin-orders-page .admin_product_offers_status.is_scheduled { background: #e8f0ff; color: #4065a6; }
+body.admin-orders-page .admin_product_offers_status.is_active { background: #e7f6e9; color: #277441; }
+body.admin-orders-page .admin_product_offers_status.is_disabled { background: #f2eee8; color: #75695c; }
+body.admin-orders-page .admin_product_offers_status.is_expired { background: #fff0e8; color: #ad572f; }
+body.admin-orders-page .admin_product_offers_status.is_scheduled { background: #e8f0ff; color: #4065a6; }
 body.admin-orders-page .admin_product_offers_item_actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
 body.admin-orders-page .admin_product_offers_item_actions button { min-height: 34px; padding: 0 10px; border-color: #e7dac7; background: #fff; color: #6f511b; }
-body.admin-orders-page .admin_product_offers_item_actions button[data-admin-product-offer-delete], body.admin-orders-page .admin_product_offers_item_actions button[data-offer-delete] { border-color: #f1d2c7; color: #a8452b; }
+body.admin-orders-page .admin_product_offers_item_actions button[data-admin-product-offer-delete],
+body.admin-orders-page .admin_product_offers_item_actions button[data-offer-delete] { border-color: #f1d2c7; color: #a8452b; }
 body.admin-orders-page .admin_product_offers_empty { display: grid; min-height: 136px; place-items: center; align-content: center; gap: 5px; padding: 18px; border: 1px dashed #dec9a9; border-radius: 12px; background: #fffcf5; color: #877664; text-align: center; }
-body.admin-orders-page .admin_product_offers_empty strong { color: #60481f; font-size: 14px; } body.admin-orders-page .admin_product_offers_empty span { font-size: 12px; }
-@media (max-width: 767px) { body.admin-orders-page .admin_product_offers_card { padding: 17px; } body.admin-orders-page .admin_product_offers_card_head { display: grid; gap: 7px; } body.admin-orders-page .admin_product_offers_card_head p { margin: 0; text-align: left; } body.admin-orders-page .admin_product_offers_grid, body.admin-orders-page .admin_product_offers_item { grid-template-columns: 1fr; } body.admin-orders-page .admin_product_offers_item { gap: 12px; } body.admin-orders-page .admin_product_offers_item_actions { justify-content: flex-start; } }
+body.admin-orders-page .admin_product_offers_empty strong { color: #60481f; font-size: 14px; }
+body.admin-orders-page .admin_product_offers_empty span { font-size: 12px; }
+@media (max-width: 767px) {
+  body.admin-orders-page .admin_product_offers_card { padding: 17px; }
+  body.admin-orders-page .admin_product_offers_card_head { display: grid; gap: 7px; }
+  body.admin-orders-page .admin_product_offers_card_head p { margin: 0; text-align: left; }
+  body.admin-orders-page .admin_product_offers_grid,
+  body.admin-orders-page .admin_product_offers_item { grid-template-columns: 1fr; }
+  body.admin-orders-page .admin_product_offers_item { gap: 12px; }
+  body.admin-orders-page .admin_product_offers_item_actions { justify-content: flex-start; }
+}
 
 /* Offers page contrast guardrails */
 .offers_page_section {
@@ -17988,7 +18006,15 @@ body.admin-orders-page .admin_inventory_toggle {
 }
 
 /* Final inventory toolbar and contained three-control row layout. */
-body.admin-orders-page .admin_inventory_toolbar { display: grid; grid-template-columns: minmax(260px, 1fr) auto auto auto; gap: 16px; align-items: center; width: 100%; max-width: 100%; box-sizing: border-box; }
+body.admin-orders-page .admin_inventory_toolbar {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) auto auto auto;
+  gap: 16px;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
 body.admin-orders-page .admin_inventory_search_group { display: grid; gap: 8px; min-width: 0; }
 body.admin-orders-page .admin_inventory_search_group > span { color: #73511c; font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
 body.admin-orders-page .admin_inventory_search_group input { width: 100%; min-width: 0; }
