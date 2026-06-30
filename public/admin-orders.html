@@ -291,9 +291,10 @@
                         <option value="Beverages"></option>
                       </datalist>
                       <div class="admin_product_drafts_actions">
-                        <button type="submit" class="admin_product_drafts_primary" data-i18n="adminUi.saveDraftProduct">Save draft</button>
+                        <button id="adminProductDraftSaveBtn" type="submit" class="admin_product_drafts_primary" data-i18n="adminUi.saveDraftProduct">Save draft</button>
                         <button id="adminProductDraftResetBtn" type="button" class="admin_product_drafts_secondary" data-i18n="adminUi.newDraftProduct">New draft</button>
                       </div>
+                      <p id="adminProductDraftStatus" class="admin_product_drafts_status_message" role="status" aria-live="polite"></p>
                     </form>
 
                     <div class="admin_product_drafts_card admin_product_drafts_library">
@@ -512,7 +513,7 @@
   <script defer src="js/custom.js?v=20260701a"></script>
   <script type="module" src="js/navbar-offers.js?v=20260701a" defer></script>
 <script type="module" src="js/app-shell.js?v=20260701a" defer></script>
-  <script type="module" src="js/admin-orders.js?v=20260701a" defer></script>
+  <script type="module" src="js/admin-orders.js?v=20260701b" defer></script>
 </body>
 
 </html>

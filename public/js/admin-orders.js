@@ -862,6 +862,14 @@ function resetProductDraftForm() {
   if (originalSlug) originalSlug.value = "";
   if (slugInput) slugInput.disabled = false;
   if (title) title.textContent = getAdminText("createProductDraft", "Create product draft");
+  setProductDraftStatus("");
+}
+
+function setProductDraftStatus(message = "", type = "info") {
+  const status = getElement("adminProductDraftStatus");
+  if (!status) return;
+  status.textContent = message;
+  status.dataset.status = type;
 }
 
 function fillProductDraftForm(product) {
@@ -958,23 +966,32 @@ async function adminProductDraftRequest(method, action, payload = {}) {
 }
 
 async function fetchAdminProductDrafts() {
+  setProductDraftStatus(getAdminText("loading", "Loading"), "info");
   const body = await adminProductDraftRequest("GET", "listAdminProducts");
   adminProductDrafts = Array.isArray(body.products) ? body.products : [];
   renderProductDrafts();
+  setProductDraftStatus("");
 }
 
 async function saveAdminProductDraftFromForm() {
-  const saveButton = document.querySelector("#adminProductDraftForm [type='submit']");
+  const saveButton = getElement("adminProductDraftSaveBtn") || document.querySelector("#adminProductDraftForm [type='submit']");
   const product = getProductDraftFormValues();
   if (saveButton) {
     saveButton.disabled = true;
     saveButton.textContent = getAdminText("saving", "Saving...");
   }
+  setProductDraftStatus(getAdminText("saving", "Saving..."), "info");
   try {
     await adminProductDraftRequest("POST", "saveAdminProductDraft", { product });
     await fetchAdminProductDrafts();
     resetProductDraftForm();
-    emitToast(getAdminText("draftProductSaved", "Product draft saved."), "success");
+    const message = getAdminText("draftProductSaved", "Draft saved successfully");
+    setProductDraftStatus(message, "success");
+    emitToast(message, "success");
+  } catch (error) {
+    const message = `${getAdminText("productDraftCouldNotSave", "Failed to save draft")}: ${error.message || getAdminText("somethingWentWrong", "Something went wrong")}`;
+    setProductDraftStatus(message, "error");
+    throw error;
   } finally {
     if (saveButton) {
       saveButton.disabled = false;
@@ -993,11 +1010,14 @@ function editAdminProductDraft(slug) {
 }
 
 async function archiveAdminProductDraft(slug) {
+  setProductDraftStatus(getAdminText("updating", "Updating..."), "info");
   await adminProductDraftRequest("PATCH", "archiveAdminProduct", { slug });
   await fetchAdminProductDrafts();
   const originalSlug = getElement("adminProductDraftOriginalSlug")?.value;
   if (originalSlug === slug) resetProductDraftForm();
-  emitToast(getAdminText("draftProductArchived", "Product draft archived."), "success");
+  const message = getAdminText("draftProductArchived", "Product draft archived.");
+  setProductDraftStatus(message, "success");
+  emitToast(message, "success");
 }
 
 function renderShippingRatesEditor() {
@@ -1696,7 +1716,20 @@ function bindDashboardEvents() {
     if (productDraftArchive) {
       const slug = productDraftArchive.getAttribute("data-admin-product-draft-archive");
       archiveAdminProductDraft(slug)
-        .catch((error) => emitToast(error.message || getAdminText("productDraftCouldNotArchive", "Product draft could not be archived."), "error"));
+        .catch((error) => {
+          const message = error.message || getAdminText("productDraftCouldNotArchive", "Product draft could not be archived.");
+          setProductDraftStatus(`${getAdminText("productDraftCouldNotArchive", "Product draft could not be archived.")}: ${message}`, "error");
+          emitToast(message, "error");
+        });
+      return;
+    }
+
+    if (event.target.closest("#adminProductDraftSaveBtn")) {
+      event.preventDefault();
+      saveAdminProductDraftFromForm().catch((error) => {
+        console.error("Product draft save failed.", error);
+        emitToast(error.message || getAdminText("productDraftCouldNotSave", "Product draft could not be saved."), "error");
+      });
       return;
     }
 
