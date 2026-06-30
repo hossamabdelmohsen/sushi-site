@@ -1,4 +1,4 @@
-import { buildProductUrl, formatPrice, getExactProductById } from "./product-catalog.js?v=20260602c";
+import { buildProductUrl, formatPrice, getExactProductById } from "./product-catalog.js?v=20260701a";
 let offers = []; let refreshTimer = null; const listeners = new Set();
 function cairoDay(value = new Date()) { const date = new Date(value); if (!Number.isFinite(date.getTime())) return ""; const parts = new Intl.DateTimeFormat("en", { timeZone: "Africa/Cairo", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(date); const values = Object.fromEntries(parts.map((part) => [part.type, part.value])); return `${values.year}-${values.month}-${values.day}`; }
 function offerDay(value) { const source = String(value || "").trim(); return /^\d{4}-\d{2}-\d{2}/.test(source) ? source.slice(0, 10) : cairoDay(source); }

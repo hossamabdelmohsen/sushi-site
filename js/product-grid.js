@@ -2,7 +2,7 @@ import {
   addCartItemWithInventory,
   getInventoryStatus,
   subscribeToInventory
-} from "./inventory-store.js?v=20260619a";
+} from "./inventory-store.js?v=20260701a";
 import {
   applyResponsiveImage,
   buildResponsiveImageMarkup,
@@ -15,8 +15,8 @@ import {
   getProductIdFromCard,
   getProductSearchText,
   searchProductsDetailed
-} from "./product-catalog.js?v=20260603a";
-import { isProductWishlisted, toggleWishlistItem } from "./wishlist-store.js?v=20260602c";
+} from "./product-catalog.js?v=20260701a";
+import { isProductWishlisted, toggleWishlistItem } from "./wishlist-store.js?v=20260701a";
 import {
   bindCardNavigation,
   buildRatingSummaryMarkup,
@@ -24,10 +24,10 @@ import {
   escapeHtml,
   primeRatingsCache,
   shareProduct
-} from "./ui-utils.js?v=20260523a";
-import { getActiveOfferForProduct, getOfferDisplayData, subscribeToProductOffers } from "./offers-data.js?v=20260620a";
-import { t } from "./i18n/i18n.js?v=20260629productsui";
-import { getProductDisplayData } from "./i18n/product-display.js?v=20260629titlebidi";
+} from "./ui-utils.js?v=20260701a";
+import { getActiveOfferForProduct, getOfferDisplayData, subscribeToProductOffers } from "./offers-data.js?v=20260701a";
+import { t } from "./i18n/i18n.js?v=20260701a";
+import { getProductDisplayData } from "./i18n/product-display.js?v=20260701a";
 
 let productTitleTooltip = null;
 let productTitleTooltipHideTimer = null;

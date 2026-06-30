@@ -9,9 +9,9 @@ import {
   setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { auth, db } from "./firebase-config.js?v=20260502b";
-import { getAllProducts } from "./product-catalog.js?v=20260602c";
-import { timestampToDate } from "./ui-utils.js?v=20260502b";
+import { auth, db } from "./firebase-config.js?v=20260701a";
+import { getAllProducts } from "./product-catalog.js?v=20260701a";
+import { timestampToDate } from "./ui-utils.js?v=20260701a";
 
 const REVIEW_SUMMARIES_CACHE_KEY = "sushi-box-review-summaries:v1";
 const REVIEW_SUMMARIES_CACHE_TTL = 5 * 60 * 1000;

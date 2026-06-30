@@ -375,16 +375,16 @@ function Footer() {
 function ProductScripts() {
   return (
     <>
-      <Script src="/js/jquery-3.4.1.min.js" strategy="afterInteractive" />
+      <Script src="/js/jquery-3.4.1.min.js?v=20260701a" strategy="afterInteractive" />
       <Script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" strategy="afterInteractive" />
-      <Script src="/js/bootstrap.js" strategy="afterInteractive" />
+      <Script src="/js/bootstrap.js?v=20260701a" strategy="afterInteractive" />
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js" strategy="afterInteractive" />
       <Script src="https://unpkg.com/isotope-layout@3.0.4/dist/isotope.pkgd.min.js" strategy="afterInteractive" />
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/js/jquery.nice-select.min.js" strategy="afterInteractive" />
-      <Script src="/js/custom.js?v=20260603a" strategy="afterInteractive" />
-      <Script type="module" src="/js/navbar-offers.js?v=20260518c" strategy="afterInteractive" />
-      <Script type="module" src="/js/app-shell.js?v=20260629commonaccessibility" strategy="afterInteractive" />
-      <Script type="module" src="/js/product-page.js?v=20260629productdetailsi18n" strategy="afterInteractive" />
+      <Script src="/js/custom.js?v=20260701a" strategy="afterInteractive" />
+      <Script type="module" src="/js/navbar-offers.js?v=20260701a" strategy="afterInteractive" />
+      <Script type="module" src="/js/app-shell.js?v=20260701a" strategy="afterInteractive" />
+      <Script type="module" src="/js/product-page.js?v=20260701a" strategy="afterInteractive" />
     </>
   );
 }

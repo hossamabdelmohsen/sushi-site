@@ -20,11 +20,11 @@ export default function RootLayout({ children }) {
         <link rel="shortcut icon" href="/images/favicon.png" type="image/x-icon" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/css/nice-select.min.css" />
-        <link rel="stylesheet" href="/css/bootstrap.css" />
-        <link rel="stylesheet" href="/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="/css/bootstrap.css?v=20260701a" />
+        <link rel="stylesheet" href="/css/font-awesome.min.css?v=20260701a" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap" />
-        <link rel="stylesheet" href="/css/style.css?v=20260603d" />
-        <link rel="stylesheet" href="/css/responsive.css?v=20260629footerrows" />
+        <link rel="stylesheet" href="/css/style.css?v=20260701a" />
+        <link rel="stylesheet" href="/css/responsive.css?v=20260701a" />
       </head>
       <body className="sub_page product-page">{children}</body>
     </html>

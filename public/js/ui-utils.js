@@ -1,4 +1,4 @@
-import { t } from "./i18n/i18n.js";
+import { t } from "./i18n/i18n.js?v=20260701a";
 
 function normalizeRating(rating) {
   return Math.max(0, Math.min(5, Number(rating) || 0));

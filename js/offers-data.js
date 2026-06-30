@@ -1,4 +1,4 @@
-import { buildProductUrl, formatPrice, getExactProductById } from "./product-catalog.js?v=20260602c";
+import { buildProductUrl, formatPrice, getExactProductById } from "./product-catalog.js?v=20260701a";
 
 let offers = [];
 let refreshTimer = null;

@@ -8,15 +8,15 @@ import {
   setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { auth, db } from "./firebase-config.js?v=20260502b";
+import { auth, db } from "./firebase-config.js?v=20260701a";
 import {
   getScopedStorageKey,
   readStorageArray,
   removeLegacyStorageKeys,
   removeStorageKey,
   writeStorageArray
-} from "./scoped-storage.js";
-import { trackAddToWishlist } from "./analytics-events.js?v=20260602c";
+} from "./scoped-storage.js?v=20260701a";
+import { trackAddToWishlist } from "./analytics-events.js?v=20260701a";
 
 const LEGACY_WISHLIST_STORAGE_KEY = "sushi-box-wishlist";
 const WISHLIST_UPDATED_EVENT = "sushi-box:wishlist-updated";

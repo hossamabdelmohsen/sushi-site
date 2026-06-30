@@ -1,5 +1,5 @@
-import { getLanguage } from "./i18n.js?v=20260629productfix";
-import { SUSHI_PRODUCT_TRANSLATIONS_AR } from "./product-translations-ar.js?v=20260629titlebidi";
+import { getLanguage } from "./i18n.js?v=20260701a";
+import { SUSHI_PRODUCT_TRANSLATIONS_AR } from "./product-translations-ar.js?v=20260701a";
 
 const FALLBACK_PRODUCT_NAME = "Product";
 const FALLBACK_PRODUCT_IMAGE = "images/optimized/Logo.webp";

@@ -1,10 +1,10 @@
-import { getActiveOfferDisplayData, subscribeToProductOffers } from "./offers-data.js?v=20260620a";
-import { buildResponsiveImageMarkup } from "./product-catalog.js?v=20260602c";
-import { subscribeToReviewSummaries } from "./firebase-reviews.js?v=20260618b";
-import { addCartItemWithInventory, getInventoryStatus, subscribeToInventory } from "./inventory-store.js?v=20260619a";
-import { bindCardNavigation, buildRatingSummaryMarkup, escapeHtml, primeRatingsCache, shareProduct } from "./ui-utils.js?v=20260523a";
-import { t } from "./i18n/i18n.js";
-import { getProductDisplayData } from "./i18n/product-display.js?v=20260629titlebidi";
+import { getActiveOfferDisplayData, subscribeToProductOffers } from "./offers-data.js?v=20260701a";
+import { buildResponsiveImageMarkup } from "./product-catalog.js?v=20260701a";
+import { subscribeToReviewSummaries } from "./firebase-reviews.js?v=20260701a";
+import { addCartItemWithInventory, getInventoryStatus, subscribeToInventory } from "./inventory-store.js?v=20260701a";
+import { bindCardNavigation, buildRatingSummaryMarkup, escapeHtml, primeRatingsCache, shareProduct } from "./ui-utils.js?v=20260701a";
+import { t } from "./i18n/i18n.js?v=20260701a";
+import { getProductDisplayData } from "./i18n/product-display.js?v=20260701a";
 
 let latestReviewSummaries = {};
 

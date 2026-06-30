@@ -1,5 +1,5 @@
-import { getActiveOffers, subscribeToProductOffers } from "./offers-data.js?v=20260620a";
-import { applyTranslations, t } from "./i18n/i18n.js";
+import { getActiveOffers, subscribeToProductOffers } from "./offers-data.js?v=20260701a";
+import { applyTranslations, t } from "./i18n/i18n.js?v=20260701a";
 
 function createElementFromHTML(markup) {
   const template = document.createElement("template");

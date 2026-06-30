@@ -8,8 +8,8 @@ import {
   query
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { auth, db } from "./firebase-config.js?v=20260502b";
-import { getGuestSessionId } from "./scoped-storage.js";
+import { auth, db } from "./firebase-config.js?v=20260701a";
+import { getGuestSessionId } from "./scoped-storage.js?v=20260701a";
 
 function waitForAuthState() {
   if (auth.currentUser) {

@@ -1,7 +1,7 @@
-import { formatPrice } from "./product-catalog.js?v=20260602c";
-import { subscribeToCustomerOrders } from "./orders-store.js?v=20260520a";
-import { emitToast, escapeHtml } from "./ui-utils.js?v=20260502b";
-import { getLanguage, t } from "./i18n/i18n.js";
+import { formatPrice } from "./product-catalog.js?v=20260701a";
+import { subscribeToCustomerOrders } from "./orders-store.js?v=20260701a";
+import { emitToast, escapeHtml } from "./ui-utils.js?v=20260701a";
+import { getLanguage, t } from "./i18n/i18n.js?v=20260701a";
 
 let latestOrdersState = {
   loading: true,

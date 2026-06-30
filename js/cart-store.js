@@ -1,13 +1,13 @@
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { auth } from "./firebase-config.js?v=20260502b";
+import { auth } from "./firebase-config.js?v=20260701a";
 import {
   findStorageKeys,
   getScopedStorageKey,
   readStorageArray,
   removeStorageKey,
   writeStorageArray
-} from "./scoped-storage.js";
-import { trackAddToCart, trackRemoveFromCart } from "./analytics-events.js?v=20260602c";
+} from "./scoped-storage.js?v=20260701a";
+import { trackAddToCart, trackRemoveFromCart } from "./analytics-events.js?v=20260701a";
 
 const LEGACY_CART_STORAGE_KEY = "sushi-box-cart";
 const GUEST_CART_STORAGE_PREFIX = "sushi-box-cart-guest-";

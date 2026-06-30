@@ -1,6 +1,6 @@
-import { getProductById } from "./product-catalog.js?v=20260602c";
+import { getProductById } from "./product-catalog.js?v=20260701a";
 import { logEvent } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
-import { analyticsReady } from "./firebase-config.js?v=20260502b";
+import { analyticsReady } from "./firebase-config.js?v=20260701a";
 
 const CURRENCY = "EGP";
 const PURCHASED_ORDERS_KEY = "sushi-box-ga4-purchases";

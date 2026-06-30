@@ -23131,6 +23131,41 @@ html[dir="rtl"] .delivery-list {
   padding-inline-start: 0 !important;
 }
 
+@media (max-width: 768px) {
+  html[dir="rtl"] body.feedback-page {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  html[dir="rtl"] body.feedback-page .feedback_page_main,
+  html[dir="rtl"] body.feedback-page .feedback_hero_section,
+  html[dir="rtl"] body.feedback-page .feedback_appreciation_section,
+  html[dir="rtl"] body.feedback-page .feedback_hero_section > .container,
+  html[dir="rtl"] body.feedback-page .feedback_appreciation_section > .container,
+  html[dir="rtl"] body.feedback-page .feedback_layout,
+  html[dir="rtl"] body.feedback-page .feedback_info_panel,
+  html[dir="rtl"] body.feedback-page .feedback_form_card {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-inline: auto !important;
+  }
+
+  html[dir="rtl"] body.feedback-page .feedback_honeypot {
+    position: fixed !important;
+    inset: auto auto 0 0 !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    clip: rect(0 0 0 0) !important;
+    clip-path: inset(50%) !important;
+    white-space: nowrap !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+}
+
 html[dir="rtl"] .footer_section .footer_policy_links a::before {
   margin-inline-start: 7px !important;
   margin-inline-end: 0 !important;
