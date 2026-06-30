@@ -14494,6 +14494,257 @@ body.admin-orders-page .admin_inventory_item button:disabled {
   opacity: 0.7;
 }
 
+body.admin-orders-page .admin_product_drafts_panel {
+  display: grid;
+  gap: 18px;
+}
+
+body.admin-orders-page .admin_product_drafts_note {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(185, 135, 44, 0.2);
+  border-radius: 14px;
+  background: #fff8e6;
+  color: #7a5115;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+body.admin-orders-page .admin_product_drafts_toolbar {
+  display: flex;
+  align-items: end;
+  gap: 16px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+body.admin-orders-page .admin_product_drafts_filter {
+  display: grid;
+  gap: 8px;
+  min-width: 180px;
+}
+
+body.admin-orders-page .admin_product_drafts_filter span {
+  color: #73511c;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+body.admin-orders-page .admin_product_drafts_filter select,
+body.admin-orders-page .admin_product_drafts_fields input,
+body.admin-orders-page .admin_product_drafts_fields textarea {
+  width: 100%;
+  border: 1px solid rgba(185, 135, 44, 0.22);
+  border-radius: 12px;
+  background: #fff;
+  color: #211507;
+  padding: 11px 12px;
+  font-size: 14px;
+  outline: none;
+}
+
+body.admin-orders-page .admin_product_drafts_filter select:focus,
+body.admin-orders-page .admin_product_drafts_fields input:focus,
+body.admin-orders-page .admin_product_drafts_fields textarea:focus {
+  border-color: rgba(185, 135, 44, 0.55);
+  box-shadow: 0 0 0 3px rgba(185, 135, 44, 0.12);
+}
+
+body.admin-orders-page .admin_product_drafts_grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr);
+  gap: 18px;
+  align-items: start;
+}
+
+body.admin-orders-page .admin_product_drafts_form,
+body.admin-orders-page .admin_product_drafts_card {
+  border: 1px solid rgba(185, 135, 44, 0.16);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 18px 45px rgba(33, 21, 7, 0.07);
+  padding: 18px;
+}
+
+body.admin-orders-page .admin_product_drafts_card_head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+body.admin-orders-page .admin_product_drafts_card_head span {
+  display: block;
+  color: #b9872c;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+body.admin-orders-page .admin_product_drafts_card_head h3 {
+  margin: 4px 0 0;
+  color: #211507;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+body.admin-orders-page .admin_product_drafts_card_head p {
+  max-width: 360px;
+  margin: 0;
+  color: rgba(80, 54, 12, 0.62);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+body.admin-orders-page .admin_product_drafts_fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+body.admin-orders-page .admin_product_drafts_fields label {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  color: #73511c;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+body.admin-orders-page .admin_product_drafts_fields textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+body.admin-orders-page .admin_product_drafts_actions,
+body.admin-orders-page .admin_product_drafts_item_actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+body.admin-orders-page .admin_product_drafts_actions {
+  margin-top: 16px;
+}
+
+body.admin-orders-page .admin_product_drafts_primary,
+body.admin-orders-page .admin_product_drafts_secondary,
+body.admin-orders-page .admin_product_drafts_item_actions button {
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+body.admin-orders-page .admin_product_drafts_primary {
+  background: #211507;
+  color: #fff;
+}
+
+body.admin-orders-page .admin_product_drafts_secondary,
+body.admin-orders-page .admin_product_drafts_item_actions button {
+  background: #fff4d8;
+  color: #7a5115;
+}
+
+body.admin-orders-page .admin_product_drafts_primary:disabled,
+body.admin-orders-page .admin_product_drafts_item_actions button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+body.admin-orders-page .admin_product_drafts_list {
+  display: grid;
+  gap: 12px;
+}
+
+body.admin-orders-page .admin_product_drafts_item,
+body.admin-orders-page .admin_product_drafts_empty {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid rgba(185, 135, 44, 0.14);
+  border-radius: 16px;
+  background: #fffaf0;
+}
+
+body.admin-orders-page .admin_product_drafts_empty {
+  grid-template-columns: 1fr;
+  color: rgba(80, 54, 12, 0.66);
+}
+
+body.admin-orders-page .admin_product_drafts_empty strong,
+body.admin-orders-page .admin_product_drafts_item_main strong {
+  color: #211507;
+  font-weight: 900;
+}
+
+body.admin-orders-page .admin_product_drafts_item_main {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+body.admin-orders-page .admin_product_drafts_item_main > span,
+body.admin-orders-page .admin_product_drafts_meta {
+  color: rgba(80, 54, 12, 0.62);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+body.admin-orders-page .admin_product_drafts_meta {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+body.admin-orders-page .admin_product_drafts_status {
+  justify-self: end;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+body.admin-orders-page .admin_product_drafts_status.is_draft {
+  background: #eaf8ef;
+  color: #1f7a3e;
+}
+
+body.admin-orders-page .admin_product_drafts_status.is_archived {
+  background: #f1ece2;
+  color: #765b36;
+}
+
+body.admin-orders-page .admin_product_drafts_item_actions {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 1100px) {
+  body.admin-orders-page .admin_product_drafts_grid,
+  body.admin-orders-page .admin_product_drafts_fields {
+    grid-template-columns: 1fr;
+  }
+
+  body.admin-orders-page .admin_product_drafts_card_head,
+  body.admin-orders-page .admin_product_drafts_item {
+    grid-template-columns: 1fr;
+  }
+
+  body.admin-orders-page .admin_product_drafts_status {
+    justify-self: start;
+  }
+}
+
 body.admin-orders-page .admin_inventory_save_all {
   min-height: 44px;
   padding: 0 18px;

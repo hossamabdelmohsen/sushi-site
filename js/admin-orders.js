@@ -28,7 +28,8 @@ const FILTER_LABELS = {
 
 const STATUS_VALUES = new Set(ORDER_STATUSES.map((status) => status.value));
 const NEEDS_ACTION_STATUSES = new Set(["pending"]);
-const ADMIN_SECTIONS = new Set(["overview", "new-orders", "actioned-orders", "inventory", "shipping", "promo-codes", "product-offers"]);
+const ADMIN_SECTIONS = new Set(["overview", "new-orders", "actioned-orders", "inventory", "product-management", "shipping", "promo-codes", "product-offers"]);
+const ADMIN_PRODUCT_STATUSES = new Set(["draft", "archived"]);
 
 let currentUser = null;
 let unsubscribeOrders = null;
@@ -45,6 +46,9 @@ let checkoutSettings = {
   coupons: []
 };
 let productOffers = [];
+let adminProductDrafts = [];
+let productDraftSearchQuery = "";
+let productDraftStatusFilter = "all";
 
 const STATUS_ACCENT_CLASSES = {
   pending: "pending",
@@ -794,6 +798,208 @@ async function saveAllVisibleInventory() {
   emitToast(getAdminCountText("inventoryItemsSaved", pending.length, "{count} inventory item saved.", "{count} inventory items saved."), "success");
 }
 
+function normalizeProductDraftSlug(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_]+/g, "-")
+    .replace(/[^a-z0-9-]/g, "")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+function splitDraftList(value) {
+  return String(value || "")
+    .split(/[\n,]+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function getProductDraftStatusLabel(status) {
+  return status === "archived"
+    ? getAdminText("archived", "Archived")
+    : getAdminText("draftOnly", "Draft only");
+}
+
+function getProductDraftStatusClass(status) {
+  return status === "archived" ? "is_archived" : "is_draft";
+}
+
+function getProductDraftFormValues() {
+  const slug = normalizeProductDraftSlug(getElement("adminProductDraftSlug")?.value);
+  const name = String(getElement("adminProductDraftName")?.value || "").trim();
+  const price = Number(getElement("adminProductDraftPrice")?.value);
+  const category = String(getElement("adminProductDraftCategory")?.value || "").trim();
+  if (!slug || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
+    throw new Error(getAdminText("productDraftInvalidSlug", "Enter a lowercase URL-safe slug."));
+  }
+  if (!name || !Number.isFinite(price) || price <= 0 || !category) {
+    throw new Error(getAdminText("selectDraftProductFields", "Enter slug, name, positive price, and category."));
+  }
+  return {
+    slug,
+    name,
+    nameAr: String(getElement("adminProductDraftNameAr")?.value || "").trim(),
+    price,
+    category,
+    filterGroup: String(getElement("adminProductDraftFilterGroup")?.value || "").trim(),
+    description: String(getElement("adminProductDraftDescription")?.value || "").trim(),
+    descriptionAr: String(getElement("adminProductDraftDescriptionAr")?.value || "").trim(),
+    images: splitDraftList(getElement("adminProductDraftImages")?.value),
+    status: "draft",
+    isActive: false,
+    sortOrder: Number.isFinite(Number(getElement("adminProductDraftSortOrder")?.value)) ? Number(getElement("adminProductDraftSortOrder").value) : 0,
+    searchKeywords: splitDraftList(getElement("adminProductDraftSearchKeywords")?.value)
+  };
+}
+
+function resetProductDraftForm() {
+  const form = getElement("adminProductDraftForm");
+  if (form) form.reset();
+  const originalSlug = getElement("adminProductDraftOriginalSlug");
+  const slugInput = getElement("adminProductDraftSlug");
+  const title = getElement("adminProductDraftFormTitle");
+  if (originalSlug) originalSlug.value = "";
+  if (slugInput) slugInput.disabled = false;
+  if (title) title.textContent = getAdminText("createProductDraft", "Create product draft");
+}
+
+function fillProductDraftForm(product) {
+  if (!product) return;
+  getElement("adminProductDraftOriginalSlug").value = product.slug || "";
+  getElement("adminProductDraftSlug").value = product.slug || "";
+  getElement("adminProductDraftSlug").disabled = Boolean(product.slug);
+  getElement("adminProductDraftName").value = product.name || "";
+  getElement("adminProductDraftNameAr").value = product.nameAr || "";
+  getElement("adminProductDraftPrice").value = String(Number(product.price) || "");
+  getElement("adminProductDraftCategory").value = product.category || "";
+  getElement("adminProductDraftFilterGroup").value = product.filterGroup || "";
+  getElement("adminProductDraftSortOrder").value = String(Number(product.sortOrder) || 0);
+  getElement("adminProductDraftImages").value = Array.isArray(product.images) ? product.images.join("\n") : "";
+  getElement("adminProductDraftSearchKeywords").value = Array.isArray(product.searchKeywords) ? product.searchKeywords.join(", ") : "";
+  getElement("adminProductDraftDescription").value = product.description || "";
+  getElement("adminProductDraftDescriptionAr").value = product.descriptionAr || "";
+  const title = getElement("adminProductDraftFormTitle");
+  if (title) title.textContent = getAdminText("editProductDraft", "Edit product draft");
+  getElement("product-management")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function productDraftMatchesFilters(product) {
+  const status = ADMIN_PRODUCT_STATUSES.has(product?.status) ? product.status : "draft";
+  if (productDraftStatusFilter !== "all" && status !== productDraftStatusFilter) return false;
+  if (!productDraftSearchQuery) return true;
+  const haystack = [
+    product.slug,
+    product.name,
+    product.nameAr,
+    product.category,
+    product.filterGroup,
+    status,
+    ...(Array.isArray(product.searchKeywords) ? product.searchKeywords : [])
+  ].join(" ").toLowerCase();
+  return haystack.includes(productDraftSearchQuery);
+}
+
+function renderProductDrafts() {
+  const list = getElement("adminProductDraftList");
+  const count = getElement("adminProductDraftCount");
+  if (!list) return;
+  const products = adminProductDrafts.filter(productDraftMatchesFilters);
+  if (count) {
+    count.textContent = getAdminCountText("draftProductCount", products.length, "{count} draft", "{count} drafts");
+  }
+  if (!products.length) {
+    list.innerHTML = `<div class="admin_product_drafts_empty"><strong>${escapeHtml(getAdminText(productDraftSearchQuery || productDraftStatusFilter !== "all" ? "noMatchingDraftProducts" : "noDraftProductsYet", productDraftSearchQuery || productDraftStatusFilter !== "all" ? "No matching draft products." : "No product drafts yet."))}</strong><span>${escapeHtml(getAdminText("productDraftsNote", "Draft only - not visible on storefront"))}</span></div>`;
+    return;
+  }
+  list.innerHTML = products.map((product) => {
+    const status = ADMIN_PRODUCT_STATUSES.has(product.status) ? product.status : "draft";
+    const imageCount = Array.isArray(product.images) ? product.images.length : 0;
+    return `
+      <article class="admin_product_drafts_item">
+        <div class="admin_product_drafts_item_main">
+          <strong>${escapeHtml(product.name || product.slug)}</strong>
+          <span>${escapeHtml(product.slug)} - ${escapeHtml(product.category || getAdminText("notAvailable", "Not available"))}</span>
+          <div class="admin_product_drafts_meta">
+            <b>${escapeHtml(formatPrice(Number(product.price) || 0))}</b>
+            <span>${escapeHtml(getAdminText("imageCount", "{count} image(s)", { count: imageCount }))}</span>
+            <span>${escapeHtml(getAdminText("notVisibleOnStorefront", "Not visible on storefront"))}</span>
+          </div>
+        </div>
+        <span class="admin_product_drafts_status ${escapeHtml(getProductDraftStatusClass(status))}">${escapeHtml(getProductDraftStatusLabel(status))}</span>
+        <div class="admin_product_drafts_item_actions">
+          <button type="button" data-admin-product-draft-edit="${escapeHtml(product.slug)}">${escapeHtml(getAdminText("edit", "Edit"))}</button>
+          <button type="button" data-admin-product-draft-archive="${escapeHtml(product.slug)}" ${status === "archived" ? "disabled" : ""}>${escapeHtml(getAdminText("archiveDraft", "Archive draft"))}</button>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+async function adminProductDraftRequest(method, action, payload = {}) {
+  if (!currentUser || typeof currentUser.getIdToken !== "function") {
+    throw new Error(getAdminText("signInAgainProductDrafts", "Please sign in again before managing product drafts."));
+  }
+  const token = await currentUser.getIdToken();
+  const response = await fetch(`/api/admin-actions?action=${encodeURIComponent(action)}`, {
+    method,
+    cache: "no-store",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: method === "GET" ? undefined : JSON.stringify(payload)
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(body.error || getAdminText("productDraftCouldNotSave", "Product draft could not be saved."));
+  }
+  return body;
+}
+
+async function fetchAdminProductDrafts() {
+  const body = await adminProductDraftRequest("GET", "listAdminProducts");
+  adminProductDrafts = Array.isArray(body.products) ? body.products : [];
+  renderProductDrafts();
+}
+
+async function saveAdminProductDraftFromForm() {
+  const saveButton = document.querySelector("#adminProductDraftForm [type='submit']");
+  const product = getProductDraftFormValues();
+  if (saveButton) {
+    saveButton.disabled = true;
+    saveButton.textContent = getAdminText("saving", "Saving...");
+  }
+  try {
+    await adminProductDraftRequest("POST", "saveAdminProductDraft", { product });
+    await fetchAdminProductDrafts();
+    resetProductDraftForm();
+    emitToast(getAdminText("draftProductSaved", "Product draft saved."), "success");
+  } finally {
+    if (saveButton) {
+      saveButton.disabled = false;
+      saveButton.textContent = getAdminText("saveDraftProduct", "Save draft");
+    }
+  }
+}
+
+function editAdminProductDraft(slug) {
+  const product = adminProductDrafts.find((item) => item.slug === slug);
+  if (!product) {
+    emitToast(getAdminText("productDraftNotFound", "Product draft was not found."), "error");
+    return;
+  }
+  fillProductDraftForm(product);
+}
+
+async function archiveAdminProductDraft(slug) {
+  await adminProductDraftRequest("PATCH", "archiveAdminProduct", { slug });
+  await fetchAdminProductDrafts();
+  const originalSlug = getElement("adminProductDraftOriginalSlug")?.value;
+  if (originalSlug === slug) resetProductDraftForm();
+  emitToast(getAdminText("draftProductArchived", "Product draft archived."), "success");
+}
+
 function renderShippingRatesEditor() {
   const listEl = getElement("adminShippingRatesList");
   if (!listEl) {
@@ -1473,6 +1679,32 @@ function bindDashboardEvents() {
       return;
     }
 
+    if (event.target.closest("#adminProductDraftRefreshBtn")) {
+      fetchAdminProductDrafts()
+        .then(() => emitToast(getAdminText("productDraftsRefreshed", "Product drafts refreshed."), "success"))
+        .catch((error) => emitToast(error.message || getAdminText("productDraftsCouldNotLoad", "Product drafts could not be loaded."), "error"));
+      return;
+    }
+
+    const productDraftEdit = event.target.closest("[data-admin-product-draft-edit]");
+    if (productDraftEdit) {
+      editAdminProductDraft(productDraftEdit.getAttribute("data-admin-product-draft-edit"));
+      return;
+    }
+
+    const productDraftArchive = event.target.closest("[data-admin-product-draft-archive]");
+    if (productDraftArchive) {
+      const slug = productDraftArchive.getAttribute("data-admin-product-draft-archive");
+      archiveAdminProductDraft(slug)
+        .catch((error) => emitToast(error.message || getAdminText("productDraftCouldNotArchive", "Product draft could not be archived."), "error"));
+      return;
+    }
+
+    if (event.target.closest("#adminProductDraftResetBtn")) {
+      resetProductDraftForm();
+      return;
+    }
+
     if (event.target.matches("#adminInventoryTrackAll")) {
       document.querySelectorAll("[data-inventory-track]").forEach((input) => { input.checked = event.target.checked; });
       syncTrackStockAll();
@@ -1564,6 +1796,40 @@ function bindDashboardEvents() {
   if (productOfferForm) productOfferForm.addEventListener("submit", (event) => { event.preventDefault(); saveProductOfferFromForm().catch((error) => emitToast(error.message || getAdminText("productOfferCouldNotSave", "Product offer could not be saved."), "error")); });
   ["adminProductOfferSlug", "adminProductOfferType", "adminProductOfferValue"].forEach((id) => getElement(id)?.addEventListener("input", updateProductOfferPreview));
 
+  const productDraftForm = getElement("adminProductDraftForm");
+  if (productDraftForm) {
+    productDraftForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      saveAdminProductDraftFromForm().catch((error) => {
+        console.error("Product draft save failed.", error);
+        emitToast(error.message || getAdminText("productDraftCouldNotSave", "Product draft could not be saved."), "error");
+      });
+    });
+  }
+
+  const productDraftSlug = getElement("adminProductDraftSlug");
+  if (productDraftSlug) {
+    productDraftSlug.addEventListener("blur", () => {
+      productDraftSlug.value = normalizeProductDraftSlug(productDraftSlug.value);
+    });
+  }
+
+  const productDraftSearch = getElement("adminProductDraftSearch");
+  if (productDraftSearch) {
+    productDraftSearch.addEventListener("input", () => {
+      productDraftSearchQuery = String(productDraftSearch.value || "").trim().toLowerCase();
+      renderProductDrafts();
+    });
+  }
+
+  const productDraftStatus = getElement("adminProductDraftStatusFilter");
+  if (productDraftStatus) {
+    productDraftStatus.addEventListener("change", () => {
+      productDraftStatusFilter = productDraftStatus.value || "all";
+      renderProductDrafts();
+    });
+  }
+
   const inventorySearch = getElement("adminInventorySearch");
   if (inventorySearch) {
     inventorySearch.addEventListener("input", () => {
@@ -1607,6 +1873,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     subscribeToAdminOrders();
     subscribeToAdminInventory();
+    fetchAdminProductDrafts().catch((error) => { console.error("Product drafts load failed.", error); emitToast(error.message || getAdminText("productDraftsCouldNotLoad", "Product drafts could not be loaded."), "error"); });
     fetchProductOffers().catch((error) => { console.error("Product offers load failed.", error); emitToast(error.message || getAdminText("productOffersCouldNotLoad", "Product offers could not be loaded."), "error"); });
   }, (error) => {
     console.error("Admin auth listener failed.", error);

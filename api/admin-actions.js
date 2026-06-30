@@ -2,6 +2,7 @@ const { isAdminUser } = require("../lib/server/admin-access.cjs");
 const { verifyFirebaseIdToken } = require("../lib/server/firebase-auth.cjs");
 const { deleteCoupon, getCheckoutSettings, saveCoupon, saveShippingRates } = require("../lib/server/checkout-settings.cjs");
 const { saveInventoryRecord } = require("../lib/server/inventory-storage.cjs");
+const { archiveAdminProduct, listAdminProducts, saveAdminProductDraft } = require("../lib/server/admin-products-storage.cjs");
 const { deleteProductOffer, getProductOffer, listProductOffers, saveProductOffer, setProductOfferEnabled } = require("../lib/server/product-offers-storage.cjs");
 const { refreshReviewSummary } = require("../lib/server/review-summary-storage.cjs");
 const { updateOrderStatusRecord } = require("../lib/server/order-storage.cjs");
@@ -50,6 +51,9 @@ module.exports = async function handler(request, response) {
     if (action === "saveCoupon" && request.method === "POST") return sendJson(response, 200, { ok: true, coupon: await saveCoupon(body.coupon || {}) });
     if (action === "deleteCoupon" && request.method === "POST") return sendJson(response, 200, { ok: true, ...(await deleteCoupon(body.code)) });
     if (action === "saveInventory" && request.method === "POST") return sendJson(response, 200, { ok: true, inventory: await saveInventoryRecord(body.inventory || body, { updatedBy: admin.email || admin.uid || "admin" }) });
+    if (action === "listAdminProducts" && request.method === "GET") return sendJson(response, 200, { ok: true, products: await listAdminProducts() });
+    if (action === "saveAdminProductDraft" && ["POST", "PUT"].includes(request.method)) return sendJson(response, 200, { ok: true, product: await saveAdminProductDraft(body.product || body, admin.email || admin.uid || "admin") });
+    if (action === "archiveAdminProduct" && request.method === "PATCH") return sendJson(response, 200, { ok: true, product: await archiveAdminProduct(body.slug, admin.email || admin.uid || "admin") });
     if (action === "getProductOffers" && request.method === "GET") { const slug = String(request.query?.slug || ""); return sendJson(response, 200, { ok: true, offers: slug ? [await getProductOffer(slug)].filter(Boolean) : await listProductOffers() }); }
     if (action === "saveProductOffer" && ["POST", "PUT"].includes(request.method)) return sendJson(response, 200, { ok: true, offer: await saveProductOffer(body.offer || body, admin.email || admin.uid) });
     if (action === "setProductOfferEnabled" && request.method === "PATCH") return sendJson(response, 200, { ok: true, offer: await setProductOfferEnabled(body.slug, body.enabled === true, admin.email || admin.uid) });

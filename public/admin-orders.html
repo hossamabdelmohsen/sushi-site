@@ -125,6 +125,7 @@
                 <a href="#new-orders" data-admin-nav-section="new-orders"><i class="fa fa-bell-o" aria-hidden="true"></i><span data-i18n="adminUi.newOrders">New Orders</span><strong id="adminNeedsActionNavCount">0</strong></a>
                 <a href="#actioned-orders" data-admin-nav-section="actioned-orders"><i class="fa fa-check-circle-o" aria-hidden="true"></i><span data-i18n="adminUi.actionedOrders">Actioned Orders</span><strong id="adminActionedNavCount">0</strong></a>
                 <a href="#inventory" data-admin-nav-section="inventory"><i class="fa fa-cubes" aria-hidden="true"></i><span data-i18n="adminUi.inventory">Inventory</span></a>
+                <a href="#product-management" data-admin-nav-section="product-management"><i class="fa fa-tags" aria-hidden="true"></i><span data-i18n="adminUi.productManagement">Product Management</span></a>
                 <a href="#shipping" data-admin-nav-section="shipping"><i class="fa fa-truck" aria-hidden="true"></i><span data-i18n="adminUi.shippingSettings">Shipping Settings</span></a>
                 <a href="#promo-codes" data-admin-nav-section="promo-codes"><i class="fa fa-ticket" aria-hidden="true"></i><span data-i18n="adminUi.promoCodes">Promo Codes</span></a>
                 <a href="#product-offers" data-admin-nav-section="product-offers"><i class="fa fa-gift" aria-hidden="true"></i><span data-i18n="adminUi.productOffers">Product Offers</span></a>
@@ -227,6 +228,85 @@
 
                   <p id="adminInventoryEmpty" class="orders_item_empty" hidden data-i18n="adminUi.noMatchingProductsFound">No matching products found.</p>
                   <div id="adminInventoryList" class="admin_inventory_list"></div>
+                </section>
+
+                <section id="product-management" class="admin_dashboard_panel admin_product_drafts_panel" aria-label="Product Management" data-i18n-aria-label="adminUi.productManagement" data-admin-panel="product-management" hidden>
+                  <div class="admin_checkout_settings_head">
+                    <div>
+                      <span class="admin_orders_group_kicker" data-i18n="adminUi.draftCatalog">Draft catalog</span>
+                      <h2 data-i18n="adminUi.productManagement">Product Management</h2>
+                    </div>
+                    <button id="adminProductDraftRefreshBtn" class="admin_orders_refresh_btn" type="button" aria-label="Refresh product drafts" title="Refresh product drafts" data-i18n-aria-label="adminUi.refreshProductDrafts" data-i18n-title="adminUi.refreshProductDrafts">
+                      <i class="fa fa-refresh" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                  <p class="admin_product_drafts_note" data-i18n="adminUi.productDraftsNote">Draft only - not visible on storefront</p>
+
+                  <div class="admin_product_drafts_toolbar">
+                    <div class="admin_inventory_search_group">
+                      <span data-i18n="adminUi.searchProduct">Search product</span>
+                      <input id="adminProductDraftSearch" type="search" autocomplete="off" placeholder="Search by name, slug, category, or status" data-i18n-placeholder="adminUi.productDraftSearchPlaceholder">
+                    </div>
+                    <label class="admin_product_drafts_filter">
+                      <span data-i18n="adminUi.status">Status</span>
+                      <select id="adminProductDraftStatusFilter">
+                        <option value="all" data-i18n="adminUi.allDraftStatuses">All statuses</option>
+                        <option value="draft" data-i18n="adminUi.draftOnly">Draft only</option>
+                        <option value="archived" data-i18n="adminUi.archived">Archived</option>
+                      </select>
+                    </label>
+                    <strong id="adminProductDraftCount" class="admin_inventory_count">0 drafts</strong>
+                  </div>
+
+                  <div class="admin_product_drafts_grid">
+                    <form id="adminProductDraftForm" class="admin_product_drafts_form">
+                      <div class="admin_product_drafts_card_head">
+                        <div>
+                          <span data-i18n="adminUi.createOrEdit">Create or edit</span>
+                          <h3 id="adminProductDraftFormTitle" data-i18n="adminUi.createProductDraft">Create product draft</h3>
+                        </div>
+                        <p data-i18n="adminUi.productDraftDetailsHint">Save admin-only draft records. They do not appear on the storefront.</p>
+                      </div>
+                      <input id="adminProductDraftOriginalSlug" type="hidden">
+                      <div class="admin_product_drafts_fields">
+                        <label><span data-i18n="adminUi.slug">Slug</span><input id="adminProductDraftSlug" type="text" autocomplete="off" required></label>
+                        <label><span data-i18n="adminUi.name">Name</span><input id="adminProductDraftName" type="text" autocomplete="off" required></label>
+                        <label><span data-i18n="adminUi.nameArabic">Arabic name</span><input id="adminProductDraftNameAr" type="text" autocomplete="off"></label>
+                        <label><span data-i18n="adminUi.price">Price</span><input id="adminProductDraftPrice" type="number" min="0.01" step="0.01" required></label>
+                        <label><span data-i18n="adminUi.category">Category</span><input id="adminProductDraftCategory" type="text" list="adminProductDraftCategoryOptions" autocomplete="off" required></label>
+                        <label><span data-i18n="adminUi.filterGroup">Filter group</span><input id="adminProductDraftFilterGroup" type="text" autocomplete="off"></label>
+                        <label><span data-i18n="adminUi.sortOrder">Sort order</span><input id="adminProductDraftSortOrder" type="number" step="1"></label>
+                        <label><span data-i18n="adminUi.images">Images</span><textarea id="adminProductDraftImages" rows="3" placeholder="One image URL or path per line" data-i18n-placeholder="adminUi.imagesHint"></textarea></label>
+                        <label><span data-i18n="adminUi.searchKeywords">Search keywords</span><textarea id="adminProductDraftSearchKeywords" rows="3" placeholder="Comma or line separated keywords" data-i18n-placeholder="adminUi.searchKeywordsHint"></textarea></label>
+                        <label><span data-i18n="adminUi.description">Description</span><textarea id="adminProductDraftDescription" rows="4"></textarea></label>
+                        <label><span data-i18n="adminUi.descriptionArabic">Arabic description</span><textarea id="adminProductDraftDescriptionAr" rows="4"></textarea></label>
+                      </div>
+                      <datalist id="adminProductDraftCategoryOptions">
+                        <option value="Noodles / Ramen"></option>
+                        <option value="Sauces"></option>
+                        <option value="Frozen / Dumplings"></option>
+                        <option value="Sushi Essentials / Asian Ingredients"></option>
+                        <option value="Seafood"></option>
+                        <option value="Canned Food / Pantry"></option>
+                        <option value="Beverages"></option>
+                      </datalist>
+                      <div class="admin_product_drafts_actions">
+                        <button type="submit" class="admin_product_drafts_primary" data-i18n="adminUi.saveDraftProduct">Save draft</button>
+                        <button id="adminProductDraftResetBtn" type="button" class="admin_product_drafts_secondary" data-i18n="adminUi.newDraftProduct">New draft</button>
+                      </div>
+                    </form>
+
+                    <div class="admin_product_drafts_card admin_product_drafts_library">
+                      <div class="admin_product_drafts_card_head">
+                        <div>
+                          <span data-i18n="adminUi.draftProducts">Draft products</span>
+                          <h3 data-i18n="adminUi.productDraftLibrary">Draft library</h3>
+                        </div>
+                        <p data-i18n="adminUi.productDraftLibraryHint">Archived drafts stay hidden and can be reviewed later.</p>
+                      </div>
+                      <div id="adminProductDraftList" class="admin_product_drafts_list"></div>
+                    </div>
+                  </div>
                 </section>
 
                 <section id="shipping" class="admin_dashboard_panel admin_checkout_settings" aria-label="Shipping settings" data-i18n-aria-label="adminUi.shippingSettings" data-admin-panel="shipping" hidden>
