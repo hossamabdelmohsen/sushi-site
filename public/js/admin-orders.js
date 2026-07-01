@@ -29,7 +29,7 @@ const FILTER_LABELS = {
 const STATUS_VALUES = new Set(ORDER_STATUSES.map((status) => status.value));
 const NEEDS_ACTION_STATUSES = new Set(["pending"]);
 const ADMIN_SECTIONS = new Set(["overview", "new-orders", "actioned-orders", "inventory", "product-management", "shipping", "promo-codes", "product-offers"]);
-const ADMIN_PRODUCT_STATUSES = new Set(["draft", "archived"]);
+const ADMIN_PRODUCT_STATUSES = new Set(["draft", "published", "archived"]);
 
 let currentUser = null;
 let unsubscribeOrders = null;
@@ -816,13 +816,15 @@ function splitDraftList(value) {
 }
 
 function getProductDraftStatusLabel(status) {
-  return status === "archived"
-    ? getAdminText("archived", "Archived")
-    : getAdminText("draftOnly", "Draft only");
+  if (status === "archived") return getAdminText("archived", "Archived");
+  if (status === "published") return getAdminText("published", "Published");
+  return getAdminText("draftOnly", "Draft only");
 }
 
 function getProductDraftStatusClass(status) {
-  return status === "archived" ? "is_archived" : "is_draft";
+  if (status === "archived") return "is_archived";
+  if (status === "published") return "is_published";
+  return "is_draft";
 }
 
 function getProductDraftFormValues() {
@@ -931,12 +933,17 @@ function renderProductDrafts() {
           <div class="admin_product_drafts_meta">
             <b>${escapeHtml(formatPrice(Number(product.price) || 0))}</b>
             <span>${escapeHtml(getAdminText("imageCount", "{count} image(s)", { count: imageCount }))}</span>
-            <span>${escapeHtml(getAdminText("notVisibleOnStorefront", "Not visible on storefront"))}</span>
+            <span>${escapeHtml(status === "published" ? getAdminText("dynamicProductsNotConnected", "Dynamic products are prepared but not connected to the storefront yet.") : getAdminText("notVisibleOnStorefront", "Not visible on storefront"))}</span>
           </div>
         </div>
         <span class="admin_product_drafts_status ${escapeHtml(getProductDraftStatusClass(status))}">${escapeHtml(getProductDraftStatusLabel(status))}</span>
         <div class="admin_product_drafts_item_actions">
           <button type="button" data-admin-product-draft-edit="${escapeHtml(product.slug)}">${escapeHtml(getAdminText("edit", "Edit"))}</button>
+          ${status === "published"
+            ? `<button type="button" data-admin-product-unpublish="${escapeHtml(product.slug)}">${escapeHtml(getAdminText("unpublishProduct", "Unpublish"))}</button>`
+            : status === "draft"
+              ? `<button type="button" data-admin-product-publish="${escapeHtml(product.slug)}">${escapeHtml(getAdminText("publishProduct", "Publish"))}</button>`
+              : ""}
           <button type="button" data-admin-product-draft-archive="${escapeHtml(product.slug)}" ${status === "archived" ? "disabled" : ""}>${escapeHtml(getAdminText("archiveDraft", "Archive draft"))}</button>
         </div>
       </article>
@@ -1016,6 +1023,24 @@ async function archiveAdminProductDraft(slug) {
   const originalSlug = getElement("adminProductDraftOriginalSlug")?.value;
   if (originalSlug === slug) resetProductDraftForm();
   const message = getAdminText("draftProductArchived", "Product draft archived.");
+  setProductDraftStatus(message, "success");
+  emitToast(message, "success");
+}
+
+async function publishAdminProductDraft(slug) {
+  setProductDraftStatus(getAdminText("updating", "Updating..."), "info");
+  await adminProductDraftRequest("PATCH", "publishAdminProduct", { slug });
+  await fetchAdminProductDrafts();
+  const message = getAdminText("productPublished", "Product published successfully");
+  setProductDraftStatus(message, "success");
+  emitToast(message, "success");
+}
+
+async function unpublishAdminProductDraft(slug) {
+  setProductDraftStatus(getAdminText("updating", "Updating..."), "info");
+  await adminProductDraftRequest("PATCH", "unpublishAdminProduct", { slug });
+  await fetchAdminProductDrafts();
+  const message = getAdminText("productUnpublished", "Product unpublished successfully");
   setProductDraftStatus(message, "success");
   emitToast(message, "success");
 }
@@ -1719,6 +1744,30 @@ function bindDashboardEvents() {
         .catch((error) => {
           const message = error.message || getAdminText("productDraftCouldNotArchive", "Product draft could not be archived.");
           setProductDraftStatus(`${getAdminText("productDraftCouldNotArchive", "Product draft could not be archived.")}: ${message}`, "error");
+          emitToast(message, "error");
+        });
+      return;
+    }
+
+    const productPublish = event.target.closest("[data-admin-product-publish]");
+    if (productPublish) {
+      const slug = productPublish.getAttribute("data-admin-product-publish");
+      publishAdminProductDraft(slug)
+        .catch((error) => {
+          const message = error.message || getAdminText("productCouldNotPublish", "Product could not be published.");
+          setProductDraftStatus(`${getAdminText("failedToPublish", "Failed to publish")}: ${message}`, "error");
+          emitToast(message, "error");
+        });
+      return;
+    }
+
+    const productUnpublish = event.target.closest("[data-admin-product-unpublish]");
+    if (productUnpublish) {
+      const slug = productUnpublish.getAttribute("data-admin-product-unpublish");
+      unpublishAdminProductDraft(slug)
+        .catch((error) => {
+          const message = error.message || getAdminText("productCouldNotUnpublish", "Product could not be unpublished.");
+          setProductDraftStatus(`${getAdminText("failedToUnpublish", "Failed to unpublish")}: ${message}`, "error");
           emitToast(message, "error");
         });
       return;

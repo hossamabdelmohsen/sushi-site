@@ -4,6 +4,7 @@ const path = require("path");
 const vm = require("vm");
 const { saveOrderRecord } = require("../lib/server/order-storage.cjs");
 const { verifyFirebaseIdToken } = require("../lib/server/firebase-auth.cjs");
+const { listPublishedAdminProducts } = require("../lib/server/admin-products-storage.cjs");
 const {
   centsToAmount,
   getCheckoutSettings,
@@ -251,6 +252,39 @@ function getProductCatalogMap() {
   return catalogCache;
 }
 
+function isDynamicProductsEnabled() {
+  const value = String(process.env.SUSHI_ENABLE_DYNAMIC_PRODUCTS || "").trim().toLowerCase();
+  return value === "true" || value === "1";
+}
+
+function isSafeAdminProductSlug(value) {
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(String(value || ""));
+}
+
+async function getTrustedPaymentProductMap() {
+  const products = new Map(getProductCatalogMap());
+
+  if (!isDynamicProductsEnabled()) {
+    return products;
+  }
+
+  const publishedProducts = await listPublishedAdminProducts();
+  publishedProducts.forEach((product) => {
+    const productId = normalizeProductId(product.slug || product.id);
+    if (!productId || !isSafeAdminProductSlug(productId) || products.has(productId)) {
+      return;
+    }
+
+    products.set(productId, {
+      id: productId,
+      name: normalizeText(product.name || productId, 120),
+      price: Number(product.price) || 0
+    });
+  });
+
+  return products;
+}
+
 function validateCustomer(customer = {}, shippingRates = {}) {
   const cityId = normalizeProductId(customer.cityId);
   const cityName = shippingRates[cityId]?.cityName;
@@ -335,7 +369,7 @@ async function getOrderOwner(identity = {}) {
   };
 }
 
-function validateItems(cartItems, activeOffers = []) {
+async function validateItems(cartItems, activeOffers = []) {
   if (!Array.isArray(cartItems) || cartItems.length === 0) {
     throw createPaymentError("Your cart is empty.", {
       code: "empty_cart",
@@ -350,7 +384,7 @@ function validateItems(cartItems, activeOffers = []) {
     });
   }
 
-  const catalog = getProductCatalogMap();
+  const catalog = await getTrustedPaymentProductMap();
   const itemsById = new Map();
   const offersBySlug = new Map((activeOffers || []).map((offer) => [offer.slug, offer]));
 
@@ -873,7 +907,7 @@ module.exports = async function handler(request, response) {
 
     const paymentMethod = normalizePaymentMethod(body.paymentMethod);
     const activeOffers = await listActiveProductOffers();
-    const { items, amountCents: subtotalCents } = validateItems(body.items || body.cart || [], activeOffers);
+    const { items, amountCents: subtotalCents } = await validateItems(body.items || body.cart || [], activeOffers);
     const inventoryValidation = await validateInventoryForItems(items);
     if (!inventoryValidation.valid) {
       const firstIssue = inventoryValidation.issues[0] || {};
